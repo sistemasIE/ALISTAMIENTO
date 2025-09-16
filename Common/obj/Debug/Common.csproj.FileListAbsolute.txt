@@ -1,0 +1,12 @@
+C:\Users\Lenovo\source\repos\LECTURA-DE-BANDAA\Common\bin\Debug\Common.dll
+C:\Users\Lenovo\source\repos\LECTURA-DE-BANDAA\Common\bin\Debug\Common.pdb
+C:\Users\Lenovo\source\repos\LECTURA-DE-BANDAA\Common\obj\Debug\Common.csproj.AssemblyReference.cache
+C:\Users\Lenovo\source\repos\LECTURA-DE-BANDAA\Common\obj\Debug\Common.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\source\repos\LECTURA-DE-BANDAA\Common\obj\Debug\Common.dll
+C:\Users\Lenovo\source\repos\LECTURA-DE-BANDAA\Common\obj\Debug\Common.pdb
+C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\Common\bin\Debug\Common.dll
+C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\Common\bin\Debug\Common.pdb
+C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\Common\obj\Debug\Common.csproj.AssemblyReference.cache
+C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\Common\obj\Debug\Common.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\Common\obj\Debug\Common.dll
+C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\Common\obj\Debug\Common.pdb

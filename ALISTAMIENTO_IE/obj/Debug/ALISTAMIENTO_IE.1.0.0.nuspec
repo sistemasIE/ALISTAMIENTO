@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>ALISTAMIENTO_IE</id>
+    <version>1.0.0</version>
+    <authors>ALISTAMIENTO_IE</authors>
+    <description>Package Description</description>
+    <repository type="git" />
+    <dependencies>
+      <group targetFramework="net8.0-windows7.0">
+        <dependency id="Common" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.EntityFrameworkCore" version="9.0.8" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.EntityFrameworkCore.SqlServer" version="9.0.8" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkReferences>
+      <group targetFramework="net8.0-windows7.0">
+        <frameworkReference name="Microsoft.WindowsDesktop.App.WindowsForms" />
+      </group>
+    </frameworkReferences>
+  </metadata>
+  <files>
+    <file src="C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\ALISTAMIENTO_IE\bin\Debug\net8.0-windows\ALISTAMIENTO_IE.runtimeconfig.json" target="lib\net8.0-windows7.0\ALISTAMIENTO_IE.runtimeconfig.json" />
+    <file src="C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\ALISTAMIENTO_IE\bin\Debug\net8.0-windows\ALISTAMIENTO_IE.dll" target="lib\net8.0-windows7.0\ALISTAMIENTO_IE.dll" />
+  </files>
+</package>

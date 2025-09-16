@@ -1,0 +1,357 @@
+﻿using ALISTAMIENTO_IE.DTOs;
+using ALISTAMIENTO_IE.Services;
+using ALISTAMIENTO_IE.Utils;
+
+namespace ALISTAMIENTO_IE
+{
+    public partial class ALISTAR_CAMION : Form
+    {
+        private readonly AlistamientoService alistamientoService;
+        private readonly DetalleCamionXDiaService _detalleCamionXDiaService;
+        private readonly AlistamientoEtiquetaService _alistamientoEtiquetaService; // reporte
+        private List<CamionDetallesDTO> _camiones;
+        private readonly TimerTurnos _turnoTimerManager; // Manejador de Timer y Turnos
+        private readonly System.Windows.Forms.Timer _timer;
+        private System.Windows.Forms.Timer _cooldownTimer;
+        private bool _canClick;
+
+
+        public ALISTAR_CAMION()
+        {
+            InitializeComponent();
+
+            this.Icon = ALISTAMIENTO_IE.Properties.Resources.Icono;
+
+
+            _detalleCamionXDiaService = new DetalleCamionXDiaService();
+            alistamientoService = new AlistamientoService();
+            _alistamientoEtiquetaService = new AlistamientoEtiquetaService();
+            _turnoTimerManager = new TimerTurnos(this); // inicializar el timer
+
+
+            CargarUI();
+            lvwListasCamiones.DoubleClick += lvwListasCamiones_DoubleClick;
+            lvwListasCamiones.Click += lvwListasCamiones_DoubleClick;
+            btnAlistar.Visible = true;
+
+            // Timer para actualizar los camiones cada 5 minutos.
+            _timer = new System.Windows.Forms.Timer();
+            _timer.Interval = 5 * 60 * 1000;
+            _timer.Start();
+            _timer.Tick += Timer_Tick;
+
+            // Timer para recargar los camiones:
+            _cooldownTimer = new System.Windows.Forms.Timer();
+            _cooldownTimer.Interval = 5000; // 5 segundos
+            _cooldownTimer.Tick += (s, e) =>
+            {
+                _canClick = true;
+                RECARGAR.Enabled = true;
+                _cooldownTimer.Stop();
+            };
+
+
+            // Reportes: cargar al entrar en la pestaña y al cambiar fecha y turno
+            tabMain.SelectedIndexChanged += TabMain_SelectedIndexChanged;
+            dtpFechaReporte.ValueChanged += DtpFechaReporte_ValueChanged;
+            tbcTurnos.SelectedIndexChanged += TbcTurnos_SelectedIndexChanged;
+        }
+
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            CargarUI();
+        }
+
+
+        private void CargarUI()
+        {
+            CargarCamiones();
+        }
+
+
+        private async void TabMain_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (tabMain.SelectedTab == tabReportes)
+            {
+                // Al entrar a la pestaña de Reportes:
+                await CargarReportesYTotales();
+            }
+        }
+
+        private async void DtpFechaReporte_ValueChanged(object sender, EventArgs e)
+        {
+            // Al cambiar la fecha, cargar acorde al tab de turno seleccionado
+            if (tabMain.SelectedTab == tabReportes)
+            {
+                await CargarReportesYTotales();
+            }
+        }
+
+        private async void TbcTurnos_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (tabMain.SelectedTab == tabReportes)
+            {
+                // Al cambiar de turno dentro de la pestaña Reportes, cargar acorde al tab
+                await CargarReportesYTotales();
+            }
+        }
+
+        private async Task CargarReportesYTotales()
+        {
+            // Primero, determinar el filtro de turno
+            string? turnoLike = null;
+            if (tbcTurnos.SelectedTab == tabTurno1)
+            {
+                turnoLike = "%TURNO1%";
+            }
+            else if (tbcTurnos.SelectedTab == tabTurno2)
+            {
+                turnoLike = "%TURNO2%";
+            }
+            else if (tbcTurnos.SelectedTab == tabTurno3)
+            {
+                turnoLike = "%TURNO3%";
+            }
+            // Si el tab es "TOTAL", turnoLike se mantiene en null, lo cual es correcto
+
+            try
+            {
+                // Llamar al método para obtener los totales de pacas y camiones.
+                var totales = await _alistamientoEtiquetaService.ObtenerTotalesReporte(dtpFechaReporte.Value, turnoLike);
+                if (totales != null)
+                {
+                    lblUnidadesPacas.Text = totales.TotalPacas.ToString();
+                    lblCamionesNumero.Text = totales.TotalCamiones.ToString();
+                }
+                else
+                {
+                    // Si no hay datos, mostrar 0
+                    lblUnidadesPacas.Text = "0";
+                    lblCamionesNumero.Text = "0";
+                }
+
+                // Ahora, cargar el reporte detallado para el DataGridView
+                IEnumerable<dynamic> data;
+                if (turnoLike == null)
+                {
+                    // Cargar reporte para el tab "TOTAL"
+                    data = await _alistamientoEtiquetaService.ObtenerReportePacasPorHora(dtpFechaReporte.Value);
+                }
+                else
+                {
+                    // Cargar reporte para un turno específico
+                    data = await _alistamientoEtiquetaService.ObtenerReportePacasPorHoraPorTurno(dtpFechaReporte.Value, turnoLike);
+                }
+
+                dgvResumen.DataSource = DataGridViewExporter.ConvertDynamicToDataTable(data);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error cargando reporte: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        private void CargarCamiones()
+        {
+
+            List<CamionEnAlistamientoDTO> _camiones = alistamientoService.ObtenerCamionesEnAlistamiento().ToList();
+            lvwListasCamiones.Items.Clear();
+            foreach (CamionEnAlistamientoDTO camion in _camiones)
+            {
+                ListViewItem item = new ListViewItem(new[]
+                {
+                    camion.Placas,
+                    camion.Fecha.ToString("yyyy-MM-dd"),
+                    camion.CantTotalPedido.ToString(),
+                    camion.EstadoAlistamiento // Agregar el estado del alistamiento
+                });
+                // Guarda el CodCamion en Tag para fácil acceso
+                item.Tag = camion.CodCamion;
+
+                // Colorear las filas según el estado del alistamiento para mejor visualización
+                switch (camion.EstadoAlistamiento)
+                {
+                    case "ALISTADO_INCOMPLETO":
+                        item.BackColor = Color.Orange;
+                        item.ForeColor = Color.White;
+                        break;
+                    case "SIN_ALISTAR":
+                        item.BackColor = Color.LightGray;
+                        break;
+                    case "EN_PROCESO":
+                        item.BackColor = Color.LightBlue;
+                        break;
+                    case "ALISTADO":
+                        item.BackColor = Color.LightGreen;
+                        break;
+                    case "ANULADO":
+                        item.BackColor = Color.LightCoral;
+                        break;
+                }
+
+                lvwListasCamiones.Items.Add(item);
+            }
+        }
+
+        private void lvwListasCamiones_DoubleClick(object sender, EventArgs e)
+        {
+            if (lvwListasCamiones.SelectedItems.Count == 0)
+            {
+                dgvItems.DataSource = null;
+                return;
+            }
+
+
+
+
+
+            ListViewItem selectedItem = lvwListasCamiones.SelectedItems[0];
+
+            // Recuperar el CodCamion que se guardó en el Tag
+            int codCamion = selectedItem.Tag is int tag ? tag : 0;
+
+            // Recuperar los valores de cada columna (SubItems)
+            string placas = selectedItem.SubItems[0].Text;     // Placas
+            string fechaTexto = selectedItem.SubItems[1].Text; // Fecha en texto
+
+            // Convertir a DateTime de forma segura
+            DateTime fecha;
+            if (!DateTime.TryParseExact(fechaTexto, "yyyy-MM-dd",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out fecha))
+            {
+                MessageBox.Show("La fecha seleccionada no es válida.");
+                return;
+            }
+
+            if (codCamion > 0)
+            {
+                MostrarItemsDeCamion(codCamion);
+                btnAlistar.Visible = true;
+
+                lblTituloCamion.Text = $"CAMIÓN - {placas}";
+                lblFechaValor.Text = fecha.ToString("dd/MM/yyyy"); // lo muestras en formato lindo
+            }
+        }
+
+
+
+
+
+        private void MostrarItemsDeCamion(int codCamion)
+        {
+            List<ItemsDetalleDTO> items = new List<ItemsDetalleDTO>(alistamientoService.ObtenerItemsPorAlistarCamion(codCamion));
+            dgvItems.DataSource = items;
+            if (dgvItems.Columns.Count > 0)
+            {
+                dgvItems.Columns["Item"].HeaderText = "ITEM";
+                dgvItems.Columns["Descripcion"].HeaderText = "Descripción";
+                dgvItems.Columns["CantidadPlanificada"].HeaderText = "Cantidad";
+            }
+        }
+
+        private int? GetSelectedCamionId()
+        {
+            if (lvwListasCamiones.SelectedItems.Count == 0)
+                return null;
+            var selectedItem = lvwListasCamiones.SelectedItems[0];
+            return selectedItem.Tag is int codCamion ? codCamion : (int?)null;
+        }
+
+        private void btnAlistar_Click(object sender, EventArgs e)
+        {
+            int? codCamion = GetSelectedCamionId();
+            if (codCamion == null || codCamion <= 0)
+            {
+                MessageBox.Show("Seleccione un camión para alistar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Obtener el estado actual del camión seleccionado
+            string estadoActual = GetSelectedCamionEstado();
+
+            // Validar que el estado permita el alistamiento
+            if (estadoActual == "EN_PROCESO")
+            {
+                MessageBox.Show("Este camión ya tiene un alistamiento en proceso. No se puede iniciar un nuevo alistamiento.",
+                              "Estado No Válido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (estadoActual == "ALISTADO")
+            {
+                MessageBox.Show("Este camión ya ha sido alistado completamente. No se puede volver a alistar.",
+                              "Estado No Válido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (estadoActual == "ANULADO")
+            {
+                MessageBox.Show("Este camión tiene un alistamiento anulado. No se puede alistar.",
+                              "Estado No Válido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Solo permitir alistamiento para estados: SIN_ALISTAR y ALISTADO_INCOMPLETO
+            if (estadoActual != "SIN_ALISTAR" && estadoActual != "ALISTADO_INCOMPLETO")
+            {
+                MessageBox.Show($"No se puede alistar un camión con estado '{estadoActual}'.",
+                              "Estado No Válido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Si llegamos aquí, el estado es válido para alistamiento
+            string mensaje = estadoActual == "ALISTADO_INCOMPLETO"
+                ? "Este camión tiene un alistamiento incompleto. ¿Desea CONTINUAR con el alistamiento?"
+                : "¿Desea INICIAR el alistamiento de este camión?";
+
+            var result = MessageBox.Show(mensaje, "Confirmar Alistamiento",
+                                        MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+
+            if (result == DialogResult.Yes)
+            {
+                // IMPORTANTE: Pasar el estado original para que ALISTAMIENTO sepa cómo manejarlo
+                // pero el formulario ALISTAMIENTO se encargará de cambiar el estado a EN_PROCESO internamente
+                var alistamientoForm = new ALISTAMIENTO(codCamion.Value, estadoActual);
+                alistamientoForm.ShowDialog(this);
+
+                // Recargar los camiones después de cerrar el formulario para reflejar cambios
+                CargarCamiones();
+            }
+        }
+
+        /// <summary>
+        /// Obtiene el estado del alistamiento del camión seleccionado
+        /// </summary>
+        /// <returns>Estado del alistamiento del camión seleccionado</returns>
+        private string GetSelectedCamionEstado()
+        {
+            if (lvwListasCamiones.SelectedItems.Count == 0)
+                return string.Empty;
+
+            var selectedItem = lvwListasCamiones.SelectedItems[0];
+            // El estado está en la columna 3 (índice 3) del ListView
+            return selectedItem.SubItems.Count > 3 ? selectedItem.SubItems[3].Text : string.Empty;
+        }
+
+        private void ALISTAR_CAMION_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _turnoTimerManager.Stop();
+        }
+
+        private void RECARGAR_Click(object sender, EventArgs e)
+        {
+            if (!_canClick) return;  // Ignora si está en cooldown
+
+            _canClick = false;
+            RECARGAR.Enabled = false;
+
+            CargarUI();
+
+            // Inicia el cooldown
+            _cooldownTimer.Start();
+        }
+    }
+}

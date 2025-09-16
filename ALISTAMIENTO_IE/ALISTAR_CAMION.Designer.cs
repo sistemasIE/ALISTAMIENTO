@@ -1,0 +1,750 @@
+﻿namespace ALISTAMIENTO_IE
+{
+    partial class ALISTAR_CAMION
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            Button RECARGAR;
+            tabMain = new TabControl();
+            tabAlistar = new TabPage();
+            splMain = new SplitContainer();
+            tlpLeft = new TableLayoutPanel();
+            lblListasTitulo = new Label();
+            lvwListasCamiones = new ListView();
+            colPlaca = new ColumnHeader();
+            colFecha = new ColumnHeader();
+            colCantidad = new ColumnHeader();
+            grpDetalleCamion = new GroupBox();
+            tlpRight = new TableLayoutPanel();
+            lblFechaTitulo = new Label();
+            lblFechaValor = new Label();
+            lblItemsTitulo = new Label();
+            dgvItems = new DataGridView();
+            lblTituloCamion = new Label();
+            tableLayoutPanel1 = new TableLayoutPanel();
+            btnAlistar = new Button();
+            tabReportes = new TabPage();
+            tlpReportes = new TableLayoutPanel();
+            tlpFiltros = new TableLayoutPanel();
+            lblEscogeFecha = new Label();
+            grpFecha = new GroupBox();
+            tlpFecha = new TableLayoutPanel();
+            dtpFechaReporte = new DateTimePicker();
+            lblFechaTituloRpt = new Label();
+            tlpResumenHost = new TableLayoutPanel();
+            tbcTurnos = new TabControl();
+            tabTotal = new TabPage();
+            tabTurno1 = new TabPage();
+            tabTurno2 = new TabPage();
+            tabTurno3 = new TabPage();
+            grpResumen = new GroupBox();
+            tlpResumen = new TableLayoutPanel();
+            dgvResumen = new DataGridView();
+            pnlKpis = new Panel();
+            lblCamionesTexto = new Label();
+            lblCamionesNumero = new Label();
+            lblUnidadesTexto = new Label();
+            lblUnidadesPacas = new Label();
+            dgvMovimientos = new DataGridView();
+            RECARGAR = new Button();
+            tabMain.SuspendLayout();
+            tabAlistar.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splMain).BeginInit();
+            splMain.Panel1.SuspendLayout();
+            splMain.Panel2.SuspendLayout();
+            splMain.SuspendLayout();
+            tlpLeft.SuspendLayout();
+            grpDetalleCamion.SuspendLayout();
+            tlpRight.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvItems).BeginInit();
+            tableLayoutPanel1.SuspendLayout();
+            tabReportes.SuspendLayout();
+            tlpReportes.SuspendLayout();
+            tlpFiltros.SuspendLayout();
+            grpFecha.SuspendLayout();
+            tlpFecha.SuspendLayout();
+            tlpResumenHost.SuspendLayout();
+            tbcTurnos.SuspendLayout();
+            grpResumen.SuspendLayout();
+            tlpResumen.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvResumen).BeginInit();
+            pnlKpis.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvMovimientos).BeginInit();
+            SuspendLayout();
+            // 
+            // RECARGAR
+            // 
+            RECARGAR.Dock = DockStyle.Fill;
+            RECARGAR.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
+            RECARGAR.Location = new Point(215, 3);
+            RECARGAR.Name = "RECARGAR";
+            RECARGAR.Size = new Size(206, 36);
+            RECARGAR.TabIndex = 6;
+            RECARGAR.Text = "⟳ Recargar";
+            RECARGAR.UseVisualStyleBackColor = true;
+            RECARGAR.Click += RECARGAR_Click;
+            // 
+            // tabMain
+            // 
+            tabMain.Controls.Add(tabAlistar);
+            tabMain.Controls.Add(tabReportes);
+            tabMain.Dock = DockStyle.Fill;
+            tabMain.Location = new Point(0, 0);
+            tabMain.Margin = new Padding(2);
+            tabMain.Name = "tabMain";
+            tabMain.SelectedIndex = 0;
+            tabMain.Size = new Size(958, 516);
+            tabMain.TabIndex = 0;
+            // 
+            // tabAlistar
+            // 
+            tabAlistar.Controls.Add(splMain);
+            tabAlistar.Location = new Point(4, 30);
+            tabAlistar.Margin = new Padding(2);
+            tabAlistar.Name = "tabAlistar";
+            tabAlistar.Padding = new Padding(6);
+            tabAlistar.Size = new Size(950, 482);
+            tabAlistar.TabIndex = 0;
+            tabAlistar.Text = "Alistar";
+            tabAlistar.UseVisualStyleBackColor = true;
+            // 
+            // splMain
+            // 
+            splMain.Dock = DockStyle.Fill;
+            splMain.Location = new Point(6, 6);
+            splMain.Margin = new Padding(2);
+            splMain.Name = "splMain";
+            // 
+            // splMain.Panel1
+            // 
+            splMain.Panel1.Controls.Add(tlpLeft);
+            splMain.Panel1.Padding = new Padding(6);
+            // 
+            // splMain.Panel2
+            // 
+            splMain.Panel2.Controls.Add(grpDetalleCamion);
+            splMain.Panel2.Padding = new Padding(6);
+            splMain.Size = new Size(938, 470);
+            splMain.SplitterDistance = 412;
+            splMain.SplitterWidth = 3;
+            splMain.TabIndex = 0;
+            // 
+            // tlpLeft
+            // 
+            tlpLeft.ColumnCount = 1;
+            tlpLeft.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 253F));
+            tlpLeft.Controls.Add(lblListasTitulo, 0, 0);
+            tlpLeft.Controls.Add(lvwListasCamiones, 0, 1);
+            tlpLeft.Dock = DockStyle.Fill;
+            tlpLeft.Location = new Point(6, 6);
+            tlpLeft.Margin = new Padding(2);
+            tlpLeft.Name = "tlpLeft";
+            tlpLeft.RowCount = 2;
+            tlpLeft.RowStyles.Add(new RowStyle());
+            tlpLeft.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tlpLeft.RowStyles.Add(new RowStyle(SizeType.Absolute, 16F));
+            tlpLeft.Size = new Size(400, 458);
+            tlpLeft.TabIndex = 0;
+            // 
+            // lblListasTitulo
+            // 
+            lblListasTitulo.AutoSize = true;
+            lblListasTitulo.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            lblListasTitulo.Location = new Point(0, 0);
+            lblListasTitulo.Margin = new Padding(0, 0, 0, 5);
+            lblListasTitulo.Name = "lblListasTitulo";
+            lblListasTitulo.Size = new Size(154, 21);
+            lblListasTitulo.TabIndex = 0;
+            lblListasTitulo.Text = "Listas de Camiones";
+            // 
+            // lvwListasCamiones
+            // 
+            lvwListasCamiones.Columns.AddRange(new ColumnHeader[] { colPlaca, colFecha, colCantidad });
+            lvwListasCamiones.Dock = DockStyle.Fill;
+            lvwListasCamiones.FullRowSelect = true;
+            lvwListasCamiones.Location = new Point(2, 28);
+            lvwListasCamiones.Margin = new Padding(2);
+            lvwListasCamiones.MultiSelect = false;
+            lvwListasCamiones.Name = "lvwListasCamiones";
+            lvwListasCamiones.Size = new Size(396, 428);
+            lvwListasCamiones.TabIndex = 0;
+            lvwListasCamiones.UseCompatibleStateImageBehavior = false;
+            lvwListasCamiones.View = View.Details;
+            // 
+            // colPlaca
+            // 
+            colPlaca.Text = "Placa";
+            colPlaca.Width = 90;
+            // 
+            // colFecha
+            // 
+            colFecha.Text = "Fecha";
+            colFecha.Width = 110;
+            // 
+            // colCantidad
+            // 
+            colCantidad.Text = "Cantidad";
+            colCantidad.Width = 90;
+            // 
+            // grpDetalleCamion
+            // 
+            grpDetalleCamion.Controls.Add(tlpRight);
+            grpDetalleCamion.Controls.Add(tableLayoutPanel1);
+            grpDetalleCamion.Dock = DockStyle.Fill;
+            grpDetalleCamion.Location = new Point(6, 6);
+            grpDetalleCamion.Margin = new Padding(2);
+            grpDetalleCamion.Name = "grpDetalleCamion";
+            grpDetalleCamion.Padding = new Padding(8);
+            grpDetalleCamion.Size = new Size(511, 458);
+            grpDetalleCamion.TabIndex = 0;
+            grpDetalleCamion.TabStop = false;
+            grpDetalleCamion.Text = "Escoger Camión";
+            // 
+            // tlpRight
+            // 
+            tlpRight.ColumnCount = 1;
+            tlpRight.ColumnStyles.Add(new ColumnStyle());
+            tlpRight.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tlpRight.Controls.Add(lblFechaTitulo, 0, 1);
+            tlpRight.Controls.Add(lblFechaValor, 1, 1);
+            tlpRight.Controls.Add(lblItemsTitulo, 0, 2);
+            tlpRight.Controls.Add(dgvItems, 0, 3);
+            tlpRight.Controls.Add(lblTituloCamion, 1, 0);
+            tlpRight.Dock = DockStyle.Top;
+            tlpRight.Location = new Point(8, 30);
+            tlpRight.Margin = new Padding(2);
+            tlpRight.Name = "tlpRight";
+            tlpRight.RowCount = 5;
+            tlpRight.RowStyles.Add(new RowStyle());
+            tlpRight.RowStyles.Add(new RowStyle());
+            tlpRight.RowStyles.Add(new RowStyle());
+            tlpRight.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tlpRight.RowStyles.Add(new RowStyle());
+            tlpRight.RowStyles.Add(new RowStyle(SizeType.Absolute, 16F));
+            tlpRight.Size = new Size(495, 362);
+            tlpRight.TabIndex = 0;
+            // 
+            // lblFechaTitulo
+            // 
+            lblFechaTitulo.AutoSize = true;
+            lblFechaTitulo.Font = new Font("Segoe UI", 10F);
+            lblFechaTitulo.Location = new Point(0, 35);
+            lblFechaTitulo.Margin = new Padding(0, 0, 5, 5);
+            lblFechaTitulo.Name = "lblFechaTitulo";
+            lblFechaTitulo.Size = new Size(47, 19);
+            lblFechaTitulo.TabIndex = 1;
+            lblFechaTitulo.Text = "Fecha:";
+            // 
+            // lblFechaValor
+            // 
+            lblFechaValor.AutoSize = true;
+            lblFechaValor.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblFechaValor.Location = new Point(0, 59);
+            lblFechaValor.Margin = new Padding(0, 0, 0, 5);
+            lblFechaValor.Name = "lblFechaValor";
+            lblFechaValor.Size = new Size(69, 19);
+            lblFechaValor.TabIndex = 2;
+            lblFechaValor.Text = "--/--/----";
+            // 
+            // lblItemsTitulo
+            // 
+            lblItemsTitulo.AutoSize = true;
+            tlpRight.SetColumnSpan(lblItemsTitulo, 2);
+            lblItemsTitulo.Font = new Font("Segoe UI", 10F);
+            lblItemsTitulo.Location = new Point(0, 88);
+            lblItemsTitulo.Margin = new Padding(0, 5, 0, 5);
+            lblItemsTitulo.Name = "lblItemsTitulo";
+            lblItemsTitulo.Size = new Size(97, 19);
+            lblItemsTitulo.TabIndex = 3;
+            lblItemsTitulo.Text = "Lista de Items:";
+            // 
+            // dgvItems
+            // 
+            dgvItems.AllowUserToAddRows = false;
+            dgvItems.AllowUserToDeleteRows = false;
+            dgvItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvItems.BackgroundColor = SystemColors.Window;
+            dgvItems.ColumnHeadersHeight = 29;
+            tlpRight.SetColumnSpan(dgvItems, 2);
+            dgvItems.Dock = DockStyle.Top;
+            dgvItems.Location = new Point(2, 137);
+            dgvItems.Margin = new Padding(2);
+            dgvItems.Name = "dgvItems";
+            dgvItems.ReadOnly = true;
+            dgvItems.RowHeadersVisible = false;
+            dgvItems.RowHeadersWidth = 51;
+            dgvItems.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvItems.Size = new Size(491, 223);
+            dgvItems.TabIndex = 4;
+            // 
+            // lblTituloCamion
+            // 
+            lblTituloCamion.AutoSize = true;
+            tlpRight.SetColumnSpan(lblTituloCamion, 2);
+            lblTituloCamion.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+            lblTituloCamion.Location = new Point(0, 0);
+            lblTituloCamion.Margin = new Padding(0, 0, 0, 5);
+            lblTituloCamion.Name = "lblTituloCamion";
+            lblTituloCamion.Size = new Size(119, 30);
+            lblTituloCamion.TabIndex = 0;
+            lblTituloCamion.Text = "CAMIÓN -";
+            // 
+            // tableLayoutPanel1
+            // 
+            tableLayoutPanel1.ColumnCount = 2;
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel1.Controls.Add(RECARGAR, 1, 0);
+            tableLayoutPanel1.Controls.Add(btnAlistar, 0, 0);
+            tableLayoutPanel1.GrowStyle = TableLayoutPanelGrowStyle.AddColumns;
+            tableLayoutPanel1.Location = new Point(39, 413);
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            tableLayoutPanel1.RowCount = 1;
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel1.Size = new Size(424, 42);
+            tableLayoutPanel1.TabIndex = 7;
+            // 
+            // btnAlistar
+            // 
+            btnAlistar.AutoSize = true;
+            btnAlistar.BackColor = Color.FromArgb(198, 239, 206);
+            btnAlistar.Cursor = Cursors.Hand;
+            btnAlistar.Dock = DockStyle.Fill;
+            btnAlistar.FlatAppearance.BorderColor = Color.FromArgb(155, 187, 89);
+            btnAlistar.FlatStyle = FlatStyle.Flat;
+            btnAlistar.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
+            btnAlistar.Location = new Point(2, 2);
+            btnAlistar.Margin = new Padding(2);
+            btnAlistar.Name = "btnAlistar";
+            btnAlistar.Padding = new Padding(10, 5, 10, 5);
+            btnAlistar.Size = new Size(208, 38);
+            btnAlistar.TabIndex = 5;
+            btnAlistar.Text = "ALISTAR";
+            btnAlistar.UseVisualStyleBackColor = false;
+            btnAlistar.Visible = false;
+            btnAlistar.Click += btnAlistar_Click;
+            // 
+            // tabReportes
+            // 
+            tabReportes.Controls.Add(tlpReportes);
+            tabReportes.Location = new Point(4, 30);
+            tabReportes.Margin = new Padding(2);
+            tabReportes.Name = "tabReportes";
+            tabReportes.Padding = new Padding(6);
+            tabReportes.Size = new Size(950, 482);
+            tabReportes.TabIndex = 1;
+            tabReportes.Text = "Reportes";
+            tabReportes.UseVisualStyleBackColor = true;
+            // 
+            // tlpReportes
+            // 
+            tlpReportes.ColumnCount = 2;
+            tlpReportes.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 224F));
+            tlpReportes.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tlpReportes.Controls.Add(tlpFiltros, 0, 0);
+            tlpReportes.Controls.Add(tlpResumenHost, 1, 0);
+            tlpReportes.Dock = DockStyle.Fill;
+            tlpReportes.Location = new Point(6, 6);
+            tlpReportes.Margin = new Padding(2);
+            tlpReportes.Name = "tlpReportes";
+            tlpReportes.RowCount = 1;
+            tlpReportes.RowStyles.Add(new RowStyle(SizeType.Absolute, 16F));
+            tlpReportes.Size = new Size(938, 470);
+            tlpReportes.TabIndex = 0;
+            // 
+            // tlpFiltros
+            // 
+            tlpFiltros.ColumnCount = 1;
+            tlpFiltros.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 206F));
+            tlpFiltros.Controls.Add(lblEscogeFecha, 0, 0);
+            tlpFiltros.Controls.Add(grpFecha, 0, 1);
+            tlpFiltros.Dock = DockStyle.Fill;
+            tlpFiltros.Location = new Point(2, 2);
+            tlpFiltros.Margin = new Padding(2);
+            tlpFiltros.Name = "tlpFiltros";
+            tlpFiltros.Padding = new Padding(6);
+            tlpFiltros.RowCount = 6;
+            tlpFiltros.RowStyles.Add(new RowStyle());
+            tlpFiltros.RowStyles.Add(new RowStyle());
+            tlpFiltros.RowStyles.Add(new RowStyle());
+            tlpFiltros.RowStyles.Add(new RowStyle());
+            tlpFiltros.RowStyles.Add(new RowStyle());
+            tlpFiltros.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tlpFiltros.Size = new Size(220, 466);
+            tlpFiltros.TabIndex = 0;
+            // 
+            // lblEscogeFecha
+            // 
+            lblEscogeFecha.AutoSize = true;
+            lblEscogeFecha.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            lblEscogeFecha.Location = new Point(6, 6);
+            lblEscogeFecha.Margin = new Padding(0, 0, 0, 6);
+            lblEscogeFecha.Name = "lblEscogeFecha";
+            lblEscogeFecha.Size = new Size(129, 21);
+            lblEscogeFecha.TabIndex = 0;
+            lblEscogeFecha.Text = "Escoge la Fecha";
+            // 
+            // grpFecha
+            // 
+            grpFecha.Controls.Add(tlpFecha);
+            grpFecha.Dock = DockStyle.Top;
+            grpFecha.Location = new Point(8, 35);
+            grpFecha.Margin = new Padding(2);
+            grpFecha.Name = "grpFecha";
+            grpFecha.Padding = new Padding(6);
+            grpFecha.Size = new Size(204, 360);
+            grpFecha.TabIndex = 1;
+            grpFecha.TabStop = false;
+            // 
+            // tlpFecha
+            // 
+            tlpFecha.ColumnCount = 1;
+            tlpFecha.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 189F));
+            tlpFecha.Controls.Add(dtpFechaReporte, 0, 1);
+            tlpFecha.Controls.Add(lblFechaTituloRpt, 0, 0);
+            tlpFecha.Dock = DockStyle.Fill;
+            tlpFecha.Location = new Point(6, 28);
+            tlpFecha.Margin = new Padding(2);
+            tlpFecha.Name = "tlpFecha";
+            tlpFecha.RowCount = 2;
+            tlpFecha.RowStyles.Add(new RowStyle());
+            tlpFecha.RowStyles.Add(new RowStyle());
+            tlpFecha.Size = new Size(192, 326);
+            tlpFecha.TabIndex = 0;
+            // 
+            // dtpFechaReporte
+            // 
+            dtpFechaReporte.CustomFormat = "dd/MM/yyyy";
+            dtpFechaReporte.Dock = DockStyle.Top;
+            dtpFechaReporte.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            dtpFechaReporte.Format = DateTimePickerFormat.Custom;
+            dtpFechaReporte.Location = new Point(2, 27);
+            dtpFechaReporte.Margin = new Padding(2);
+            dtpFechaReporte.Name = "dtpFechaReporte";
+            dtpFechaReporte.Size = new Size(188, 29);
+            dtpFechaReporte.TabIndex = 1;
+            // 
+            // lblFechaTituloRpt
+            // 
+            lblFechaTituloRpt.AutoSize = true;
+            lblFechaTituloRpt.Font = new Font("Segoe UI", 11F);
+            lblFechaTituloRpt.Location = new Point(0, 0);
+            lblFechaTituloRpt.Margin = new Padding(0, 0, 0, 5);
+            lblFechaTituloRpt.Name = "lblFechaTituloRpt";
+            lblFechaTituloRpt.Size = new Size(50, 20);
+            lblFechaTituloRpt.TabIndex = 0;
+            lblFechaTituloRpt.Text = "Fecha:";
+            // 
+            // tlpResumenHost
+            // 
+            tlpResumenHost.ColumnCount = 1;
+            tlpResumenHost.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 16F));
+            tlpResumenHost.Controls.Add(tbcTurnos, 0, 0);
+            tlpResumenHost.Controls.Add(grpResumen, 0, 1);
+            tlpResumenHost.Dock = DockStyle.Fill;
+            tlpResumenHost.Location = new Point(226, 2);
+            tlpResumenHost.Margin = new Padding(2);
+            tlpResumenHost.Name = "tlpResumenHost";
+            tlpResumenHost.RowCount = 2;
+            tlpResumenHost.RowStyles.Add(new RowStyle());
+            tlpResumenHost.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tlpResumenHost.Size = new Size(710, 466);
+            tlpResumenHost.TabIndex = 1;
+            // 
+            // tbcTurnos
+            // 
+            tbcTurnos.Controls.Add(tabTotal);
+            tbcTurnos.Controls.Add(tabTurno1);
+            tbcTurnos.Controls.Add(tabTurno2);
+            tbcTurnos.Controls.Add(tabTurno3);
+            tbcTurnos.Dock = DockStyle.Fill;
+            tbcTurnos.ItemSize = new Size(100, 28);
+            tbcTurnos.Location = new Point(2, 2);
+            tbcTurnos.Margin = new Padding(2);
+            tbcTurnos.Name = "tbcTurnos";
+            tbcTurnos.SelectedIndex = 0;
+            tbcTurnos.Size = new Size(706, 80);
+            tbcTurnos.SizeMode = TabSizeMode.Fixed;
+            tbcTurnos.TabIndex = 0;
+            // 
+            // tabTotal
+            // 
+            tabTotal.Location = new Point(4, 32);
+            tabTotal.Margin = new Padding(2);
+            tabTotal.Name = "tabTotal";
+            tabTotal.Size = new Size(698, 44);
+            tabTotal.TabIndex = 0;
+            tabTotal.Text = "TOTAL";
+            tabTotal.UseVisualStyleBackColor = true;
+            // 
+            // tabTurno1
+            // 
+            tabTurno1.Location = new Point(4, 32);
+            tabTurno1.Margin = new Padding(2);
+            tabTurno1.Name = "tabTurno1";
+            tabTurno1.Size = new Size(698, 44);
+            tabTurno1.TabIndex = 1;
+            tabTurno1.Text = "TURNO1";
+            tabTurno1.UseVisualStyleBackColor = true;
+            // 
+            // tabTurno2
+            // 
+            tabTurno2.Location = new Point(4, 32);
+            tabTurno2.Margin = new Padding(2);
+            tabTurno2.Name = "tabTurno2";
+            tabTurno2.Size = new Size(698, 44);
+            tabTurno2.TabIndex = 2;
+            tabTurno2.Text = "TURNO2";
+            tabTurno2.UseVisualStyleBackColor = true;
+            // 
+            // tabTurno3
+            // 
+            tabTurno3.Location = new Point(4, 32);
+            tabTurno3.Margin = new Padding(2);
+            tabTurno3.Name = "tabTurno3";
+            tabTurno3.Size = new Size(698, 44);
+            tabTurno3.TabIndex = 3;
+            tabTurno3.Text = "TURNO3";
+            tabTurno3.UseVisualStyleBackColor = true;
+            // 
+            // grpResumen
+            // 
+            grpResumen.Controls.Add(tlpResumen);
+            grpResumen.Dock = DockStyle.Fill;
+            grpResumen.Location = new Point(2, 86);
+            grpResumen.Margin = new Padding(2);
+            grpResumen.Name = "grpResumen";
+            grpResumen.Padding = new Padding(6);
+            grpResumen.Size = new Size(706, 378);
+            grpResumen.TabIndex = 1;
+            grpResumen.TabStop = false;
+            // 
+            // tlpResumen
+            // 
+            tlpResumen.ColumnCount = 2;
+            tlpResumen.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70F));
+            tlpResumen.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
+            tlpResumen.Controls.Add(dgvResumen, 0, 0);
+            tlpResumen.Controls.Add(pnlKpis, 1, 0);
+            tlpResumen.Controls.Add(dgvMovimientos, 0, 1);
+            tlpResumen.Dock = DockStyle.Fill;
+            tlpResumen.Location = new Point(6, 28);
+            tlpResumen.Margin = new Padding(2);
+            tlpResumen.Name = "tlpResumen";
+            tlpResumen.RowCount = 2;
+            tlpResumen.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
+            tlpResumen.RowStyles.Add(new RowStyle(SizeType.Percent, 45F));
+            tlpResumen.Size = new Size(694, 344);
+            tlpResumen.TabIndex = 0;
+            // 
+            // dgvResumen
+            // 
+            dgvResumen.AllowUserToAddRows = false;
+            dgvResumen.AllowUserToDeleteRows = false;
+            dgvResumen.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvResumen.BackgroundColor = SystemColors.Window;
+            dgvResumen.ColumnHeadersHeight = 29;
+            dgvResumen.Dock = DockStyle.Fill;
+            dgvResumen.Location = new Point(2, 2);
+            dgvResumen.Margin = new Padding(2);
+            dgvResumen.Name = "dgvResumen";
+            dgvResumen.ReadOnly = true;
+            dgvResumen.RowHeadersVisible = false;
+            dgvResumen.RowHeadersWidth = 51;
+            dgvResumen.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvResumen.Size = new Size(481, 185);
+            dgvResumen.TabIndex = 0;
+            // 
+            // pnlKpis
+            // 
+            pnlKpis.Controls.Add(lblCamionesTexto);
+            pnlKpis.Controls.Add(lblCamionesNumero);
+            pnlKpis.Controls.Add(lblUnidadesTexto);
+            pnlKpis.Controls.Add(lblUnidadesPacas);
+            pnlKpis.Dock = DockStyle.Fill;
+            pnlKpis.Location = new Point(487, 2);
+            pnlKpis.Margin = new Padding(2);
+            pnlKpis.Name = "pnlKpis";
+            pnlKpis.Padding = new Padding(6);
+            pnlKpis.Size = new Size(205, 185);
+            pnlKpis.TabIndex = 1;
+            // 
+            // lblCamionesTexto
+            // 
+            lblCamionesTexto.AutoSize = true;
+            lblCamionesTexto.Font = new Font("Segoe UI", 11F);
+            lblCamionesTexto.Location = new Point(10, 109);
+            lblCamionesTexto.Margin = new Padding(2, 0, 2, 0);
+            lblCamionesTexto.Name = "lblCamionesTexto";
+            lblCamionesTexto.Size = new Size(72, 20);
+            lblCamionesTexto.TabIndex = 0;
+            lblCamionesTexto.Text = "camiones";
+            // 
+            // lblCamionesNumero
+            // 
+            lblCamionesNumero.AutoSize = true;
+            lblCamionesNumero.Font = new Font("Segoe UI", 24F, FontStyle.Bold);
+            lblCamionesNumero.Location = new Point(6, 74);
+            lblCamionesNumero.Margin = new Padding(2, 0, 2, 0);
+            lblCamionesNumero.Name = "lblCamionesNumero";
+            lblCamionesNumero.Size = new Size(38, 45);
+            lblCamionesNumero.TabIndex = 1;
+            lblCamionesNumero.Text = "0";
+            // 
+            // lblUnidadesTexto
+            // 
+            lblUnidadesTexto.AutoSize = true;
+            lblUnidadesTexto.Font = new Font("Segoe UI", 11F);
+            lblUnidadesTexto.Location = new Point(10, 42);
+            lblUnidadesTexto.Margin = new Padding(2, 0, 2, 0);
+            lblUnidadesTexto.Name = "lblUnidadesTexto";
+            lblUnidadesTexto.Size = new Size(69, 20);
+            lblUnidadesTexto.TabIndex = 2;
+            lblUnidadesTexto.Text = "unidades";
+            // 
+            // lblUnidadesPacas
+            // 
+            lblUnidadesPacas.AutoSize = true;
+            lblUnidadesPacas.Font = new Font("Segoe UI", 24F, FontStyle.Bold);
+            lblUnidadesPacas.Location = new Point(6, 6);
+            lblUnidadesPacas.Margin = new Padding(2, 0, 2, 0);
+            lblUnidadesPacas.Name = "lblUnidadesPacas";
+            lblUnidadesPacas.Size = new Size(38, 45);
+            lblUnidadesPacas.TabIndex = 3;
+            lblUnidadesPacas.Text = "0";
+            // 
+            // dgvMovimientos
+            // 
+            dgvMovimientos.AllowUserToAddRows = false;
+            dgvMovimientos.AllowUserToDeleteRows = false;
+            dgvMovimientos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvMovimientos.BackgroundColor = SystemColors.Window;
+            dgvMovimientos.ColumnHeadersHeight = 29;
+            tlpResumen.SetColumnSpan(dgvMovimientos, 2);
+            dgvMovimientos.Dock = DockStyle.Fill;
+            dgvMovimientos.Location = new Point(2, 191);
+            dgvMovimientos.Margin = new Padding(2);
+            dgvMovimientos.Name = "dgvMovimientos";
+            dgvMovimientos.ReadOnly = true;
+            dgvMovimientos.RowHeadersVisible = false;
+            dgvMovimientos.RowHeadersWidth = 51;
+            dgvMovimientos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvMovimientos.Size = new Size(690, 151);
+            dgvMovimientos.TabIndex = 2;
+            // 
+            // ALISTAR_CAMION
+            // 
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+            ClientSize = new Size(958, 516);
+            Controls.Add(tabMain);
+            Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            Margin = new Padding(2);
+            MinimumSize = new Size(643, 408);
+            Name = "ALISTAR_CAMION";
+            Text = "Alistar Camión";
+            FormClosing += ALISTAR_CAMION_FormClosing;
+            tabMain.ResumeLayout(false);
+            tabAlistar.ResumeLayout(false);
+            splMain.Panel1.ResumeLayout(false);
+            splMain.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splMain).EndInit();
+            splMain.ResumeLayout(false);
+            tlpLeft.ResumeLayout(false);
+            tlpLeft.PerformLayout();
+            grpDetalleCamion.ResumeLayout(false);
+            tlpRight.ResumeLayout(false);
+            tlpRight.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvItems).EndInit();
+            tableLayoutPanel1.ResumeLayout(false);
+            tableLayoutPanel1.PerformLayout();
+            tabReportes.ResumeLayout(false);
+            tlpReportes.ResumeLayout(false);
+            tlpFiltros.ResumeLayout(false);
+            tlpFiltros.PerformLayout();
+            grpFecha.ResumeLayout(false);
+            tlpFecha.ResumeLayout(false);
+            tlpFecha.PerformLayout();
+            tlpResumenHost.ResumeLayout(false);
+            tbcTurnos.ResumeLayout(false);
+            grpResumen.ResumeLayout(false);
+            tlpResumen.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvResumen).EndInit();
+            pnlKpis.ResumeLayout(false);
+            pnlKpis.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvMovimientos).EndInit();
+            ResumeLayout(false);
+        }
+
+        #endregion
+
+        private TabControl tabMain; // tab
+        private TabPage tabAlistar; // tab
+        private TabPage tabReportes; // tab
+        private SplitContainer splMain; // spl
+
+        // Reportes fields
+        private TableLayoutPanel tlpReportes; // tlp
+        private TableLayoutPanel tlpFiltros; // tlp
+        private Label lblEscogeFecha; // lbl
+        private GroupBox grpFecha; // grp
+        private TableLayoutPanel tlpFecha; // tlp
+        private Label lblFechaTituloRpt; // lbl
+        private DateTimePicker dtpFechaReporte; // dtp
+        private TableLayoutPanel tlpResumenHost; // tlp
+        private TabControl tbcTurnos; // tab
+        private TabPage tabTurno3; // tab
+        private GroupBox grpResumen; // grp
+        private TableLayoutPanel tlpResumen; // tlp
+        private DataGridView dgvResumen; // dgv
+        private Panel pnlKpis; // pnl
+        private Label lblUnidadesPacas; // lbl
+        private Label lblUnidadesTexto; // lbl
+        private Label lblCamionesNumero; // lbl
+        private Label lblCamionesTexto; // lbl
+        private DataGridView dgvMovimientos; // dgv
+        private TableLayoutPanel tlpLeft;
+        private Label lblListasTitulo;
+        private ListView lvwListasCamiones;
+        private ColumnHeader colPlaca;
+        private ColumnHeader colFecha;
+        private ColumnHeader colCantidad;
+        private GroupBox grpDetalleCamion;
+        private TableLayoutPanel tlpRight;
+        private Label lblFechaTitulo;
+        private Label lblFechaValor;
+        private DataGridView dgvItems;
+        private Button btnAlistar;
+        private Label lblTituloCamion;
+        private Label lblItemsTitulo;
+        private TabPage tabTotal;
+        private TabPage tabTurno1;
+        private TabPage tabTurno2;
+        private Button RECARGAR;
+        private TableLayoutPanel tableLayoutPanel1;
+    }
+}
