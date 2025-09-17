@@ -117,6 +117,35 @@
           }
         }
       },
+      "ExcelDataReader/3.7.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.1/ExcelDataReader.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/ExcelDataReader.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
+      "ExcelDataReader.DataSet/3.7.0": {
+        "type": "package",
+        "dependencies": {
+          "ExcelDataReader": "3.7.0"
+        },
+        "compile": {
+          "lib/netstandard2.1/ExcelDataReader.DataSet.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/ExcelDataReader.DataSet.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "ExcelNumberFormat/1.1.0": {
         "type": "package",
         "compile": {
@@ -1684,6 +1713,50 @@
         "lib/net8.0/DocumentFormat.OpenXml.Framework.xml",
         "lib/netstandard2.0/DocumentFormat.OpenXml.Framework.dll",
         "lib/netstandard2.0/DocumentFormat.OpenXml.Framework.xml"
+      ]
+    },
+    "ExcelDataReader/3.7.0": {
+      "sha512": "AMv3oDETRHSRyXC17rBtKH45qIfFyo433LMeaMB3u4RNr/c9Luuc0Z+JMP6+3Cx9n4wXqFqcrEIVxrf/GgYnZg==",
+      "type": "package",
+      "path": "exceldatareader/3.7.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ExcelDataReader.png",
+        "README.md",
+        "exceldatareader.3.7.0.nupkg.sha512",
+        "exceldatareader.nuspec",
+        "lib/net462/ExcelDataReader.dll",
+        "lib/net462/ExcelDataReader.pdb",
+        "lib/net462/ExcelDataReader.xml",
+        "lib/netstandard2.0/ExcelDataReader.dll",
+        "lib/netstandard2.0/ExcelDataReader.pdb",
+        "lib/netstandard2.0/ExcelDataReader.xml",
+        "lib/netstandard2.1/ExcelDataReader.dll",
+        "lib/netstandard2.1/ExcelDataReader.pdb",
+        "lib/netstandard2.1/ExcelDataReader.xml"
+      ]
+    },
+    "ExcelDataReader.DataSet/3.7.0": {
+      "sha512": "zA2/CVzbMspkNg0qf0/Zp+eU6VxYP5PtiJSErLDP46d/Y7F6of/NCcSGeXjs97KDq7UiEf6XJe+89s/92n2GYg==",
+      "type": "package",
+      "path": "exceldatareader.dataset/3.7.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ExcelDataReader.png",
+        "README.md",
+        "exceldatareader.dataset.3.7.0.nupkg.sha512",
+        "exceldatareader.dataset.nuspec",
+        "lib/net462/ExcelDataReader.DataSet.dll",
+        "lib/net462/ExcelDataReader.DataSet.pdb",
+        "lib/net462/ExcelDataReader.DataSet.xml",
+        "lib/netstandard2.0/ExcelDataReader.DataSet.dll",
+        "lib/netstandard2.0/ExcelDataReader.DataSet.pdb",
+        "lib/netstandard2.0/ExcelDataReader.DataSet.xml",
+        "lib/netstandard2.1/ExcelDataReader.DataSet.dll",
+        "lib/netstandard2.1/ExcelDataReader.DataSet.pdb",
+        "lib/netstandard2.1/ExcelDataReader.DataSet.xml"
       ]
     },
     "ExcelNumberFormat/1.1.0": {
@@ -4285,6 +4358,8 @@
       "ClosedXML >= 0.105.0",
       "Common >= 1.0.0",
       "Dapper >= 2.1.66",
+      "ExcelDataReader >= 3.7.0",
+      "ExcelDataReader.DataSet >= 3.7.0",
       "Microsoft.Data.SqlClient >= 6.1.1",
       "Microsoft.EntityFrameworkCore >= 9.0.8",
       "Microsoft.EntityFrameworkCore.SqlServer >= 9.0.8",
@@ -4292,23 +4367,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Lenovo\\.nuget\\packages\\": {},
+    "C:\\Users\\jsanchez.INTEMPAQUES\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE.csproj",
+      "projectUniqueName": "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE.csproj",
       "projectName": "ALISTAMIENTO_IE",
-      "projectPath": "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE.csproj",
-      "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE\\obj\\",
+      "projectPath": "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE.csproj",
+      "packagesPath": "C:\\Users\\jsanchez.INTEMPAQUES\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\ALISTAMIENTO_IE\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\jsanchez.INTEMPAQUES\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -4323,8 +4398,8 @@
         "net8.0-windows7.0": {
           "targetAlias": "net8.0-windows",
           "projectReferences": {
-            "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\Common\\Common.csproj": {
-              "projectPath": "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\Common\\Common.csproj"
+            "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\Common\\Common.csproj": {
+              "projectPath": "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\Common\\Common.csproj"
             }
           }
         }
@@ -4352,6 +4427,14 @@
           "Dapper": {
             "target": "Package",
             "version": "[2.1.66, )"
+          },
+          "ExcelDataReader": {
+            "target": "Package",
+            "version": "[3.7.0, )"
+          },
+          "ExcelDataReader.DataSet": {
+            "target": "Package",
+            "version": "[3.7.0, )"
           },
           "Microsoft.Data.SqlClient": {
             "target": "Package",

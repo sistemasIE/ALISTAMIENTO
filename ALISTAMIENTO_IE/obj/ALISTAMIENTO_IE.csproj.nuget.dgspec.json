@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE.csproj": {}
+    "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE.csproj": {
+    "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE.csproj",
+        "projectUniqueName": "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE.csproj",
         "projectName": "ALISTAMIENTO_IE",
-        "projectPath": "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE.csproj",
-        "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE\\obj\\",
+        "projectPath": "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\ALISTAMIENTO_IE\\ALISTAMIENTO_IE.csproj",
+        "packagesPath": "C:\\Users\\jsanchez.INTEMPAQUES\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\ALISTAMIENTO_IE\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\jsanchez.INTEMPAQUES\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -32,8 +32,8 @@
           "net8.0-windows7.0": {
             "targetAlias": "net8.0-windows",
             "projectReferences": {
-              "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\Common\\Common.csproj": {
-                "projectPath": "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\Common\\Common.csproj"
+              "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\Common\\Common.csproj": {
+                "projectPath": "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\Common\\Common.csproj"
               }
             }
           }
@@ -61,6 +61,14 @@
             "Dapper": {
               "target": "Package",
               "version": "[2.1.66, )"
+            },
+            "ExcelDataReader": {
+              "target": "Package",
+              "version": "[3.7.0, )"
+            },
+            "ExcelDataReader.DataSet": {
+              "target": "Package",
+              "version": "[3.7.0, )"
             },
             "Microsoft.Data.SqlClient": {
               "target": "Package",
@@ -104,11 +112,11 @@
         }
       }
     },
-    "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\Common\\Common.csproj": {
+    "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\Common\\Common.csproj": {
       "restore": {
-        "projectUniqueName": "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\Common\\Common.csproj",
+        "projectUniqueName": "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\Common\\Common.csproj",
         "projectName": "Common",
-        "projectPath": "C:\\Users\\Lenovo\\source\\repos\\ALISTAMIENTO_IE\\Common\\Common.csproj",
+        "projectPath": "C:\\Users\\jsanchez.INTEMPAQUES\\source\\repos\\sistemasIE\\ALISTAMIENTO\\Common\\Common.csproj",
         "UsingMicrosoftNETSdk": false,
         "frameworks": {
           "net48": {

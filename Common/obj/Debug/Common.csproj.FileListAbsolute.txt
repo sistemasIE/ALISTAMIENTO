@@ -10,3 +10,9 @@ C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\Common\obj\Debug\Common.csproj.Asse
 C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\Common\obj\Debug\Common.csproj.CoreCompileInputs.cache
 C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\Common\obj\Debug\Common.dll
 C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\Common\obj\Debug\Common.pdb
+C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\Common\bin\Debug\Common.dll
+C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\Common\bin\Debug\Common.pdb
+C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\Common\obj\Debug\Common.csproj.AssemblyReference.cache
+C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\Common\obj\Debug\Common.csproj.CoreCompileInputs.cache
+C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\Common\obj\Debug\Common.dll
+C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\Common\obj\Debug\Common.pdb

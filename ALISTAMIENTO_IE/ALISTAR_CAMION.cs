@@ -1,6 +1,9 @@
 ﻿using ALISTAMIENTO_IE.DTOs;
 using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
+using ExcelDataReader;
+using System.Data;
+using System.Text;
 
 namespace ALISTAMIENTO_IE
 {
@@ -352,6 +355,58 @@ namespace ALISTAMIENTO_IE
 
             // Inicia el cooldown
             _cooldownTimer.Start();
+        }
+
+        private void btnCargarArchivo_Click(object sender, EventArgs e)
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Title = "Selecciona un archivo de Excel",
+                Filter = "Archivos de Excel|*.xlsx;*.xls;*.xlsb"
+            };
+
+            if (ofd.ShowDialog() != DialogResult.OK) return;
+
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            using var stream = File.Open(ofd.FileName, FileMode.Open, FileAccess.Read);
+            using var reader = ExcelReaderFactory.CreateReader(stream);
+
+            var conf = new ExcelDataSetConfiguration
+            {
+                ConfigureDataTable = _ => new ExcelDataTableConfiguration
+                {
+                    UseHeaderRow = true // Primera fila = encabezados
+                }
+            };
+
+            var ds = reader.AsDataSet(conf);
+            if (ds.Tables.Count == 0)
+            {
+                MessageBox.Show("El archivo no contiene hojas.");
+                return;
+            }
+
+            DataTable dt = ds.Tables[0]; // primera hoja
+
+            // Mostrar en el DataGridView
+            dtgCargueMasivo.DataSource = dt;
+
+            foreach (DataRow fila in dt.Rows)
+            {
+                string empresa = fila["EMPRESA"].ToString();
+                string tipoDocumento = fila["TIPO DOCUMENTO"].ToString();
+                string documento = fila["ID DOCUMENTO"].ToString();
+                string codConductor = fila["COD_CONDUCTOR"].ToString();
+                string item = fila["ITEM"].ToString();
+                string codCamion = fila["COD CAMION"].ToString();
+                string puntoEnvio = fila["PUNTO ENVIO"].ToString();
+                string cantidad = fila["CANTIDAD"].ToString();
+
+                Console.WriteLine($"{empresa} | {documento} | {codConductor} | {item} | {codCamion} | {puntoEnvio} | {cantidad}");
+            }
+
+
         }
     }
 }
