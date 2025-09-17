@@ -2,8 +2,10 @@
 using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
 using ExcelDataReader;
+using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ALISTAMIENTO_IE
 {
@@ -12,6 +14,7 @@ namespace ALISTAMIENTO_IE
         private readonly AlistamientoService alistamientoService;
         private readonly DetalleCamionXDiaService _detalleCamionXDiaService;
         private readonly AlistamientoEtiquetaService _alistamientoEtiquetaService; // reporte
+        private readonly CargueMasivoService _cargueMasivoService; 
         private List<CamionDetallesDTO> _camiones;
         private readonly TimerTurnos _turnoTimerManager; // Manejador de Timer y Turnos
         private readonly System.Windows.Forms.Timer _timer;
@@ -30,7 +33,7 @@ namespace ALISTAMIENTO_IE
             alistamientoService = new AlistamientoService();
             _alistamientoEtiquetaService = new AlistamientoEtiquetaService();
             _turnoTimerManager = new TimerTurnos(this); // inicializar el timer
-
+            _cargueMasivoService = new CargueMasivoService();
 
             CargarUI();
             lvwListasCamiones.DoubleClick += lvwListasCamiones_DoubleClick;
@@ -343,7 +346,7 @@ namespace ALISTAMIENTO_IE
         {
             _turnoTimerManager.Stop();
         }
-
+       
         private void RECARGAR_Click(object sender, EventArgs e)
         {
             if (!_canClick) return;  // Ignora si está en cooldown
@@ -357,7 +360,7 @@ namespace ALISTAMIENTO_IE
             _cooldownTimer.Start();
         }
 
-        private void btnCargarArchivo_Click(object sender, EventArgs e)
+        private async void btnCargarArchivo_Click(object sender, EventArgs e)
         {
             using var ofd = new OpenFileDialog
             {
@@ -390,23 +393,72 @@ namespace ALISTAMIENTO_IE
             DataTable dt = ds.Tables[0]; // primera hoja
 
             // Mostrar en el DataGridView
-            dtgCargueMasivo.DataSource = dt;
 
+            List< MovimientoDocumentoDto> Lista = new List<MovimientoDocumentoDto>();
             foreach (DataRow fila in dt.Rows)
             {
-                string empresa = fila["EMPRESA"].ToString();
-                string tipoDocumento = fila["TIPO DOCUMENTO"].ToString();
-                string documento = fila["ID DOCUMENTO"].ToString();
-                string codConductor = fila["COD_CONDUCTOR"].ToString();
-                string item = fila["ITEM"].ToString();
-                string codCamion = fila["COD CAMION"].ToString();
-                string puntoEnvio = fila["PUNTO ENVIO"].ToString();
-                string cantidad = fila["CANTIDAD"].ToString();
+                string empresa = fila["EMPRESA"].ToString().Trim();
+                string tipoDocumento = fila["TIPO DOCUMENTO"].ToString().Trim();
+                string idDocumento = fila["ID DOCUMENTO"].ToString().Trim();
+                string ciaTransporte = fila["NIT CIA TRANSPORTE"].ToString().Trim();
+                string codConductor = fila["COD_CONDUCTOR"].ToString().Trim();
+                string item = fila["ITEM"].ToString().Trim();
+                string codCamion = fila["COD CAMION"].ToString().Trim();
+                string puntoEnvio = fila["PUNTO ENVIO"].ToString().Trim();
+                string cantidad = fila["CANTIDAD"].ToString().Trim();
 
-                Console.WriteLine($"{empresa} | {documento} | {codConductor} | {item} | {codCamion} | {puntoEnvio} | {cantidad}");
+
+
+                var documento = await _cargueMasivoService.ObtenerDocumentoContableAsync(empresa, tipoDocumento, int.Parse(idDocumento));
+                var CodCiaTransporte = await _cargueMasivoService.ObtenerTerceroPorRowIdAsync(int.Parse(ciaTransporte));
+                var conductor = await _cargueMasivoService.ObtenerConductorPorCodigoAsync(int.Parse(codConductor));
+                var camion = await _cargueMasivoService.ObtenerCamionPorCodigoAsync(long.Parse(codCamion));
+                var movimientoDocto = await _cargueMasivoService.ObtenerMovimientosPorConsecutivoAsync(int.Parse (idDocumento));
+
+                if (documento == null)
+                {
+                    MessageBox.Show($"Documento no encontrado:{tipoDocumento}/{idDocumento}");
+                    continue;
+                }
+                if(CodCiaTransporte == null)
+                {
+                    MessageBox.Show($"Compañia de transporte no encontrada:{ciaTransporte}");
+                    continue;
+                }
+                if(conductor == null)
+                {
+                    MessageBox.Show($"Conductor no encontrado:{codConductor}");
+                    continue;
+                }
+                if(camion == null)
+                {
+                    MessageBox.Show($"Camión no encontrado:{codCamion}");
+                    continue;
+                }
+
+                foreach(var m in movimientoDocto)
+                {
+                    var movimiento = new MovimientoDocumentoDto
+                    {
+                        FECHA = m.FECHA,
+                        NUM_DOCUMENTO = documento.Documento,
+                        ESTADO = m.ESTADO,
+                        NOMBRE_CONDUCTOR = conductor.NOMBRES,
+                        BOD_SALIDA = m.BOD_SALIDA,
+                        BOD_ENTRADA = m.BOD_ENTRADA,
+                        ITEM_RESUMEN = m.ITEM_RESUMEN,
+                        CANT_SALDO = m.CANT_SALDO,
+                        NOTAS_DEL_DOCTO = m.NOTAS_DEL_DOCTO
+                    };
+                    Lista.Add(movimiento);
+                }
+
+
+               
             }
 
-
+            dtgCargueMasivo.DataSource = Lista;
+            dtgCargueMasivo.AutoResizeColumns();
         }
     }
 }
