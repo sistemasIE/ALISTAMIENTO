@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using ALISTAMIENTO_IE.DTOs;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -180,34 +181,151 @@ namespace ALISTAMIENTO_IE.Services
         {
             const string sql = @"
         SELECT 
-            t350.f350_fecha AS FECHA,
-            CASE t350.f350_id_cia 
-                WHEN '1' THEN 'RD/' 
-                WHEN '2' THEN 'IE/' 
-            END + t350.f350_id_tipo_docto + '-' + CONVERT(nvarchar, t350.f350_consec_docto) AS NUM_DOCUMENTO,
-            CASE t350.f350_ind_estado 
-                WHEN 0 THEN 'EN ELABORACION' 
-                WHEN 1 THEN 'APROBADO' 
-                WHEN 2 THEN 'ANULADO' 
-            END AS ESTADO,
-            '' AS NOMBRE_CONDUCTOR,
-            t150.f150_descripcion AS BOD_SALIDA,
-            t470.f470_id_ubicacion_aux AS BOD_ENTRADA,
-            CONVERT(nvarchar, t120.f120_id) + '->' + CONVERT(nvarchar, t120.f120_descripcion) AS ITEM_RESUMEN,
-            t470.f470_cant_base AS CANT_SALDO,
-            t350.f350_notas AS NOTAS_DEL_DOCTO
-        FROM t350_co_docto_contable        AS t350
-        JOIN t470_cm_movto_invent          AS t470 ON t350.f350_rowid         = t470.f470_rowid_docto
-        JOIN t121_mc_items_extensiones     AS t121 ON t470.f470_rowid_item_ext = t121.f121_rowid
-        JOIN t120_mc_items                 AS t120 ON t121.f121_rowid_item    = t120.f120_rowid
-        JOIN t150_mc_bodegas               AS t150 ON t470.f470_rowid_bodega  = t150.f150_rowid
-        WHERE UPPER(t350.f350_id_tipo_docto) = UPPER(@idTipoDocto)
-          AND t350.f350_consec_docto = @consecDocto
-        ORDER BY t350.f350_fecha DESC, t120.f120_id;";
+    t350.f350_rowid,
+    t350.f350_fecha AS FECHA,
+    CASE t350.f350_id_cia WHEN 1 THEN 'RD/' WHEN 2 THEN 'IE/' END
+        + t350.f350_id_tipo_docto + '-' + CONVERT(nvarchar(20), t350.f350_consec_docto) AS [NUM DOCUMENTO],
+    CASE t350.f350_ind_estado WHEN 0 THEN 'EN ELABORACION' WHEN 1 THEN 'APROBADO' WHEN 2 THEN 'ANULADO' END AS [ESTADO],
+    '' AS [NOMBRE_CONDUCTOR],
+
+    -- Bodega salida (desde t470)
+    bod_s.f150_descripcion AS [BOD_SALIDA],
+
+    -- Bodega entrada (desde t450 -> t150)
+    (bod_e.f150_id + '-->'+ bod_e.f150_id) AS [BOD_ENTRADA],
+
+    CONVERT(nvarchar(50), t120.f120_id) + ' ->' + CONVERT(nvarchar(200), t120.f120_descripcion) AS [ITEM_RESUMEN],
+    t470.f470_cant_base AS [CANT_SALDO],
+    t350.f350_notas AS [NOTAS_DEL_DOCTO]
+FROM t350_co_docto_contable AS t350
+JOIN t470_cm_movto_invent      AS t470  ON t470.f470_rowid_docto     = t350.f350_rowid
+JOIN t121_mc_items_extensiones AS t121  ON t121.f121_rowid           = t470.f470_rowid_item_ext
+JOIN t120_mc_items             AS t120  ON t120.f120_rowid           = t121.f121_rowid_item
+JOIN t450_cm_docto_invent      AS t450  ON t450.f450_rowid_docto     = t350.f350_rowid
+-- t150 para bodega de salida
+JOIN UnoEE_Doron.dbo.t150_mc_bodegas           AS bod_s ON bod_s.f150_rowid          = t470.f470_rowid_bodega
+-- t150 para bodega de entrada
+LEFT JOIN UnoEE_Doron.dbo.t150_mc_bodegas      AS bod_e ON bod_e.f150_rowid          = t450.f450_rowid_bodega_entrada
+WHERE 
+    t350.f350_id_tipo_docto = @idTipoDocto
+    AND t350.f350_consec_docto = @consecDocto;";
 
             await using var connection = new SqlConnection(_connectionString);
             return await connection.QueryAsync<MovimientoDoctoDto>(sql, new { consecDocto, idTipoDocto });
         }
+
+       
+
+        public async Task<int> GuardarCamionDiaYDetallesAsync(
+    IEnumerable<GrupoMovimientosDto> grupos,
+    string estadoCabecera = "C",           // estado para CAMION_X_DIA
+    string estadoDetalle = "C",            // estado para DETALLE_CAMION_X_DIA
+    string? unidadMedidaDefault = null
+)
+        {
+            // Insert cabecera (siempre nueva)
+            const string sqlInsertCabecera = @"
+        INSERT INTO CAMION_X_DIA
+            (COD_CAMION, FECHA, COD_EMPRESA_TRANSPORTE, ESTADO, COD_REGISTRO_CAMION, COD_CONDUCTOR)
+        VALUES
+            (@COD_CAMION, @FECHA, @COD_EMPRESA_TRANSPORTE, @ESTADO, @COD_REGISTRO_CAMION, @COD_CONDUCTOR);";
+
+            // Insert detalle
+            const string sqlInsertDetalle = @"
+        INSERT INTO DETALLE_CAMION_X_DIA
+            (COD_DETALLE_CAMION, COD_CAMION, ITEM, CANTIDAD_PLANIFICADA, CANTIDAD_DESPACHADA,
+             JUSTIFICACION, ESTADO, ITEM_EQUIVALENTE, PTO_ENVIO, SECUENCIAL, UN_MEDIDA)
+        VALUES
+            (@COD_DETALLE_CAMION, @COD_CAMION, @ITEM, @CANTIDAD_PLANIFICADA, @CANTIDAD_DESPACHADA,
+             @JUSTIFICACION, @ESTADO, @ITEM_EQUIVALENTE, @PTO_ENVIO, @SECUENCIAL, @UN_MEDIDA);";
+
+            // Para los PK autogenerados (MAX+1)
+            const string sqlMaxCabecera = @"SELECT ISNULL(MAX(COD_CAMION), 0) FROM CAMION_X_DIA WITH (UPDLOCK, HOLDLOCK);";
+            const string sqlMaxDetalle = @"SELECT ISNULL(MAX(COD_DETALLE_CAMION), 0) FROM DETALLE_CAMION_X_DIA WITH (UPDLOCK, HOLDLOCK);";
+
+            int filasAfectadas = 0;
+
+            await using var cn = new SqlConnection(_connectionStringSIIE);
+            await cn.OpenAsync();
+            using var tx = cn.BeginTransaction();
+
+            try
+            {
+                var maxCodCamion = await cn.ExecuteScalarAsync<long>(sqlMaxCabecera, transaction: tx);
+                var maxCodDetalle = await cn.ExecuteScalarAsync<long>(sqlMaxDetalle, transaction: tx);
+
+                long nextCodCamion = maxCodCamion + 1;
+                long nextDetId = maxCodDetalle + 1;
+
+                foreach (var g in grupos)
+                {
+                    // 1) Insertar CABECERA
+                    long codCamionDia = nextCodCamion++;
+
+                    filasAfectadas += await cn.ExecuteAsync(
+                        sqlInsertCabecera,
+                        new
+                        {
+                            COD_CAMION = codCamionDia,                 // PK generado
+                            FECHA = g.Fecha,
+                            COD_EMPRESA_TRANSPORTE = g.EmpresaTransporte,
+                            ESTADO = estadoCabecera,
+                            COD_REGISTRO_CAMION = g.CodCamion,        // el código de camión original
+                            COD_CONDUCTOR = g.CodConductor
+                        },
+                        tx);
+
+                    // 2) Insertar DETALLES
+                    var detallesParams = new List<object>(g.Movimientos.Count);
+
+                    foreach (var m in g.Movimientos)
+                    {
+                        double? cantidadPlanificada = (double?)Convert.ToDecimal(m.CANT_SALDO);
+                        string item = ExtraerItemDesdeResumen(m.ITEM_RESUMEN);
+                        string ptoEnvio = m.BOD_ENTRADA ?? string.Empty;
+                        string secuencial = m.NUM_DOCUMENTO;
+
+                        detallesParams.Add(new
+                        {
+                            COD_DETALLE_CAMION = nextDetId++,
+                            COD_CAMION = codCamionDia,                // referencia al COD_CAMION de la cabecera
+                            ITEM = item,
+                            CANTIDAD_PLANIFICADA = cantidadPlanificada,
+                            CANTIDAD_DESPACHADA = (double?)null,
+                            JUSTIFICACION = "N/A",
+                            ESTADO = estadoDetalle,
+                            ITEM_EQUIVALENTE = (string?)null,
+                            PTO_ENVIO = ptoEnvio,
+                            SECUENCIAL = secuencial,
+                            UN_MEDIDA = unidadMedidaDefault
+                        });
+                    }
+
+                    if (detallesParams.Count > 0)
+                    {
+                        filasAfectadas += await cn.ExecuteAsync(sqlInsertDetalle, detallesParams, tx);
+                    }
+                }
+
+                tx.Commit();
+                return filasAfectadas;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        // Helper para extraer el ITEM desde ITEM_RESUMEN
+        private static string ExtraerItemDesdeResumen(string itemResumen)
+        {
+            if (string.IsNullOrWhiteSpace(itemResumen)) return string.Empty;
+            int p = itemResumen.IndexOf("->", StringComparison.Ordinal);
+            return (p > 0) ? itemResumen[..p].Trim() : itemResumen.Trim();
+        }
+
     }
+
 
 }

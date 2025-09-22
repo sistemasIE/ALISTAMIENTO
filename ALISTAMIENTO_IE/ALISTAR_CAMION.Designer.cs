@@ -71,8 +71,10 @@
             lblUnidadesPacas = new Label();
             dgvMovimientos = new DataGridView();
             tabCargueMasivo = new TabPage();
-            btnCargarArchivo = new Button();
+            dtgAgrupada = new DataGridView();
             dtgCargueMasivo = new DataGridView();
+            btnCrearCamiones = new Button();
+            btnCargarArchivo = new Button();
             RECARGAR = new Button();
             tabMain.SuspendLayout();
             tabAlistar.SuspendLayout();
@@ -98,6 +100,7 @@
             pnlKpis.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvMovimientos).BeginInit();
             tabCargueMasivo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dtgAgrupada).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dtgCargueMasivo).BeginInit();
             SuspendLayout();
             // 
@@ -664,7 +667,9 @@
             // 
             // tabCargueMasivo
             // 
+            tabCargueMasivo.Controls.Add(dtgAgrupada);
             tabCargueMasivo.Controls.Add(dtgCargueMasivo);
+            tabCargueMasivo.Controls.Add(btnCrearCamiones);
             tabCargueMasivo.Controls.Add(btnCargarArchivo);
             tabCargueMasivo.Location = new Point(4, 30);
             tabCargueMasivo.Name = "tabCargueMasivo";
@@ -672,6 +677,32 @@
             tabCargueMasivo.TabIndex = 2;
             tabCargueMasivo.Text = "Cargue Masivo";
             tabCargueMasivo.UseVisualStyleBackColor = true;
+            // 
+            // dtgAgrupada
+            // 
+            dtgAgrupada.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dtgAgrupada.Location = new Point(536, 13);
+            dtgAgrupada.Name = "dtgAgrupada";
+            dtgAgrupada.Size = new Size(360, 149);
+            dtgAgrupada.TabIndex = 1;
+            // 
+            // dtgCargueMasivo
+            // 
+            dtgCargueMasivo.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dtgCargueMasivo.Location = new Point(30, 168);
+            dtgCargueMasivo.Name = "dtgCargueMasivo";
+            dtgCargueMasivo.Size = new Size(866, 248);
+            dtgCargueMasivo.TabIndex = 1;
+            // 
+            // btnCrearCamiones
+            // 
+            btnCrearCamiones.Location = new Point(362, 422);
+            btnCrearCamiones.Name = "btnCrearCamiones";
+            btnCrearCamiones.Size = new Size(211, 44);
+            btnCrearCamiones.TabIndex = 0;
+            btnCrearCamiones.Text = "CREAR CAMIONES";
+            btnCrearCamiones.UseVisualStyleBackColor = true;
+            btnCrearCamiones.Click += button1_Click;
             // 
             // btnCargarArchivo
             // 
@@ -682,14 +713,6 @@
             btnCargarArchivo.Text = "Cargar Archivo";
             btnCargarArchivo.UseVisualStyleBackColor = true;
             btnCargarArchivo.Click += btnCargarArchivo_Click;
-            // 
-            // dtgCargueMasivo
-            // 
-            dtgCargueMasivo.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dtgCargueMasivo.Location = new Point(30, 109);
-            dtgCargueMasivo.Name = "dtgCargueMasivo";
-            dtgCargueMasivo.Size = new Size(866, 307);
-            dtgCargueMasivo.TabIndex = 1;
             // 
             // ALISTAR_CAMION
             // 
@@ -703,6 +726,7 @@
             Name = "ALISTAR_CAMION";
             Text = "Alistar Camión";
             FormClosing += ALISTAR_CAMION_FormClosing;
+            Load += ALISTAR_CAMION_Load;
             tabMain.ResumeLayout(false);
             tabAlistar.ResumeLayout(false);
             splMain.Panel1.ResumeLayout(false);
@@ -733,6 +757,7 @@
             pnlKpis.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvMovimientos).EndInit();
             tabCargueMasivo.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dtgAgrupada).EndInit();
             ((System.ComponentModel.ISupportInitialize)dtgCargueMasivo).EndInit();
             ResumeLayout(false);
         }
@@ -786,5 +811,7 @@
         private TabPage tabCargueMasivo;
         private DataGridView dtgCargueMasivo;
         private Button btnCargarArchivo;
+        private DataGridView dtgAgrupada;
+        private Button btnCrearCamiones;
     }
 }
