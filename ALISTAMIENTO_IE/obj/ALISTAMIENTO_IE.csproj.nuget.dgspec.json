@@ -70,6 +70,10 @@
               "target": "Package",
               "version": "[3.7.0, )"
             },
+            "MailKit": {
+              "target": "Package",
+              "version": "[4.13.0, )"
+            },
             "Microsoft.Data.SqlClient": {
               "target": "Package",
               "version": "[6.1.1, )"

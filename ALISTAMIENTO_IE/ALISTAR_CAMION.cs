@@ -6,6 +6,7 @@ using DocumentFormat.OpenXml.Bibliography;
 using ExcelDataReader;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -439,7 +440,7 @@ namespace ALISTAMIENTO_IE
                 var tercero = await _cargueMasivoService.ObtenerTerceroPorRowIdAsync(rowIdTransporte); // tiene f200_id y f200_razon_social
                 var conductor = await _cargueMasivoService.ObtenerConductorPorCodigoAsync(codConductorLong);
                 var camion = await _cargueMasivoService.ObtenerCamionPorCodigoAsync(codCamionLong);
-                var movsDoc = await _cargueMasivoService.ObtenerMovimientosPorConsecutivoAsync(idDocumento); // TTS por defecto
+                var movsDoc = await _cargueMasivoService.ObtenerMovimientosPorConsecutivoAsync(idDocumento,tipoDocumento,int.Parse(empresa)); // TTS por defecto
 
                 if (documento == null)
                 {
@@ -481,6 +482,22 @@ namespace ALISTAMIENTO_IE
                         NOTAS_DEL_DOCTO = m.NOTAS_DEL_DOCTO
                     };
 
+                    if (int.Parse(empresa) == 1)
+                    {
+                        string itemEquivalente = await _cargueMasivoService.SacaItemEquivalenteAsync(CargueMasivoService.ExtraerItemDesdeResumen(movimiento.ITEM_RESUMEN));
+                        if (itemEquivalente == "N/A")
+                        {
+                            MessageBox.Show("El item " +movimiento.ITEM_RESUMEN + "No tiene Item Equivalente en IE");
+                        }
+                        else
+                        {
+                            movimiento.ITEM_RESUMEN = itemEquivalente.TrimEnd() +"->" + await _cargueMasivoService.ObtenerDescripcionItemAsync(itemEquivalente);
+                        }
+                    }
+
+                    
+
+
                     listaNormal.Add(movimiento);
 
                     itemsParaAgrupar.Add((m.FECHA.Date, empresaTransporte, camion.COD_CAMION, conductor.COD_CONDUCTOR, movimiento));
@@ -511,24 +528,120 @@ namespace ALISTAMIENTO_IE
             // Si tienes otro grid para la agrupada, podrías hacer:
             dtgAgrupada.DataSource = listaAgrupada;
         }
+        private static string HtmlMessageBody(GrupoMovimientosDto grupo, string? placas, string? nombreConductor, string? docPrincipal)
+        {
+            var sb = new StringBuilder();
 
+            sb.AppendLine($@"
+<div style=""font-family: Segoe UI, Arial, sans-serif; font-size:13px;"">
+  <p><strong>Programacion y Despacho camion:</strong> {System.Net.WebUtility.HtmlEncode(placas ?? $"CAMION {grupo.CodCamion}")} &nbsp;&nbsp;
+     <strong>Conductor:</strong> {System.Net.WebUtility.HtmlEncode(nombreConductor ?? grupo.CodConductor.ToString())} &nbsp;&nbsp;
+     <strong>De:</strong> &lt;&lt;{System.Net.WebUtility.HtmlEncode(docPrincipal ?? "")}&gt;&gt;</p>
+
+  <table cellpadding=""6"" cellspacing=""0"" style=""border-collapse:collapse; border:1px solid #999; min-width:900px;"">
+    <thead>
+      <tr style=""background:#f0f6fb;"">
+        <th style=""border:1px solid #999;"">FECHA</th>
+        <th style=""border:1px solid #999;"">NUM DOCUMENTO</th>
+        <th style=""border:1px solid #999;"">ESTADO</th>
+        <th style=""border:1px solid #999;"">BOD. SALIDA</th>
+        <th style=""border:1px solid #999;"">BOD. ENTRADA</th>
+        <th style=""border:1px solid #999;"">ITEM RESUMEN</th>
+        <th style=""border:1px solid #999;"">CANT. SALDO</th>
+        <th style=""border:1px solid #999;"">NOTAS DEL DOCTO</th>
+      </tr>
+    </thead>
+    <tbody>");
+
+            foreach (var m in grupo.Movimientos)
+            {
+                sb.AppendLine($@"
+      <tr>
+        <td style=""border:1px solid #999;"">{m.FECHA:dd/MM/yyyy}</td>
+        <td style=""border:1px solid #999;"">{System.Net.WebUtility.HtmlEncode(m.NUM_DOCUMENTO)}</td>
+        <td style=""border:1px solid #999;"">{System.Net.WebUtility.HtmlEncode(m.ESTADO)}</td>
+        <td style=""border:1px solid #999;"">{System.Net.WebUtility.HtmlEncode(m.BOD_SALIDA)}</td>
+        <td style=""border:1px solid #999;"">{System.Net.WebUtility.HtmlEncode(m.BOD_ENTRADA)}</td>
+        <td style=""border:1px solid #999;"">{System.Net.WebUtility.HtmlEncode(m.ITEM_RESUMEN)}</td>
+        <td style=""border:1px solid #999; text-align:right;"">{m.CANT_SALDO:0.###}</td>
+        <td style=""border:1px solid #999;"">{System.Net.WebUtility.HtmlEncode(m.NOTAS_DEL_DOCTO)}</td>
+      </tr>");
+            }
+
+            sb.AppendLine(@"
+    </tbody>
+  </table>
+</div>");
+
+            return sb.ToString();
+        }
         private async void button1_Click(object sender, EventArgs e)
         {
+            if (listaAgrupada is null || listaAgrupada.Count == 0)
+            {
+                MessageBox.Show("No hay grupos para guardar/enviar. Carga y agrupa primero.");
+                return;
+            }
+
+            btnCrearCamiones.Enabled = false;
+
             try
             {
-                // Llamada al service
+                // 1) Guardar
                 int filas = await _cargueMasivoService.GuardarCamionDiaYDetallesAsync(
                     listaAgrupada,
-                    estadoCabecera: "C",     // Estado de la cabecera (ej: 'C' = creado)
-                    estadoDetalle: "C",      // Estado de los detalles
-                    unidadMedidaDefault: "UND" // Puedes cambiarlo a "KLS" o null según tu lógica
+                    estadoCabecera: "C",
+                    estadoDetalle: "C",
+                    unidadMedidaDefault: "UND"
                 );
 
-                MessageBox.Show($"Se guardaron {filas} registros (cabeceras + detalles).", "Éxito");
+                // 2) Enviar emails (uno por cada grupo)
+                foreach (var grupo in listaAgrupada)
+                {
+                    // Obtener placas y nombre del conductor si quieres enriquecer el asunto
+                    var camion = await _cargueMasivoService.ObtenerCamionPorCodigoAsync(grupo.CodCamion);
+                    var placas = camion?.PLACAS;
+                    var nombreConductor = grupo.Movimientos.FirstOrDefault()?.NOMBRE_CONDUCTOR ?? "";
+                    var docPrincipal = grupo.Movimientos.FirstOrDefault()?.NUM_DOCUMENTO ?? "";
+
+                    string asunto = $"Programacion y Despacho camion: {placas ?? $"CAMION {grupo.CodCamion}"} " +
+                                    $"Conductor: {nombreConductor} de: <<{docPrincipal}>>";
+
+                    string html = HtmlMessageBody(grupo, placas, nombreConductor, docPrincipal);
+
+                    using (var client = new System.Net.Mail.SmtpClient("192.168.16.215"))
+                    using (var msg = new System.Net.Mail.MailMessage("notificaciones@integraldeempaques.com", "jefedesistemas@integraldeempaques.com"))
+                    {
+                        // Cuerpo
+                        msg.Subject = asunto;
+                        msg.IsBodyHtml = true;
+                        msg.BodyEncoding = System.Text.Encoding.UTF8;
+                        msg.Body = html;
+
+                        // (Opcional) Adjuntar CSV:
+                        // var csv = BuildCsv(grupo);
+                        // var bytes = Encoding.UTF8.GetBytes(csv);
+                        // var stream = new MemoryStream(bytes);
+                        // msg.Attachments.Add(new Attachment(stream, $"{placas ?? grupo.CodCamion}-{grupo.Fecha:yyyyMMdd}.csv", MediaTypeNames.Text.Plain));
+
+                        // Config SMTP (las tuyas)
+                        client.UseDefaultCredentials = false;
+                        client.Port = 2727;
+                        client.Credentials = new System.Net.NetworkCredential("cabana\\notificaciones", "Notifica@inte");
+
+                        await client.SendMailAsync(msg);
+                    }
+                }
+
+                MessageBox.Show($"Se guardaron {filas} registros y se enviaron los correos.", "Éxito");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al guardar en BD: {ex.Message}");
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                btnCrearCamiones.Enabled = true;
             }
         }
 

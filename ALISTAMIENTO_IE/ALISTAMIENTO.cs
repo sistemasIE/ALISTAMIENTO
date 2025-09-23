@@ -357,13 +357,13 @@ namespace ALISTAMIENTO_IE
             // Si el estado no contiene 'ALISTADO', mostrar el cuadro de observaciones
             if (!_estadoAlistamiento.Contains("ALISTADO"))
             {
-                using (var obsForm = new OBSERVACIONES(_idAlistamiento, "Indique el motivo de anulación del alistamiento"))
+                using (var obsForm = new OBSERVACIONES(_idAlistamiento, "Indique el motivo de cierre del alistamiento"))
                 {
                     var result = obsForm.ShowDialog(this);
                     if (result == DialogResult.OK && obsForm.AlistamientoAnulado)
                     {
                         // Se aceptó la observación y se anuló el alistamiento
-                        _estadoAlistamiento = "ANULADO";
+                        _estadoAlistamiento = "ALISTADO_INCOMPLETO";
                         e.Cancel = false;
                     }
                     else

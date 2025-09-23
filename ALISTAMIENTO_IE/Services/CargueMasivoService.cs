@@ -177,60 +177,93 @@ namespace ALISTAMIENTO_IE.Services
         }
         public async Task<IEnumerable<MovimientoDoctoDto>> ObtenerMovimientosPorConsecutivoAsync(
     int consecDocto,
-    string idTipoDocto = "TTS")
+    string idTipoDocto,
+    int idCia)
         {
-            const string sql = @"
-        SELECT 
-    t350.f350_rowid,
-    t350.f350_fecha AS FECHA,
-    CASE t350.f350_id_cia WHEN 1 THEN 'RD/' WHEN 2 THEN 'IE/' END
-        + t350.f350_id_tipo_docto + '-' + CONVERT(nvarchar(20), t350.f350_consec_docto) AS [NUM DOCUMENTO],
-    CASE t350.f350_ind_estado WHEN 0 THEN 'EN ELABORACION' WHEN 1 THEN 'APROBADO' WHEN 2 THEN 'ANULADO' END AS [ESTADO],
-    '' AS [NOMBRE_CONDUCTOR],
-
-    -- Bodega salida (desde t470)
-    bod_s.f150_descripcion AS [BOD_SALIDA],
-
-    -- Bodega entrada (desde t450 -> t150)
-    (bod_e.f150_id + '-->'+ bod_e.f150_id) AS [BOD_ENTRADA],
-
-    CONVERT(nvarchar(50), t120.f120_id) + ' ->' + CONVERT(nvarchar(200), t120.f120_descripcion) AS [ITEM_RESUMEN],
-    t470.f470_cant_base AS [CANT_SALDO],
-    t350.f350_notas AS [NOTAS_DEL_DOCTO]
-FROM t350_co_docto_contable AS t350
-JOIN t470_cm_movto_invent      AS t470  ON t470.f470_rowid_docto     = t350.f350_rowid
-JOIN t121_mc_items_extensiones AS t121  ON t121.f121_rowid           = t470.f470_rowid_item_ext
-JOIN t120_mc_items             AS t120  ON t120.f120_rowid           = t121.f121_rowid_item
-JOIN t450_cm_docto_invent      AS t450  ON t450.f450_rowid_docto     = t350.f350_rowid
--- t150 para bodega de salida
-JOIN UnoEE_Doron.dbo.t150_mc_bodegas           AS bod_s ON bod_s.f150_rowid          = t470.f470_rowid_bodega
--- t150 para bodega de entrada
-LEFT JOIN UnoEE_Doron.dbo.t150_mc_bodegas      AS bod_e ON bod_e.f150_rowid          = t450.f450_rowid_bodega_entrada
-WHERE 
-    t350.f350_id_tipo_docto = @idTipoDocto
-    AND t350.f350_consec_docto = @consecDocto;";
-
             await using var connection = new SqlConnection(_connectionString);
-            return await connection.QueryAsync<MovimientoDoctoDto>(sql, new { consecDocto, idTipoDocto });
+
+            if (string.Equals(idTipoDocto, "RMV", StringComparison.OrdinalIgnoreCase))
+            {
+                // === Query RMV ===
+                const string sqlRmv = @"
+            select f350_fecha AS FECHA,'' as [NOMBRE CONDUCTOR],
+             case f350_id_cia when '1' then 'RD/' when '2' then 'IE/' end+f350_id_tipo_docto+'-'+CONVERT(nvarchar, f350_consec_docto) AS [NUM DOCUMENTO],
+             f200_nit, f200_razon_social as[Razon Social cliente despacho],'' as [U.M.emp.],f470_cant_base AS [CANT_SALDO],'' as [Peso en KLS],'' as [Cantidad en emp.],
+             f150_descripcion as [BOD_SALIDA],f120_id as [ITEM],'' as [ITEM EQUIVALENTE IE],convert(nvarchar, f120_id)+'->'+convert(nvarchar, f120_descripcion) AS ITEM_RESUMEN,
+             '' as [ANCHO], '' as [LARGO],'' AS [GRAMAJE],f350_notas AS [NOTAS_DEL_DOCTO],f215_descripcion ,f350_id_cia,
+             UPPER(t013_mm_ciudades.f013_descripcion) as [BOD_ENTRADA]
+             from t350_co_docto_contable, t470_cm_movto_invent,t200_mm_terceros,t120_mc_items,t121_mc_items_extensiones,t150_mc_bodegas,t215_mm_puntos_envio_cliente,
+             t015_mm_contactos,t013_mm_ciudades
+             where t350_co_docto_contable.f350_rowid= t470_cm_movto_invent.f470_rowid_docto  
+             and t350_co_docto_contable.f350_rowid_tercero=t200_mm_terceros.f200_rowid
+             and t470_cm_movto_invent.f470_rowid_item_ext= t121_mc_items_extensiones.f121_rowid 
+             and t121_mc_items_extensiones.f121_rowid_item=t120_mc_items.f120_rowid
+             and t470_cm_movto_invent.f470_rowid_bodega=t150_mc_bodegas.f150_rowid
+             and f470_rowid_punto_envio_rem=f215_rowid
+             and f470_rowid_bodega=f150_rowid and f215_rowid_tercero=t200_mm_terceros.f200_rowid
+             and t200_mm_terceros.f200_rowid_contacto  = t015_mm_contactos.f015_rowid 
+             and t015_mm_contactos.f015_id_ciudad = t013_mm_ciudades.f013_id 
+             and t015_mm_contactos.f015_id_depto  = t013_mm_ciudades.f013_id_depto 
+             and  t015_mm_contactos.f015_id_pais = t013_mm_ciudades.f013_id_pais 
+              and f350_id_tipo_docto =UPPER(@idTipoDocto)
+              and f350_consec_docto = @consecDocto
+              and f350_id_cia = @idCia";
+
+                return await connection.QueryAsync<MovimientoDoctoDto>(sqlRmv, new { consecDocto, idTipoDocto, idCia });
+            }
+            else
+            {
+                // === Query TTS (u otros) ===
+                const string sqlTts = @"
+            SELECT 
+                t350.f350_rowid,
+                t350.f350_fecha AS FECHA,
+                CASE t350.f350_id_cia WHEN 1 THEN 'RD/' WHEN 2 THEN 'IE/' END
+                    + t350.f350_id_tipo_docto + '-' + CONVERT(nvarchar(20), t350.f350_consec_docto) AS NUM_DOCUMENTO,
+                CASE t350.f350_ind_estado 
+                    WHEN 0 THEN 'EN ELABORACION' 
+                    WHEN 1 THEN 'APROBADO' 
+                    WHEN 2 THEN 'ANULADO' 
+                END AS ESTADO,
+                '' AS NOMBRE_CONDUCTOR,
+                bod_s.f150_descripcion AS BOD_SALIDA,
+                (bod_e.f150_id + '-->' + bod_e.f150_id) AS BOD_ENTRADA,
+                CONVERT(nvarchar(50), t120.f120_id) + ' ->' + CONVERT(nvarchar(200), t120.f120_descripcion) AS ITEM_RESUMEN,
+                t470.f470_cant_base AS CANT_SALDO,
+                t350.f350_notas AS NOTAS_DEL_DOCTO
+            FROM t350_co_docto_contable        AS t350
+            JOIN t470_cm_movto_invent          AS t470  ON t470.f470_rowid_docto     = t350.f350_rowid
+            JOIN t121_mc_items_extensiones     AS t121  ON t121.f121_rowid           = t470.f470_rowid_item_ext
+            JOIN t120_mc_items                 AS t120  ON t120.f120_rowid           = t121.f121_rowid_item
+            JOIN t450_cm_docto_invent          AS t450  ON t450.f450_rowid_docto     = t350.f350_rowid
+            JOIN t150_mc_bodegas               AS bod_s ON bod_s.f150_rowid          = t470.f470_rowid_bodega
+            LEFT JOIN t150_mc_bodegas          AS bod_e ON bod_e.f150_rowid          = t450.f450_rowid_bodega_entrada
+            WHERE 
+                UPPER(t350.f350_id_tipo_docto) = UPPER(@idTipoDocto)
+                AND t350.f350_consec_docto     = @consecDocto
+                AND t350.f350_id_cia           = @idCia
+            ORDER BY t350.f350_fecha DESC, t120.f120_id;";
+
+                return await connection.QueryAsync<MovimientoDoctoDto>(sqlTts, new { consecDocto, idTipoDocto, idCia });
+            }
         }
 
-       
+
 
         public async Task<int> GuardarCamionDiaYDetallesAsync(
     IEnumerable<GrupoMovimientosDto> grupos,
-    string estadoCabecera = "C",           // estado para CAMION_X_DIA
-    string estadoDetalle = "C",            // estado para DETALLE_CAMION_X_DIA
+    string estadoCabecera = "C",    // estado para CAMION_X_DIA
+    string estadoDetalle = "C",     // estado para DETALLE_CAMION_X_DIA
     string? unidadMedidaDefault = null
 )
         {
-            // Insert cabecera (siempre nueva)
+            // 1) Inserts
             const string sqlInsertCabecera = @"
         INSERT INTO CAMION_X_DIA
             (COD_CAMION, FECHA, COD_EMPRESA_TRANSPORTE, ESTADO, COD_REGISTRO_CAMION, COD_CONDUCTOR)
         VALUES
             (@COD_CAMION, @FECHA, @COD_EMPRESA_TRANSPORTE, @ESTADO, @COD_REGISTRO_CAMION, @COD_CONDUCTOR);";
 
-            // Insert detalle
             const string sqlInsertDetalle = @"
         INSERT INTO DETALLE_CAMION_X_DIA
             (COD_DETALLE_CAMION, COD_CAMION, ITEM, CANTIDAD_PLANIFICADA, CANTIDAD_DESPACHADA,
@@ -239,9 +272,16 @@ WHERE
             (@COD_DETALLE_CAMION, @COD_CAMION, @ITEM, @CANTIDAD_PLANIFICADA, @CANTIDAD_DESPACHADA,
              @JUSTIFICACION, @ESTADO, @ITEM_EQUIVALENTE, @PTO_ENVIO, @SECUENCIAL, @UN_MEDIDA);";
 
-            // Para los PK autogenerados (MAX+1)
+            const string sqlInsertDocDespachado = @"
+        INSERT INTO DOCUMENTOS_DESPACHADOS
+            (COD_DOCUMENTO_DESPACHADO, SECUENCIAL, COD_CAMION)
+        VALUES
+            (@COD_DOCUMENTO_DESPACHADO, @SECUENCIAL, @COD_CAMION);";
+
+            // 2) MAX+1 (con bloqueos para reservar rango en la transacción)
             const string sqlMaxCabecera = @"SELECT ISNULL(MAX(COD_CAMION), 0) FROM CAMION_X_DIA WITH (UPDLOCK, HOLDLOCK);";
             const string sqlMaxDetalle = @"SELECT ISNULL(MAX(COD_DETALLE_CAMION), 0) FROM DETALLE_CAMION_X_DIA WITH (UPDLOCK, HOLDLOCK);";
+            const string sqlMaxDocDesp = @"SELECT ISNULL(MAX(COD_DOCUMENTO_DESPACHADO), 0) FROM DOCUMENTOS_DESPACHADOS WITH (UPDLOCK, HOLDLOCK);";
 
             int filasAfectadas = 0;
 
@@ -251,31 +291,34 @@ WHERE
 
             try
             {
+                // Reservas de ID
                 var maxCodCamion = await cn.ExecuteScalarAsync<long>(sqlMaxCabecera, transaction: tx);
                 var maxCodDetalle = await cn.ExecuteScalarAsync<long>(sqlMaxDetalle, transaction: tx);
+                var maxCodDocDesp = await cn.ExecuteScalarAsync<long>(sqlMaxDocDesp, transaction: tx);
 
                 long nextCodCamion = maxCodCamion + 1;
                 long nextDetId = maxCodDetalle + 1;
+                long nextDocId = maxCodDocDesp + 1;
 
                 foreach (var g in grupos)
                 {
-                    // 1) Insertar CABECERA
+                    // === 1) CABECERA ===
                     long codCamionDia = nextCodCamion++;
 
                     filasAfectadas += await cn.ExecuteAsync(
                         sqlInsertCabecera,
                         new
                         {
-                            COD_CAMION = codCamionDia,                 // PK generado
+                            COD_CAMION = codCamionDia,                 // PK generado para X_DIA
                             FECHA = g.Fecha,
-                            COD_EMPRESA_TRANSPORTE = g.EmpresaTransporte,
+                            COD_EMPRESA_TRANSPORTE = g.EmpresaTransporte, // ideal: f200_id
                             ESTADO = estadoCabecera,
-                            COD_REGISTRO_CAMION = g.CodCamion,        // el código de camión original
+                            COD_REGISTRO_CAMION = g.CodCamion,         // código real de camión
                             COD_CONDUCTOR = g.CodConductor
                         },
                         tx);
 
-                    // 2) Insertar DETALLES
+                    // === 2) DETALLES ===
                     var detallesParams = new List<object>(g.Movimientos.Count);
 
                     foreach (var m in g.Movimientos)
@@ -288,11 +331,11 @@ WHERE
                         detallesParams.Add(new
                         {
                             COD_DETALLE_CAMION = nextDetId++,
-                            COD_CAMION = codCamionDia,                // referencia al COD_CAMION de la cabecera
+                            COD_CAMION = codCamionDia,                // FK al X_DIA recién creado
                             ITEM = item,
-                            CANTIDAD_PLANIFICADA = cantidadPlanificada,
+                            CANTIDAD_PLANIFICADA = cantidadPlanificada, // **planificada**
                             CANTIDAD_DESPACHADA = (double?)null,
-                            JUSTIFICACION = "N/A",
+                            JUSTIFICACION = "N/A",                      // **N/A**
                             ESTADO = estadoDetalle,
                             ITEM_EQUIVALENTE = (string?)null,
                             PTO_ENVIO = ptoEnvio,
@@ -304,6 +347,32 @@ WHERE
                     if (detallesParams.Count > 0)
                     {
                         filasAfectadas += await cn.ExecuteAsync(sqlInsertDetalle, detallesParams, tx);
+                    }
+
+                    // === 3) DOCUMENTOS_DESPACHADOS ===
+                    // Para evitar duplicar el mismo documento varias veces (si hay múltiples líneas),
+                    // tomamos los SECUENCIALES distintos del grupo:
+                    var secuencialesUnicos = g.Movimientos
+                        .Select(m => m.NUM_DOCUMENTO)
+                        .Where(s => !string.IsNullOrWhiteSpace(s))
+                        .Distinct()
+                        .ToList();
+
+                    var docsParams = new List<object>(secuencialesUnicos.Count);
+
+                    foreach (var sec in secuencialesUnicos)
+                    {
+                        docsParams.Add(new
+                        {
+                            COD_DOCUMENTO_DESPACHADO = nextDocId++,
+                            SECUENCIAL = sec,
+                            COD_CAMION = codCamionDia
+                        });
+                    }
+
+                    if (docsParams.Count > 0)
+                    {
+                        filasAfectadas += await cn.ExecuteAsync(sqlInsertDocDespachado, docsParams, tx);
                     }
                 }
 
@@ -317,14 +386,67 @@ WHERE
             }
         }
 
+        public async Task<string> SacaItemEquivalenteAsync(string itemDocumento)
+        {
+            if (string.IsNullOrWhiteSpace(itemDocumento))
+                return "N/A";
+
+            // Quitar último carácter del item (igual que en tu código original)
+           
+
+            const string sql = @"
+        SELECT TOP 1 t106.f106_descripcion
+        FROM t105_mc_criterios_item_planes AS t105
+        INNER JOIN t106_mc_criterios_item_mayores AS t106
+            ON t105.f105_id_cia = t106.f106_id_cia
+           AND t105.f105_id     = t106.f106_id_plan
+        INNER JOIN t125_mc_items_criterios AS t125
+            ON t106.f106_id_cia   = t125.f125_id_cia
+           AND t106.f106_id_plan  = t125.f125_id_plan
+           AND t106.f106_id       = t125.f125_id_criterio_mayor
+        INNER JOIN t120_mc_items AS t120
+            ON t125.f125_rowid_item = t120.f120_rowid
+        WHERE t120.f120_id = @Item
+          AND t105.f105_descripcion = 'ITEM IE';";  // valor fijo
+
+            try
+            {
+                await using var cn = new SqlConnection(_connectionString);
+                var desc = await cn.QueryFirstOrDefaultAsync<string>(sql, new { Item = itemDocumento });
+                return string.IsNullOrWhiteSpace(desc) ? "N/A" : desc;
+            }
+            catch
+            {
+                return "N/A";
+            }
+        }
+
         // Helper para extraer el ITEM desde ITEM_RESUMEN
-        private static string ExtraerItemDesdeResumen(string itemResumen)
+        public static string ExtraerItemDesdeResumen(string itemResumen)
         {
             if (string.IsNullOrWhiteSpace(itemResumen)) return string.Empty;
             int p = itemResumen.IndexOf("->", StringComparison.Ordinal);
             return (p > 0) ? itemResumen[..p].Trim() : itemResumen.Trim();
         }
 
+        public async Task<string?> ObtenerDescripcionItemAsync(string itemId)
+        {
+
+            const string sql = @"
+        SELECT TOP 1 f120_descripcion
+        FROM t120_mc_items
+        WHERE f120_id = @ItemId;";
+
+            try
+            {
+                await using var connection = new SqlConnection(_connectionString);
+                return await connection.QueryFirstOrDefaultAsync<string>(sql, new { ItemId = itemId });
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 
 

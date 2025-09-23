@@ -353,3 +353,6 @@ C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\ALISTAMIENTO_
 C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\ALISTAMIENTO_IE\obj\Debug\net8.0-windows\ref\ALISTAMIENTO_IE.dll
 C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\ALISTAMIENTO_IE\bin\Debug\net8.0-windows\ExcelDataReader.dll
 C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\ALISTAMIENTO_IE\bin\Debug\net8.0-windows\ExcelDataReader.DataSet.dll
+C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\ALISTAMIENTO_IE\bin\Debug\net8.0-windows\BouncyCastle.Cryptography.dll
+C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\ALISTAMIENTO_IE\bin\Debug\net8.0-windows\MailKit.dll
+C:\Users\jsanchez.INTEMPAQUES\source\repos\sistemasIE\ALISTAMIENTO\ALISTAMIENTO_IE\bin\Debug\net8.0-windows\MimeKit.dll
