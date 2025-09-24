@@ -364,6 +364,55 @@ namespace ALISTAMIENTO_IE
             // Inicia el cooldown
             _cooldownTimer.Start();
         }
+        public static string? InputBox(string prompt, string title, string defaultValue = "")
+        {
+            Form form = new Form();
+            Label label = new Label();
+            TextBox textBox = new TextBox();
+            Button buttonOk = new Button();
+            Button buttonCancel = new Button();
+
+            form.Text = title;
+
+            label.Text = prompt;
+            textBox.Text = defaultValue;
+
+            buttonOk.Text = "OK";
+            buttonCancel.Text = "Cancelar";
+            buttonOk.DialogResult = DialogResult.OK;
+            buttonCancel.DialogResult = DialogResult.Cancel;
+
+            // --- tamaños más cómodos ---
+            form.ClientSize = new Size(600, 160);                 // ventana más ancha/alta
+            label.SetBounds(12, 12, 576, 0);
+            label.AutoSize = true;
+            label.MaximumSize = new Size(576, 0);                 // permite que el texto haga wrap
+
+            textBox.Font = new Font(textBox.Font, FontStyle.Regular);
+            textBox.Font = new Font(textBox.Font.FontFamily, 11f); // fuente más grande
+            textBox.SetBounds(12, 60, 576, 32);                   // textbox más alto y ancho
+            textBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            buttonOk.SetBounds(440, 110, 75, 28);
+            buttonCancel.SetBounds(521, 110, 75, 28);
+            buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            form.Controls.AddRange(new Control[] { label, textBox, buttonOk, buttonCancel });
+
+            // ⚠️ Importante: no volver a recalcular el ClientSize con label.Right (encogía la caja)
+            // form.ClientSize = new Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
+
+            form.FormBorderStyle = FormBorderStyle.FixedDialog;
+            form.StartPosition = FormStartPosition.CenterScreen;
+            form.MinimizeBox = false;
+            form.MaximizeBox = false;
+            form.AcceptButton = buttonOk;
+            form.CancelButton = buttonCancel;
+
+            DialogResult dialogResult = form.ShowDialog();
+            return dialogResult == DialogResult.OK ? textBox.Text : null;
+        }
 
         private async void btnCargarArchivo_Click(object sender, EventArgs e)
         {
@@ -484,18 +533,37 @@ namespace ALISTAMIENTO_IE
 
                     if (int.Parse(empresa) == 1)
                     {
-                        string itemEquivalente = await _cargueMasivoService.SacaItemEquivalenteAsync(CargueMasivoService.ExtraerItemDesdeResumen(movimiento.ITEM_RESUMEN));
+                        string itemEquivalente = await _cargueMasivoService
+                            .SacaItemEquivalenteAsync(CargueMasivoService.ExtraerItemDesdeResumen(movimiento.ITEM_RESUMEN));
+
                         if (itemEquivalente == "N/A")
                         {
-                            MessageBox.Show("El item " +movimiento.ITEM_RESUMEN + "No tiene Item Equivalente en IE");
+                            // Mostrar ventana para pedir manualmente el nuevo item
+                            string? nuevoItem = InputBox(
+                                $"El item {movimiento.ITEM_RESUMEN} no tiene equivalente en IE.\nPor favor ingrese el item equivalente:",
+                                "Item Equivalente",
+                                "" // valor por defecto vacío
+                            );
+
+                            if (!string.IsNullOrWhiteSpace(nuevoItem))
+                            {
+                                string descripcion = await _cargueMasivoService.ObtenerDescripcionItemAsync(nuevoItem);
+                                movimiento.ITEM_RESUMEN = nuevoItem.TrimEnd() + "->" + descripcion;
+                            }
+                            else
+                            {
+                                MessageBox.Show($"No se asignó equivalente al item {movimiento.ITEM_RESUMEN}.",
+                                                "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
                         }
                         else
                         {
-                            movimiento.ITEM_RESUMEN = itemEquivalente.TrimEnd() +"->" + await _cargueMasivoService.ObtenerDescripcionItemAsync(itemEquivalente);
+                            movimiento.ITEM_RESUMEN = itemEquivalente.TrimEnd()
+                                                      + "->" + await _cargueMasivoService.ObtenerDescripcionItemAsync(itemEquivalente);
                         }
                     }
 
-                    
+
 
 
                     listaNormal.Add(movimiento);
