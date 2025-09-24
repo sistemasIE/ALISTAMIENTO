@@ -406,12 +406,12 @@ namespace ALISTAMIENTO_IE
                 string empresa = fila["EMPRESA"]?.ToString()?.Trim() ?? "";
                 string tipoDocumento = fila["TIPO DOCUMENTO"]?.ToString()?.Trim() ?? "";
                 string idDocumentoTxt = fila["ID DOCUMENTO"]?.ToString()?.Trim() ?? "";
-                string ciaTransporteTxt = fila["NIT CIA TRANSPORTE"]?.ToString()?.Trim() ?? "";
+                string ciaTransporteTxt = fila["ID CIA TRANSPORTE"]?.ToString()?.Trim() ?? "";
                 string codConductorTxt = fila["COD_CONDUCTOR"]?.ToString()?.Trim() ?? "";
                 string item = fila["ITEM"]?.ToString()?.Trim() ?? "";
                 string codCamionTxt = fila["COD CAMION"]?.ToString()?.Trim() ?? "";
-                string puntoEnvio = fila["PUNTO ENVIO"]?.ToString()?.Trim() ?? "";
-                string cantidadTxt = fila["CANTIDAD"]?.ToString()?.Trim() ?? "";
+                string puntoEnvio;
+                string cantidadTxt;
 
                 // Validaciones mínimas
                 if (!int.TryParse(idDocumentoTxt, out var idDocumento))
@@ -445,22 +445,22 @@ namespace ALISTAMIENTO_IE
                 if (documento == null)
                 {
                     MessageBox.Show($"Documento no encontrado: {tipoDocumento}/{idDocumento}");
-                    continue;
+                    return;
                 }
                 if (tercero == null)
                 {
                     MessageBox.Show($"Compañía de transporte no encontrada (rowid): {rowIdTransporte}");
-                    continue;
+                    return;
                 }
                 if (conductor == null)
                 {
                     MessageBox.Show($"Conductor no encontrado: {codConductorLong}");
-                    continue;
+                    return;
                 }
                 if (camion == null)
                 {
                     MessageBox.Show($"Camión no encontrado: {codCamionLong}");
-                    continue;
+                    return;
                 }
 
                 // Nombre visible de la empresa de transporte (usa lo que prefieras)
