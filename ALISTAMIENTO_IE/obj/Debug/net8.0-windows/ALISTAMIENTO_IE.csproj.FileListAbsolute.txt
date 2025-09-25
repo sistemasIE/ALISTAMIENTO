@@ -174,3 +174,4 @@ C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\ALISTAMIENTO_IE\bin\Debug\net8.0-wi
 C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\ALISTAMIENTO_IE\obj\Debug\net8.0-windows\ALISTAMIENTO_IE.OBSERVACIONES.resources
 C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\ALISTAMIENTO_IE\obj\Debug\net8.0-windows\ALISTAMIENTO_IE.MensajeFlotanteForm.resources
 C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\ALISTAMIENTO_IE\obj\Debug\net8.0-windows\ALISTAMIENTO_IE.Properties.Resources.resources
+C:\Users\Lenovo\source\repos\ALISTAMIENTO_IE\ALISTAMIENTO_IE\obj\Debug\net8.0-windows\ALISTAMIENTO_IE.sourcelink.json
