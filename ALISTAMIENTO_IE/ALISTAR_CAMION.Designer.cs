@@ -75,6 +75,8 @@
             dtgCargueMasivo = new DataGridView();
             btnCrearCamiones = new Button();
             btnCargarArchivo = new Button();
+            progressBar1 = new ProgressBar();
+            lblProgreso = new Label();
             RECARGAR = new Button();
             tabMain.SuspendLayout();
             tabAlistar.SuspendLayout();
@@ -667,6 +669,8 @@
             // 
             // tabCargueMasivo
             // 
+            tabCargueMasivo.Controls.Add(lblProgreso);
+            tabCargueMasivo.Controls.Add(progressBar1);
             tabCargueMasivo.Controls.Add(dtgAgrupada);
             tabCargueMasivo.Controls.Add(dtgCargueMasivo);
             tabCargueMasivo.Controls.Add(btnCrearCamiones);
@@ -691,14 +695,14 @@
             dtgCargueMasivo.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dtgCargueMasivo.Location = new Point(30, 168);
             dtgCargueMasivo.Name = "dtgCargueMasivo";
-            dtgCargueMasivo.Size = new Size(866, 248);
+            dtgCargueMasivo.Size = new Size(866, 232);
             dtgCargueMasivo.TabIndex = 1;
             // 
             // btnCrearCamiones
             // 
-            btnCrearCamiones.Location = new Point(362, 422);
+            btnCrearCamiones.Location = new Point(380, 442);
             btnCrearCamiones.Name = "btnCrearCamiones";
-            btnCrearCamiones.Size = new Size(211, 44);
+            btnCrearCamiones.Size = new Size(211, 32);
             btnCrearCamiones.TabIndex = 0;
             btnCrearCamiones.Text = "CREAR CAMIONES";
             btnCrearCamiones.UseVisualStyleBackColor = true;
@@ -713,6 +717,21 @@
             btnCargarArchivo.Text = "Cargar Archivo";
             btnCargarArchivo.UseVisualStyleBackColor = true;
             btnCargarArchivo.Click += btnCargarArchivo_Click;
+            // 
+            // progressBar1
+            // 
+            progressBar1.Location = new Point(30, 413);
+            progressBar1.Name = "progressBar1";
+            progressBar1.Size = new Size(866, 23);
+            progressBar1.TabIndex = 2;
+            // 
+            // lblProgreso
+            // 
+            lblProgreso.AutoSize = true;
+            lblProgreso.Location = new Point(30, 449);
+            lblProgreso.Name = "lblProgreso";
+            lblProgreso.Size = new Size(0, 21);
+            lblProgreso.TabIndex = 3;
             // 
             // ALISTAR_CAMION
             // 
@@ -757,6 +776,7 @@
             pnlKpis.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvMovimientos).EndInit();
             tabCargueMasivo.ResumeLayout(false);
+            tabCargueMasivo.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dtgAgrupada).EndInit();
             ((System.ComponentModel.ISupportInitialize)dtgCargueMasivo).EndInit();
             ResumeLayout(false);
@@ -813,5 +833,7 @@
         private Button btnCargarArchivo;
         private DataGridView dtgAgrupada;
         private Button btnCrearCamiones;
+        private ProgressBar progressBar1;
+        private Label lblProgreso;
     }
 }

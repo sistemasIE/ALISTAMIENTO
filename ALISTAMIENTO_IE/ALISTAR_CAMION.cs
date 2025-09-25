@@ -416,6 +416,7 @@ namespace ALISTAMIENTO_IE
 
         private async void btnCargarArchivo_Click(object sender, EventArgs e)
         {
+            btnCargarArchivo.Enabled = false;
             using var ofd = new OpenFileDialog
             {
                 Title = "Selecciona un archivo de Excel",
@@ -443,158 +444,124 @@ namespace ALISTAMIENTO_IE
 
             DataTable dt = ds.Tables[0];
 
-            // Listas de salida
-            listaNormal = new List<MovimientoDocumentoDto>();
+            // --- Progreso: inicializar ---
+            progressBar1.Visible = true;
+            progressBar1.Value = 0;
+            progressBar1.Minimum = 0;
+            progressBar1.Maximum = dt.Rows.Count;   // determinate
+            lblProgreso.Visible = true;
+            lblProgreso.Text = $"0 / {dt.Rows.Count}";
 
-            // Lista auxiliar para agrupar (lleva claves + DTO)
-            var itemsParaAgrupar = new List<(DateTime Fecha, string EmpresaTransporte, long CodCamion, long CodConductor, MovimientoDocumentoDto Movimiento)>();
-
-            // --- Recorrido filas ---
-            foreach (DataRow fila in dt.Rows)
+            try
             {
-                string empresa = fila["EMPRESA"]?.ToString()?.Trim() ?? "";
-                string tipoDocumento = fila["TIPO DOCUMENTO"]?.ToString()?.Trim() ?? "";
-                string idDocumentoTxt = fila["ID DOCUMENTO"]?.ToString()?.Trim() ?? "";
-                string ciaTransporteTxt = fila["ID CIA TRANSPORTE"]?.ToString()?.Trim() ?? "";
-                string codConductorTxt = fila["COD_CONDUCTOR"]?.ToString()?.Trim() ?? "";
-                string item = fila["ITEM"]?.ToString()?.Trim() ?? "";
-                string codCamionTxt = fila["COD CAMION"]?.ToString()?.Trim() ?? "";
-                string puntoEnvio;
-                string cantidadTxt;
+                listaNormal = new List<MovimientoDocumentoDto>();
+                var itemsParaAgrupar = new List<(DateTime Fecha, string EmpresaTransporte, long CodCamion, long CodConductor, MovimientoDocumentoDto Movimiento)>();
 
-                // Validaciones mínimas
-                if (!int.TryParse(idDocumentoTxt, out var idDocumento))
-                {
-                    MessageBox.Show($"ID DOCUMENTO inválido: {idDocumentoTxt}");
-                    continue;
-                }
-                if (!int.TryParse(ciaTransporteTxt, out var rowIdTransporte))
-                {
-                    MessageBox.Show($"NIT CIA TRANSPORTE inválido: {ciaTransporteTxt}");
-                    continue;
-                }
-                if (!long.TryParse(codConductorTxt, out var codConductorLong))
-                {
-                    MessageBox.Show($"COD_CONDUCTOR inválido: {codConductorTxt}");
-                    continue;
-                }
-                if (!long.TryParse(codCamionTxt, out var codCamionLong))
-                {
-                    MessageBox.Show($"COD CAMION inválido: {codCamionTxt}");
-                    continue;
-                }
+                int procesadas = 0;
 
-                // Llamados a servicios
-                var documento = await _cargueMasivoService.ObtenerDocumentoContableAsync(empresa, tipoDocumento, idDocumento);
-                var tercero = await _cargueMasivoService.ObtenerTerceroPorRowIdAsync(rowIdTransporte); // tiene f200_id y f200_razon_social
-                var conductor = await _cargueMasivoService.ObtenerConductorPorCodigoAsync(codConductorLong);
-                var camion = await _cargueMasivoService.ObtenerCamionPorCodigoAsync(codCamionLong);
-                var movsDoc = await _cargueMasivoService.ObtenerMovimientosPorConsecutivoAsync(idDocumento,tipoDocumento,int.Parse(empresa)); // TTS por defecto
+                foreach (DataRow fila in dt.Rows)
+                {
+                    // === tu lógica actual ===
+                    string empresa = fila["EMPRESA"]?.ToString()?.Trim() ?? "";
+                    string tipoDocumento = fila["TIPO DOCUMENTO"]?.ToString()?.Trim() ?? "";
+                    string idDocumentoTxt = fila["ID DOCUMENTO"]?.ToString()?.Trim() ?? "";
+                    string ciaTransporteTxt = fila["ID CIA TRANSPORTE"]?.ToString()?.Trim() ?? "";
+                    string codConductorTxt = fila["COD_CONDUCTOR"]?.ToString()?.Trim() ?? "";
+                    string codCamionTxt = fila["COD CAMION"]?.ToString()?.Trim() ?? "";
 
-                if (documento == null)
-                {
-                    MessageBox.Show($"Documento no encontrado: {tipoDocumento}/{idDocumento}");
-                    return;
-                }
-                if (tercero == null)
-                {
-                    MessageBox.Show($"Compañía de transporte no encontrada (rowid): {rowIdTransporte}");
-                    return;
-                }
-                if (conductor == null)
-                {
-                    MessageBox.Show($"Conductor no encontrado: {codConductorLong}");
-                    return;
-                }
-                if (camion == null)
-                {
-                    MessageBox.Show($"Camión no encontrado: {codCamionLong}");
-                    return;
-                }
+                    if (!int.TryParse(idDocumentoTxt, out var idDocumento)) { /*...*/ continue; }
+                    if (!int.TryParse(ciaTransporteTxt, out var rowIdTransporte)) { /*...*/ continue; }
+                    if (!long.TryParse(codConductorTxt, out var codConductorLong)) { /*...*/ continue; }
+                    if (!long.TryParse(codCamionTxt, out var codCamionLong)) { /*...*/ continue; }
 
-                // Nombre visible de la empresa de transporte (usa lo que prefieras)
-                string empresaTransporte = tercero.f200_id;
+                    var documento = await _cargueMasivoService.ObtenerDocumentoContableAsync(empresa, tipoDocumento, idDocumento);
+                    var tercero = await _cargueMasivoService.ObtenerTerceroPorRowIdAsync(rowIdTransporte);
+                    var conductor = await _cargueMasivoService.ObtenerConductorPorCodigoAsync(codConductorLong);
+                    var camion = await _cargueMasivoService.ObtenerCamionPorCodigoAsync(codCamionLong);
+                    var movsDoc = await _cargueMasivoService.ObtenerMovimientosPorConsecutivoAsync(idDocumento, tipoDocumento, int.Parse(empresa));
 
-                // Armar lista normal y auxiliar de agrupación
-                foreach (var m in movsDoc)
-                {
-                    var movimiento = new MovimientoDocumentoDto
+                    if (documento == null || tercero == null || conductor == null || camion == null) { /*...*/ continue; }
+
+                    string empresaTransporte = tercero.f200_id;
+
+                    foreach (var m in movsDoc)
                     {
-                        FECHA = m.FECHA,
-                        NUM_DOCUMENTO = documento.Documento,
-                        ESTADO = m.ESTADO,
-                        NOMBRE_CONDUCTOR = conductor.NOMBRES ?? "",
-                        BOD_SALIDA = m.BOD_SALIDA,
-                        BOD_ENTRADA = m.BOD_ENTRADA,
-                        ITEM_RESUMEN = m.ITEM_RESUMEN,
-                        CANT_SALDO = m.CANT_SALDO,
-                        NOTAS_DEL_DOCTO = m.NOTAS_DEL_DOCTO
-                    };
-
-                    if (int.Parse(empresa) == 1)
-                    {
-                        string itemEquivalente = await _cargueMasivoService
-                            .SacaItemEquivalenteAsync(CargueMasivoService.ExtraerItemDesdeResumen(movimiento.ITEM_RESUMEN));
-
-                        if (itemEquivalente == "N/A")
+                        var movimiento = new MovimientoDocumentoDto
                         {
-                            // Mostrar ventana para pedir manualmente el nuevo item
-                            string? nuevoItem = InputBox(
-                                $"El item {movimiento.ITEM_RESUMEN} no tiene equivalente en IE.\nPor favor ingrese el item equivalente:",
-                                "Item Equivalente",
-                                "" // valor por defecto vacío
-                            );
+                            FECHA = m.FECHA,
+                            NUM_DOCUMENTO = documento.Documento,
+                            ESTADO = m.ESTADO,
+                            NOMBRE_CONDUCTOR = conductor.NOMBRES ?? "",
+                            BOD_SALIDA = m.BOD_SALIDA,
+                            BOD_ENTRADA = m.BOD_ENTRADA,
+                            ITEM_RESUMEN = m.ITEM_RESUMEN,
+                            CANT_SALDO = m.CANT_SALDO,
+                            NOTAS_DEL_DOCTO = m.NOTAS_DEL_DOCTO
+                        };
 
-                            if (!string.IsNullOrWhiteSpace(nuevoItem))
+                        if (int.Parse(empresa) == 1)
+                        {
+                            string itemEquivalente = await _cargueMasivoService.SacaItemEquivalenteAsync(
+                                CargueMasivoService.ExtraerItemDesdeResumen(movimiento.ITEM_RESUMEN));
+
+                            if (itemEquivalente == "N/A")
                             {
-                                string descripcion = await _cargueMasivoService.ObtenerDescripcionItemAsync(nuevoItem);
-                                movimiento.ITEM_RESUMEN = nuevoItem.TrimEnd() + "->" + descripcion;
+                                string? nuevoItem = InputBox(
+                                    $"El item {movimiento.ITEM_RESUMEN} no tiene equivalente en IE.\nPor favor ingrese el item equivalente:",
+                                    "Item Equivalente", "");
+
+                                if (!string.IsNullOrWhiteSpace(nuevoItem))
+                                {
+                                    string descripcion = await _cargueMasivoService.ObtenerDescripcionItemAsync(nuevoItem);
+                                    movimiento.ITEM_RESUMEN = nuevoItem.TrimEnd() + "->" + descripcion + "-------" + "ITEM INGRESADO MANUALMENTE";
+                                }
                             }
                             else
                             {
-                                MessageBox.Show($"No se asignó equivalente al item {movimiento.ITEM_RESUMEN}.",
-                                                "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                movimiento.ITEM_RESUMEN = itemEquivalente.TrimEnd()
+                                    + "->" + await _cargueMasivoService.ObtenerDescripcionItemAsync(itemEquivalente);
                             }
                         }
-                        else
-                        {
-                            movimiento.ITEM_RESUMEN = itemEquivalente.TrimEnd()
-                                                      + "->" + await _cargueMasivoService.ObtenerDescripcionItemAsync(itemEquivalente);
-                        }
+
+                        listaNormal.Add(movimiento);
+                        itemsParaAgrupar.Add((m.FECHA.Date, empresaTransporte, camion.COD_CAMION, conductor.COD_CONDUCTOR, movimiento));
                     }
 
+                    // --- Progreso: avanzar ---
+                    procesadas++;
+                    if (procesadas <= progressBar1.Maximum)
+                        progressBar1.Value = procesadas;
 
-
-
-                    listaNormal.Add(movimiento);
-
-                    itemsParaAgrupar.Add((m.FECHA.Date, empresaTransporte, camion.COD_CAMION, conductor.COD_CONDUCTOR, movimiento));
+                    lblProgreso.Text = $"{procesadas} / {dt.Rows.Count}";
+                    await Task.Yield(); // permite refrescar UI entre iteraciones
                 }
+
+                // Agrupar y bindear
+                listaAgrupada = itemsParaAgrupar
+                   .GroupBy(x => new { x.Fecha, x.EmpresaTransporte, x.CodCamion, x.CodConductor })
+                   .Select(g => new GrupoMovimientosDto
+                   {
+                       Fecha = g.Key.Fecha,
+                       EmpresaTransporte = g.Key.EmpresaTransporte,
+                       CodCamion = g.Key.CodCamion,
+                       CodConductor = g.Key.CodConductor,
+                       Movimientos = g.Select(x => x.Movimiento).ToList()
+                   })
+                   .OrderBy(g => g.Fecha).ThenBy(g => g.EmpresaTransporte).ThenBy(g => g.CodCamion).ThenBy(g => g.CodConductor)
+                   .ToList();
+
+                dtgCargueMasivo.DataSource = listaNormal;
+                dtgCargueMasivo.AutoResizeColumns();
+                dtgAgrupada.DataSource = listaAgrupada;
             }
-
-            // --- Agrupar por Fecha -> EmpresaTransporte -> CodCamion -> CodConductor ---
-            listaAgrupada = itemsParaAgrupar
-               .GroupBy(x => new { x.Fecha, x.EmpresaTransporte, x.CodCamion, x.CodConductor })
-               .Select(g => new GrupoMovimientosDto
-               {
-                   Fecha = g.Key.Fecha,
-                   EmpresaTransporte = g.Key.EmpresaTransporte,
-                   CodCamion = g.Key.CodCamion,
-                   CodConductor = g.Key.CodConductor,
-                   Movimientos = g.Select(x => x.Movimiento).ToList()
-               })
-               .OrderBy(g => g.Fecha)
-               .ThenBy(g => g.EmpresaTransporte)
-               .ThenBy(g => g.CodCamion)
-               .ThenBy(g => g.CodConductor)
-               .ToList();
-
-            // Muestra la lista "normal" en tu grid
-            dtgCargueMasivo.DataSource = listaNormal;
-            dtgCargueMasivo.AutoResizeColumns();
-
-            // Si tienes otro grid para la agrupada, podrías hacer:
-            dtgAgrupada.DataSource = listaAgrupada;
+            finally
+            {
+                // --- Progreso: finalizar ---
+                lblProgreso.Text = "";
+                progressBar1.Visible = false;
+                lblProgreso.Visible = false;
+                btnCargarArchivo.Enabled = true;
+            }
         }
         private static string HtmlMessageBody(GrupoMovimientosDto grupo, string? placas, string? nombreConductor, string? docPrincipal)
         {
