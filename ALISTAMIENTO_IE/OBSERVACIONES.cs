@@ -1,6 +1,4 @@
 ﻿using ALISTAMIENTO_IE.Services;
-using System;
-using System.Windows.Forms;
 
 namespace ALISTAMIENTO_IE
 {
@@ -51,7 +49,7 @@ namespace ALISTAMIENTO_IE
                 {
                     if (MessageBox.Show("Esta acción es irreversible. ¿Desea continuar?", "Doble confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                     {
-                        _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "ANULADO", obs, DateTime.Now);
+                        _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "ALISTADO_INCOMPLETO", obs, DateTime.Now);
                         AlistamientoAnulado = true;
                         this.DialogResult = DialogResult.OK;
                         this.Close();

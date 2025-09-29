@@ -1,14 +1,9 @@
 ﻿using ALISTAMIENTO_IE.DTOs;
-using ALISTAMIENTO_IE.Models;
 using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
-using DocumentFormat.OpenXml.Bibliography;
 using ExcelDataReader;
-using Microsoft.Data.SqlClient;
 using System.Data;
-using System.Net.Mail;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ALISTAMIENTO_IE
 {
@@ -22,7 +17,7 @@ namespace ALISTAMIENTO_IE
         private readonly TimerTurnos _turnoTimerManager; // Manejador de Timer y Turnos
         private readonly System.Windows.Forms.Timer _timer;
         private System.Windows.Forms.Timer _cooldownTimer;
-        private bool _canClick;
+        private bool _canClick = true;
 
         private List<MovimientoDocumentoDto> listaNormal = new();
         private List<GrupoMovimientosDto> listaAgrupada = new();
@@ -486,6 +481,9 @@ namespace ALISTAMIENTO_IE
 
                     foreach (var m in movsDoc)
                     {
+
+                        m.FECHA = DateTime.Now;
+
                         var movimiento = new MovimientoDocumentoDto
                         {
                             FECHA = m.FECHA,
@@ -644,28 +642,33 @@ namespace ALISTAMIENTO_IE
 
                     string html = HtmlMessageBody(grupo, placas, nombreConductor, docPrincipal);
 
+                    // Reemplaza esta línea incorrecta:
+                    // var destinatarios = ["jefedesistemas@integraldeempaques.com", "otro@correo.com"];
+
+                    // Por la sintaxis correcta de inicialización de arrays en C#:
+                    var destinatarios = new string[] { "jefedesistemas@integraldeempaques.com", "otro@correo.com" };
                     using (var client = new System.Net.Mail.SmtpClient("192.168.16.215"))
-                    using (var msg = new System.Net.Mail.MailMessage("notificaciones@integraldeempaques.com", "jefedesistemas@integraldeempaques.com"))
                     {
-                        // Cuerpo
-                        msg.Subject = asunto;
-                        msg.IsBodyHtml = true;
-                        msg.BodyEncoding = System.Text.Encoding.UTF8;
-                        msg.Body = html;
-
-                        // (Opcional) Adjuntar CSV:
-                        // var csv = BuildCsv(grupo);
-                        // var bytes = Encoding.UTF8.GetBytes(csv);
-                        // var stream = new MemoryStream(bytes);
-                        // msg.Attachments.Add(new Attachment(stream, $"{placas ?? grupo.CodCamion}-{grupo.Fecha:yyyyMMdd}.csv", MediaTypeNames.Text.Plain));
-
-                        // Config SMTP (las tuyas)
                         client.UseDefaultCredentials = false;
                         client.Port = 2727;
                         client.Credentials = new System.Net.NetworkCredential("cabana\\notificaciones", "Notifica@inte");
+                        client.EnableSsl = false;
 
-                        await client.SendMailAsync(msg);
+                        foreach (var correo in destinatarios)
+                        {
+                            using (var msg = new System.Net.Mail.MailMessage("notificaciones@integraldeempaques.com", correo))
+                            {
+                                msg.Subject = asunto;
+                                msg.IsBodyHtml = true;
+                                msg.BodyEncoding = System.Text.Encoding.UTF8;
+                                msg.Body = html;
+
+                                await client.SendMailAsync(msg);
+                            }
+                        }
                     }
+
+
                 }
 
                 MessageBox.Show($"Se guardaron {filas} registros y se enviaron los correos.", "Éxito");
@@ -680,9 +683,24 @@ namespace ALISTAMIENTO_IE
             }
         }
 
-        private void ALISTAR_CAMION_Load(object sender, EventArgs e)
+        private void btnDescPlantilla_Click(object sender, EventArgs e)
         {
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\..\"));
+            string sourcePath = Path.Combine(projectPath, "public", "template", "PLANTILLA_CARGUE.xlsx");
 
+
+            string destinationPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "plantilla_file.xlsx");
+
+            try
+            {
+                File.Copy(sourcePath, destinationPath, true);
+                MessageBox.Show("Archivo copiado correctamente en: " + destinationPath, "Hecho", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al copiar el archivo : {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

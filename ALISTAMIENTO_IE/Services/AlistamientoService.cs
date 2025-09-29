@@ -88,10 +88,10 @@ namespace ALISTAMIENTO_IE.Services
                     cxd.ESTADO AS Estado,
                     ISNULL(a.estado, 'SIN_ALISTAR') AS EstadoAlistamiento,
                     SUM(dcxd.CANTIDAD_PLANIFICADA) AS CantTotalPedido
-                    FROM [SIE BACKUP].dbo.CAMION_X_DIA cxd
-                    JOIN [SIE BACKUP].dbo.DETALLE_CAMION_X_DIA dcxd
+                    FROM [SIE].dbo.CAMION_X_DIA cxd
+                    JOIN [SIE].dbo.DETALLE_CAMION_X_DIA dcxd
                         ON cxd.COD_registro_CAMION = dcxd.COD_CAMION
-                    JOIN [SIE BACKUP].dbo.CAMION c
+                    JOIN [SIE].dbo.CAMION c
                         ON c.COD_CAMION = cxd.COD_REGISTRO_CAMION 
                     LEFT JOIN ALISTAMIENTO a
                         ON a.idCamionDia = cxd.COD_CAMION

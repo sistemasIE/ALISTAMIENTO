@@ -1,12 +1,7 @@
 ﻿using ALISTAMIENTO_IE.DTOs;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ALISTAMIENTO_IE.Services
 {
@@ -392,7 +387,7 @@ namespace ALISTAMIENTO_IE.Services
                 return "N/A";
 
             // Quitar último carácter del item (igual que en tu código original)
-           
+
 
             const string sql = @"
         SELECT TOP 1 t106.f106_descripcion
@@ -435,7 +430,9 @@ namespace ALISTAMIENTO_IE.Services
             const string sql = @"
         SELECT TOP 1 f120_descripcion
         FROM t120_mc_items
-        WHERE f120_id = @ItemId;";
+        WHERE f120_id = @ItemId
+        and f120_id_cia = 2
+            ;";
 
             try
             {

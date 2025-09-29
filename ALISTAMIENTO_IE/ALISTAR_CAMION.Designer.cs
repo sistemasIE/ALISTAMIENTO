@@ -71,12 +71,15 @@
             lblUnidadesPacas = new Label();
             dgvMovimientos = new DataGridView();
             tabCargueMasivo = new TabPage();
+            pictureBox1 = new PictureBox();
+            label1 = new Label();
+            btnDescPlantilla = new Button();
+            lblProgreso = new Label();
+            progressBar1 = new ProgressBar();
             dtgAgrupada = new DataGridView();
             dtgCargueMasivo = new DataGridView();
             btnCrearCamiones = new Button();
             btnCargarArchivo = new Button();
-            progressBar1 = new ProgressBar();
-            lblProgreso = new Label();
             RECARGAR = new Button();
             tabMain.SuspendLayout();
             tabAlistar.SuspendLayout();
@@ -102,6 +105,7 @@
             pnlKpis.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvMovimientos).BeginInit();
             tabCargueMasivo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dtgAgrupada).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dtgCargueMasivo).BeginInit();
             SuspendLayout();
@@ -669,6 +673,9 @@
             // 
             // tabCargueMasivo
             // 
+            tabCargueMasivo.Controls.Add(pictureBox1);
+            tabCargueMasivo.Controls.Add(label1);
+            tabCargueMasivo.Controls.Add(btnDescPlantilla);
             tabCargueMasivo.Controls.Add(lblProgreso);
             tabCargueMasivo.Controls.Add(progressBar1);
             tabCargueMasivo.Controls.Add(dtgAgrupada);
@@ -681,6 +688,53 @@
             tabCargueMasivo.TabIndex = 2;
             tabCargueMasivo.Text = "Cargue Masivo";
             tabCargueMasivo.UseVisualStyleBackColor = true;
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.Image = Properties.Resources.green_truck;
+            pictureBox1.InitialImage = Properties.Resources.green_truck;
+            pictureBox1.Location = new Point(79, 37);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(57, 50);
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox1.TabIndex = 6;
+            pictureBox1.TabStop = false;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Myriad Pro", 28.1999989F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label1.ForeColor = Color.LimeGreen;
+            label1.Location = new Point(132, 37);
+            label1.Name = "label1";
+            label1.Size = new Size(303, 46);
+            label1.TabIndex = 5;
+            label1.Text = "Cargar Camiones";
+            // 
+            // btnDescPlantilla
+            // 
+            btnDescPlantilla.Location = new Point(294, 95);
+            btnDescPlantilla.Name = "btnDescPlantilla";
+            btnDescPlantilla.Size = new Size(221, 44);
+            btnDescPlantilla.TabIndex = 4;
+            btnDescPlantilla.Text = "Descargar Plantilla";
+            btnDescPlantilla.UseVisualStyleBackColor = true;
+            btnDescPlantilla.Click += btnDescPlantilla_Click;
+            // 
+            // lblProgreso
+            // 
+            lblProgreso.AutoSize = true;
+            lblProgreso.Location = new Point(30, 449);
+            lblProgreso.Name = "lblProgreso";
+            lblProgreso.Size = new Size(0, 21);
+            lblProgreso.TabIndex = 3;
+            // 
+            // progressBar1
+            // 
+            progressBar1.Location = new Point(30, 413);
+            progressBar1.Name = "progressBar1";
+            progressBar1.Size = new Size(866, 23);
+            progressBar1.TabIndex = 2;
             // 
             // dtgAgrupada
             // 
@@ -710,28 +764,16 @@
             // 
             // btnCargarArchivo
             // 
-            btnCargarArchivo.Location = new Point(25, 38);
+            btnCargarArchivo.BackColor = Color.LimeGreen;
+            btnCargarArchivo.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnCargarArchivo.ForeColor = SystemColors.Window;
+            btnCargarArchivo.Location = new Point(54, 95);
             btnCargarArchivo.Name = "btnCargarArchivo";
             btnCargarArchivo.Size = new Size(211, 44);
             btnCargarArchivo.TabIndex = 0;
             btnCargarArchivo.Text = "Cargar Archivo";
-            btnCargarArchivo.UseVisualStyleBackColor = true;
+            btnCargarArchivo.UseVisualStyleBackColor = false;
             btnCargarArchivo.Click += btnCargarArchivo_Click;
-            // 
-            // progressBar1
-            // 
-            progressBar1.Location = new Point(30, 413);
-            progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(866, 23);
-            progressBar1.TabIndex = 2;
-            // 
-            // lblProgreso
-            // 
-            lblProgreso.AutoSize = true;
-            lblProgreso.Location = new Point(30, 449);
-            lblProgreso.Name = "lblProgreso";
-            lblProgreso.Size = new Size(0, 21);
-            lblProgreso.TabIndex = 3;
             // 
             // ALISTAR_CAMION
             // 
@@ -745,7 +787,6 @@
             Name = "ALISTAR_CAMION";
             Text = "Alistar Camión";
             FormClosing += ALISTAR_CAMION_FormClosing;
-            Load += ALISTAR_CAMION_Load;
             tabMain.ResumeLayout(false);
             tabAlistar.ResumeLayout(false);
             splMain.Panel1.ResumeLayout(false);
@@ -777,6 +818,7 @@
             ((System.ComponentModel.ISupportInitialize)dgvMovimientos).EndInit();
             tabCargueMasivo.ResumeLayout(false);
             tabCargueMasivo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)dtgAgrupada).EndInit();
             ((System.ComponentModel.ISupportInitialize)dtgCargueMasivo).EndInit();
             ResumeLayout(false);
@@ -835,5 +877,8 @@
         private Button btnCrearCamiones;
         private ProgressBar progressBar1;
         private Label lblProgreso;
+        private Label label1;
+        private Button btnDescPlantilla;
+        private PictureBox pictureBox1;
     }
 }
