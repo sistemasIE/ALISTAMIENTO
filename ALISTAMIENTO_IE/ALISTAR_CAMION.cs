@@ -52,7 +52,7 @@ namespace ALISTAMIENTO_IE
             _cooldownTimer.Tick += (s, e) =>
             {
                 _canClick = true;
-                RECARGAR.Enabled = true;
+                btnRecargar.Enabled = true;
                 _cooldownTimer.Stop();
             };
 
@@ -209,9 +209,6 @@ namespace ALISTAMIENTO_IE
             }
 
 
-
-
-
             ListViewItem selectedItem = lvwListasCamiones.SelectedItems[0];
 
             // Recuperar el CodCamion que se guardó en el Tag
@@ -347,12 +344,14 @@ namespace ALISTAMIENTO_IE
             _turnoTimerManager.Stop();
         }
 
-        private void RECARGAR_Click(object sender, EventArgs e)
+
+
+        private void btnRecargar_Click(object sender, EventArgs e)
         {
             if (!_canClick) return;  // Ignora si está en cooldown
 
             _canClick = false;
-            RECARGAR.Enabled = false;
+            btnRecargar.Enabled = false;
 
             CargarUI();
 
@@ -702,5 +701,7 @@ namespace ALISTAMIENTO_IE
                 MessageBox.Show($"Error al copiar el archivo : {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
     }
 }

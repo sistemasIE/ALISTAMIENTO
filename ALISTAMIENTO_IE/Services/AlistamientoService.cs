@@ -3,7 +3,6 @@ using ALISTAMIENTO_IE.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Configuration;
-using System.Data;
 
 namespace ALISTAMIENTO_IE.Services
 {
@@ -23,30 +22,7 @@ namespace ALISTAMIENTO_IE.Services
         }
         public IEnumerable<ItemsDetalleDTO> ObtenerItemsPorAlistarCamion(int camionId)
         {
-            // 1. Obtiene todos los detalles del camión.
-            IEnumerable<DetalleCamionXDia> detalles = _detalleCamionXDiaService.ObtenerPorCodCamion(camionId);
 
-            // 2. Agrupa los detalles por 'Item' y suma la cantidad planificada de cada grupo.
-            var itemsAgrupados = detalles.GroupBy(x => x.Item)
-                                         .Select(group => new
-                                         {
-                                             Item = group.Key,
-                                             CantidadPlanificadaTotal = group.Sum(x => x.CANTIDAD_PLANIFICADA)
-                                         });
-
-            // 3. Obtiene las descripciones para los ítems únicos.
-            List<int> itemIds = itemsAgrupados.Select(x => x.Item).ToList();
-            Dictionary<int, string> descripciones = _itemService.ObtenerDescripcionesItems(itemIds, 2);
-
-            // 4. Mapea la información agrupada al DTO final.
-            List<ItemsDetalleDTO> itemsDetalles = itemsAgrupados.Select(x => new ItemsDetalleDTO
-            {
-                Item = x.Item,
-                Descripcion = descripciones.ContainsKey(x.Item) ? descripciones[x.Item] : "Descripción no encontrada",
-                CantidadPlanificada = x.CantidadPlanificadaTotal,
-            }).ToList();
-
-            return itemsDetalles;
         }
 
 
@@ -72,46 +48,41 @@ namespace ALISTAMIENTO_IE.Services
         }
 
 
-
-
         public IEnumerable<CamionEnAlistamientoDTO> ObtenerCamionesEnAlistamiento()
         {
             using (SqlConnection connection = new SqlConnection(_connectionStringMAIN))
             {
-                // Modificamos la consulta para incluir el estado del alistamiento con SIN_ALISTAR cuando es null
-                // y agregamos ordenamiento personalizado
                 string sql = @"
                    SELECT
-                    cxd.COD_CAMION AS CodCamion,
-                    c.PLACAS AS Placas,
-                    cxd.Fecha AS FECHA,
-                    cxd.ESTADO AS Estado,
-                    ISNULL(a.estado, 'SIN_ALISTAR') AS EstadoAlistamiento,
-                    SUM(dcxd.CANTIDAD_PLANIFICADA) AS CantTotalPedido
-                    FROM [SIE].dbo.CAMION_X_DIA cxd
-                    JOIN [SIE].dbo.DETALLE_CAMION_X_DIA dcxd
-                        ON cxd.COD_registro_CAMION = dcxd.COD_CAMION
-                    JOIN [SIE].dbo.CAMION c
-                        ON c.COD_CAMION = cxd.COD_REGISTRO_CAMION 
-                    LEFT JOIN ALISTAMIENTO a
-                        ON a.idCamionDia = cxd.COD_CAMION
-                    WHERE
-                        cxd.ESTADO = 'C' 
-                        AND cxd.FECHA > DATEADD(DAY, -3, GETDATE())
-                        AND (a.ESTADO IS NULL OR a.ESTADO LIKE '%INCOMPLETO%' OR a.ESTADO = 'EN_PROCESO' OR a.ESTADO = 'ALISTADO' OR a.ESTADO = 'ANULADO')
+                     cxd.COD_CAMION AS CodCamion,
+                     c.PLACAS AS Placas,
+                     cxd.fecha as FECHA,
+                     cxd.ESTADO AS Estado,
+                     ISNULL(a.estado, 'SIN_ALISTAR') AS EstadoAlistamiento,
+                     sum(dcxd.CANTIDAD_PLANIFICADA ) as cantTotalPedido
+                     FROM [SIE].dbo.CAMION_X_DIA cxd
+                     JOIN [SIE].dbo.DETALLE_CAMION_X_DIA dcxd
+                         ON cxd.COD_registro_CAMION = dcxd.COD_CAMION
+                     JOIN [SIE].dbo.CAMION c
+                         ON c.COD_CAMION = cxd.COD_REGISTRO_CAMION 
+                     LEFT JOIN ALISTAMIENTO a
+                         ON a.idCamionDia = cxd.COD_CAMION
+                     WHERE
+ 	                     cxd.ESTADO = 'C' -- Sin alistar
+	                     AND cxd.FECHA > DATEADD(DAY, -5, GETDATE())
+                         AND (a.ESTADO IS NULL OR a.ESTADO LIKE '%INCOMPLETO%' OR a.ESTADO = 'EN_PROCESO' OR a.ESTADO = 'ALISTADO' OR a.ESTADO = 'ANULADO')
                     GROUP BY
-                        cxd.COD_CAMION, c.PLACAS, cxd.FECHA, cxd.ESTADO, a.estado
+                        cxd.COD_CAMION, c.PLACAS, cxd.FECHA, cxd.ESTADO, a.estado 
                     ORDER BY
-                        -- Ordenamiento personalizado según prioridad: ALISTADO_INCOMPLETO, SIN_ALISTAR, EN_PROCESO, ALISTADO, ANULADO
-                        CASE ISNULL(a.estado, 'SIN_ALISTAR')
-                            WHEN 'ALISTADO_INCOMPLETO' THEN 1
-                            WHEN 'SIN_ALISTAR' THEN 2
-                            WHEN 'EN_PROCESO' THEN 3
-                            WHEN 'ALISTADO' THEN 4
-                            WHEN 'ANULADO' THEN 5
-                            ELSE 6
-                        END,
-                        cxd.FECHA DESC;";
+                         CASE ISNULL(a.estado, 'SIN_ALISTAR')
+                             WHEN 'ALISTADO_INCOMPLETO' THEN 1
+                             WHEN 'SIN_ALISTAR' THEN 2
+                             WHEN 'EN_PROCESO' THEN 3
+                             WHEN 'ALISTADO' THEN 4
+                             WHEN 'ANULADO' THEN 5
+                             ELSE 6
+                         END,
+                         cxd.FECHA DESC;";
 
                 IEnumerable<CamionEnAlistamientoDTO> result = connection.Query<CamionEnAlistamientoDTO>(sql).ToList();
                 return result;

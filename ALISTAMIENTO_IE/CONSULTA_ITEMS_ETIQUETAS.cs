@@ -1,20 +1,22 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using ALISTAMIENTO_IE.Utils;
+using Microsoft.Data.SqlClient;
 using System.Data;
+
 
 namespace LECTURA_DE_BANDA
 {
     public partial class CONSULTA_ITEMS_ETIQUETAS : Form
     {
         private readonly string? _placaCamion;
+        private readonly PrinterService? _printerService;
 
         public CONSULTA_ITEMS_ETIQUETAS()
         {
             InitializeComponent();
 
             this.Icon = ALISTAMIENTO_IE.Properties.Resources.Icono;
+            this._printerService = new PrinterService();
 
-            btnBuscarEtiquetado.Click += btnBuscarItems_Click;
-            btnImprimirEtiquetado.Click += btnImprimirEtiquetado_Click;
         }
 
         public CONSULTA_ITEMS_ETIQUETAS(IEnumerable<string> items) : this()
@@ -166,11 +168,7 @@ ORDER BY
             ExportarDgv(dgv, ExportFormat.Excel);
         }
 
-        private int totalPages = 0;
-        private int currentPage = 0;
-        private System.Drawing.Printing.PrintDocument printDocument = null;
-        private List<string> columnasParaImprimir = new List<string>();
-        private DataTable dataParaImprimir = null;
+
 
         private void btnImprimirEtiquetado_Click(object sender, EventArgs e)
         {
@@ -180,108 +178,15 @@ ORDER BY
                 return;
             }
 
-            columnasParaImprimir.Clear();
-            foreach (DataGridViewColumn col in dgv.Columns)
-            {
-                if (col.Visible)
-                    columnasParaImprimir.Add(col.HeaderText);
-            }
 
-            dataParaImprimir = ((DataTable)dgv.DataSource).Copy();
+            // Generar PDF:
+            string urlPdf = _printerService.GenerarReporteAlistamiento(dgv, dgv);
 
-            printDocument = new System.Drawing.Printing.PrintDocument();
-            printDocument.PrintPage += PrintDocument_PrintPage;
-            printDocument.BeginPrint += PrintDocument_BeginPrint;
+            // Imprimir:
+            _printerService.ImprimirPDF(urlPdf);
 
-            PrintDialog printDialog = new PrintDialog();
-            printDialog.Document = printDocument;
-            printDialog.UseEXDialog = true;
 
-            if (printDialog.ShowDialog() == DialogResult.OK)
-            {
-                printDocument.Print();
-            }
-        }
 
-        private void PrintDocument_BeginPrint(object sender, System.Drawing.Printing.PrintEventArgs e)
-        {
-            currentPage = 0;
-            int rowsPerPage = 25;
-            totalPages = (int)Math.Ceiling(dataParaImprimir.Rows.Count / (double)rowsPerPage);
-        }
-
-        private void PrintDocument_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
-        {
-            int leftMargin = e.MarginBounds.Left;
-            int topMargin = e.MarginBounds.Top;
-            int width = e.MarginBounds.Width;
-            int height = e.MarginBounds.Height;
-
-            Font titleFont = new Font("Arial", 14, FontStyle.Bold);
-            Font headerFont = new Font("Arial", 10, FontStyle.Bold);
-            Font textFont = new Font("Arial", 9);
-
-            string title = "Reporte de Items en Bodega";
-            e.Graphics.DrawString(title, titleFont, Brushes.Black, leftMargin + (width / 2) - (e.Graphics.MeasureString(title, titleFont).Width / 2), topMargin);
-
-            string dateTime = "Fecha: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm");
-            e.Graphics.DrawString(dateTime, textFont, Brushes.Black, leftMargin + width - e.Graphics.MeasureString(dateTime, textFont).Width, topMargin);
-
-            int currentY = topMargin + (int)titleFont.GetHeight() + 40;
-
-            int numColumns = columnasParaImprimir.Count;
-            int[] columnWidths = new int[numColumns];
-            int totalWidth = 0;
-            for (int i = 0; i < numColumns; i++)
-            {
-                columnWidths[i] = width / numColumns;
-                totalWidth += columnWidths[i];
-            }
-            columnWidths[numColumns - 1] += width - totalWidth;
-
-            int currentX = leftMargin;
-            for (int i = 0; i < numColumns; i++)
-            {
-                Rectangle cellRect = new Rectangle(currentX, currentY, columnWidths[i], (int)headerFont.GetHeight() + 5);
-                e.Graphics.FillRectangle(Brushes.LightGray, cellRect);
-                e.Graphics.DrawRectangle(Pens.Black, cellRect);
-                e.Graphics.DrawString(columnasParaImprimir[i], headerFont, Brushes.Black, cellRect, new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
-                currentX += columnWidths[i];
-            }
-            currentY += (int)headerFont.GetHeight() + 5;
-
-            int rowsPerPage = 25;
-            int startRow = currentPage * rowsPerPage;
-            int endRow = Math.Min(startRow + rowsPerPage, dataParaImprimir.Rows.Count);
-
-            for (int rowIndex = startRow; rowIndex < endRow; rowIndex++)
-            {
-                DataRow row = dataParaImprimir.Rows[rowIndex];
-                currentX = leftMargin;
-                for (int colIndex = 0; colIndex < numColumns; colIndex++)
-                {
-                    string cellValue = "";
-                    if (colIndex < dataParaImprimir.Columns.Count)
-                    {
-                        object value = row[colIndex];
-                        cellValue = value == null ? "" : value.ToString();
-                    }
-                    Rectangle cellRect = new Rectangle(currentX, currentY, columnWidths[colIndex], (int)textFont.GetHeight() + 5);
-                    e.Graphics.DrawRectangle(Pens.Black, cellRect);
-                    e.Graphics.DrawString(cellValue, textFont, Brushes.Black, cellRect, new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
-                    currentX += columnWidths[colIndex];
-                }
-                currentY += (int)textFont.GetHeight() + 5;
-                if (currentY + (int)textFont.GetHeight() > e.MarginBounds.Bottom)
-                {
-                    break;
-                }
-            }
-
-            currentPage++;
-            string pageInfo = $"Página {currentPage} de {totalPages}";
-            e.Graphics.DrawString(pageInfo, textFont, Brushes.Black, leftMargin + width - e.Graphics.MeasureString(pageInfo, textFont).Width, e.MarginBounds.Bottom - (int)textFont.GetHeight());
-            e.HasMorePages = currentPage < totalPages;
         }
 
         public enum ExportFormat { Csv, Excel }
@@ -310,5 +215,7 @@ ORDER BY
                 }
             }
         }
+
+
     }
 }

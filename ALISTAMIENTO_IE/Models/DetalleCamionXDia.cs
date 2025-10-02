@@ -16,6 +16,10 @@ namespace ALISTAMIENTO_IE.Models
         [Column("ITEM")]
         public int Item { get; set; }
 
+
+        [Column("ITEM_EQUIVALENTE")]
+        public int ItemEquivalente { get; set; }
+
         [Column("ESTADO")]
         [StringLength(1)]
         public string Estado { get; set; }
