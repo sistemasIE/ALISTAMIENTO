@@ -20,8 +20,54 @@ namespace ALISTAMIENTO_IE.Services
             _detalleCamionXDiaService = new DetalleCamionXDiaService();
             _itemService = new ItemService();
         }
-        public IEnumerable<ItemsDetalleDTO> ObtenerItemsPorAlistarCamion(int camionId)
+        public async Task<IEnumerable<CamionItemsDto>> ObtenerItemsPorAlistarCamion(int camionId)
         {
+
+            using (var connection = new SqlConnection(_connectionStringMAIN))
+            {
+                string sql = @"
+                    SELECT
+                    c.PLACAS AS Placas,
+                    cxd.fecha AS Fecha,
+                    i.f120_descripcion AS Descripcion,
+                    dcxd.item AS Item,
+                    i.f120_id_unidad_inventario as UNIDAD,
+                    i.f120_id_unidad_empaque as EMB,
+                    SUM(dcxd.CANTIDAD_PLANIFICADA) AS CantTotalPedido,
+                    CASE 
+                        WHEN i.f120_id_unidad_inventario = 'UND' 
+                        THEN SUM(dcxd.CANTIDAD_PLANIFICADA) / 
+                             TRY_CAST(SUBSTRING(i.f120_id_unidad_empaque, 2, LEN(i.f120_id_unidad_empaque)) AS INT)
+                        ELSE 0
+                    END AS PacasEsperadas,
+                    CASE 
+                        WHEN i.f120_id_unidad_inventario = 'KLS'
+                        THEN SUM(dcxd.CANTIDAD_PLANIFICADA)
+                        ELSE 0
+                    END AS KilosEsperados
+                FROM [SIE].dbo.CAMION_X_DIA cxd
+                JOIN [SIE].dbo.DETALLE_CAMION_X_DIA dcxd
+                    ON cxd.COD_CAMION = dcxd.COD_CAMION
+                JOIN [SIE].dbo.CAMION c
+                    ON c.COD_CAMION = cxd.COD_REGISTRO_CAMION 
+                LEFT JOIN ALISTAMIENTO a
+                    ON a.idCamionDia = cxd.COD_CAMION
+                LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items i
+                    ON dcxd.ITEM = i.f120_id
+                WHERE
+                    cxd.COD_CAMION = @idCamionDia AND i.f120_id_cia = 2
+                GROUP BY
+                    cxd.COD_CAMION, c.PLACAS, cxd.FECHA, i.f120_id_unidad_inventario, i.f120_id, i.f120_descripcion,
+                    dcxd.item, cxd.ESTADO, a.estado, i.f120_id_unidad_empaque, dcxd.PTO_ENVIO
+                ORDER BY
+                    CantTotalPedido DESC;
+                ";
+
+
+                var result = await connection.QueryAsync<CamionItemsDto>(sql, new { idCamionDia = camionId });
+
+                return result.ToList();
+            }
 
         }
 
@@ -69,7 +115,7 @@ namespace ALISTAMIENTO_IE.Services
                          ON a.idCamionDia = cxd.COD_CAMION
                      WHERE
  	                     cxd.ESTADO = 'C' -- Sin alistar
-	                     AND cxd.FECHA > DATEADD(DAY, -5, GETDATE())
+	                     AND cxd.FECHA > DATEADD(DAY, -2, GETDATE())
                          AND (a.ESTADO IS NULL OR a.ESTADO LIKE '%INCOMPLETO%' OR a.ESTADO = 'EN_PROCESO' OR a.ESTADO = 'ALISTADO' OR a.ESTADO = 'ANULADO')
                     GROUP BY
                         cxd.COD_CAMION, c.PLACAS, cxd.FECHA, cxd.ESTADO, a.estado 

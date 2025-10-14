@@ -1,4 +1,5 @@
 ﻿using ALISTAMIENTO_IE.DTOs;
+using ALISTAMIENTO_IE.Interfaces;
 using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
 using ExcelDataReader;
@@ -10,8 +11,11 @@ namespace ALISTAMIENTO_IE
     public partial class ALISTAR_CAMION : Form
     {
         private readonly AlistamientoService alistamientoService;
+        private readonly IPdfService _pdfService;
         private readonly DetalleCamionXDiaService _detalleCamionXDiaService;
         private readonly AlistamientoEtiquetaService _alistamientoEtiquetaService; // reporte
+        private readonly KardexService _kardexService; // reporte
+        private readonly IDataGridViewExporter _dataGridViewExporter; // reporte
         private readonly CargueMasivoService _cargueMasivoService;
         private List<CamionDetallesDTO> _camiones;
         private readonly TimerTurnos _turnoTimerManager; // Manejador de Timer y Turnos
@@ -21,6 +25,10 @@ namespace ALISTAMIENTO_IE
 
         private List<MovimientoDocumentoDto> listaNormal = new();
         private List<GrupoMovimientosDto> listaAgrupada = new();
+
+        private int codCamionSeleccionado;
+        private String placaCamionSeleccionado;
+
 
         public ALISTAR_CAMION()
         {
@@ -34,8 +42,12 @@ namespace ALISTAMIENTO_IE
             _alistamientoEtiquetaService = new AlistamientoEtiquetaService();
             _turnoTimerManager = new TimerTurnos(this); // inicializar el timer
             _cargueMasivoService = new CargueMasivoService();
+            _dataGridViewExporter = new DataGridViewExporter();
+            _kardexService = new KardexService();
+            _pdfService = new QuestPDFService(_dataGridViewExporter);
 
             CargarUI();
+
             lvwListasCamiones.DoubleClick += lvwListasCamiones_DoubleClick;
             lvwListasCamiones.Click += lvwListasCamiones_DoubleClick;
             btnAlistar.Visible = true;
@@ -149,7 +161,7 @@ namespace ALISTAMIENTO_IE
                     data = await _alistamientoEtiquetaService.ObtenerReportePacasPorHoraPorTurno(dtpFechaReporte.Value, turnoLike);
                 }
 
-                dgvResumen.DataSource = DataGridViewExporter.ConvertDynamicToDataTable(data);
+                dgvResumen.DataSource = _dataGridViewExporter.ConvertDynamicToDataTable(data);
             }
             catch (Exception ex)
             {
@@ -179,20 +191,20 @@ namespace ALISTAMIENTO_IE
                 switch (camion.EstadoAlistamiento)
                 {
                     case "ALISTADO_INCOMPLETO":
-                        item.BackColor = Color.Orange;
-                        item.ForeColor = Color.White;
+                        item.BackColor = System.Drawing.Color.Orange;
+                        item.ForeColor = System.Drawing.Color.White;
                         break;
                     case "SIN_ALISTAR":
-                        item.BackColor = Color.LightGray;
+                        item.BackColor = System.Drawing.Color.LightGray;
                         break;
                     case "EN_PROCESO":
-                        item.BackColor = Color.LightBlue;
+                        item.BackColor = System.Drawing.Color.LightBlue;
                         break;
                     case "ALISTADO":
-                        item.BackColor = Color.LightGreen;
+                        item.BackColor = System.Drawing.Color.LightGreen;
                         break;
                     case "ANULADO":
-                        item.BackColor = Color.LightCoral;
+                        item.BackColor = System.Drawing.Color.LightCoral;
                         break;
                 }
 
@@ -212,10 +224,11 @@ namespace ALISTAMIENTO_IE
             ListViewItem selectedItem = lvwListasCamiones.SelectedItems[0];
 
             // Recuperar el CodCamion que se guardó en el Tag
-            int codCamion = selectedItem.Tag is int tag ? tag : 0;
+            codCamionSeleccionado = selectedItem.Tag is int tag ? tag : 0;
 
             // Recuperar los valores de cada columna (SubItems)
-            string placas = selectedItem.SubItems[0].Text;     // Placas
+            placaCamionSeleccionado = selectedItem.SubItems[0].Text;     // Placas
+
             string fechaTexto = selectedItem.SubItems[1].Text; // Fecha en texto
 
             // Convertir a DateTime de forma segura
@@ -228,30 +241,20 @@ namespace ALISTAMIENTO_IE
                 return;
             }
 
-            if (codCamion > 0)
+            if (codCamionSeleccionado > 0)
             {
-                MostrarItemsDeCamion(codCamion);
+                MostrarItemsDeCamion(codCamionSeleccionado);
                 btnAlistar.Visible = true;
 
-                lblTituloCamion.Text = $"CAMIÓN - {placas}";
+                lblTituloCamion.Text = $"CAMIÓN - {placaCamionSeleccionado}";
                 lblFechaValor.Text = fecha.ToString("dd/MM/yyyy"); // lo muestras en formato lindo
             }
         }
 
-
-
-
-
-        private void MostrarItemsDeCamion(int codCamion)
+        private async void MostrarItemsDeCamion(int codCamion)
         {
-            List<ItemsDetalleDTO> items = new List<ItemsDetalleDTO>(alistamientoService.ObtenerItemsPorAlistarCamion(codCamion));
+            List<CamionItemsDto> items = new List<CamionItemsDto>(await alistamientoService.ObtenerItemsPorAlistarCamion(codCamion));
             dgvItems.DataSource = items;
-            if (dgvItems.Columns.Count > 0)
-            {
-                dgvItems.Columns["Item"].HeaderText = "ITEM";
-                dgvItems.Columns["Descripcion"].HeaderText = "Descripción";
-                dgvItems.Columns["CantidadPlanificada"].HeaderText = "Cantidad";
-            }
         }
 
         private int? GetSelectedCamionId()
@@ -344,8 +347,6 @@ namespace ALISTAMIENTO_IE
             _turnoTimerManager.Stop();
         }
 
-
-
         private void btnRecargar_Click(object sender, EventArgs e)
         {
             if (!_canClick) return;  // Ignora si está en cooldown
@@ -382,8 +383,8 @@ namespace ALISTAMIENTO_IE
             label.AutoSize = true;
             label.MaximumSize = new Size(576, 0);                 // permite que el texto haga wrap
 
-            textBox.Font = new Font(textBox.Font, FontStyle.Regular);
-            textBox.Font = new Font(textBox.Font.FontFamily, 11f); // fuente más grande
+            textBox.Font = new System.Drawing.Font(textBox.Font, FontStyle.Regular);
+            textBox.Font = new System.Drawing.Font(textBox.Font.FontFamily, 11f); // fuente más grande
             textBox.SetBounds(12, 60, 576, 32);                   // textbox más alto y ancho
             textBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
@@ -411,43 +412,49 @@ namespace ALISTAMIENTO_IE
         private async void btnCargarArchivo_Click(object sender, EventArgs e)
         {
             btnCargarArchivo.Enabled = false;
-            using var ofd = new OpenFileDialog
-            {
-                Title = "Selecciona un archivo de Excel",
-                Filter = "Archivos de Excel|*.xlsx;*.xls;*.xlsb"
-            };
-
-            if (ofd.ShowDialog() != DialogResult.OK) return;
-
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-            using var stream = File.Open(ofd.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using var reader = ExcelReaderFactory.CreateReader(stream);
-
-            var conf = new ExcelDataSetConfiguration
-            {
-                ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
-            };
-
-            var ds = reader.AsDataSet(conf);
-            if (ds.Tables.Count == 0)
-            {
-                MessageBox.Show("El archivo no contiene hojas.");
-                return;
-            }
-
-            DataTable dt = ds.Tables[0];
-
-            // --- Progreso: inicializar ---
-            progressBar1.Visible = true;
-            progressBar1.Value = 0;
-            progressBar1.Minimum = 0;
-            progressBar1.Maximum = dt.Rows.Count;   // determinate
-            lblProgreso.Visible = true;
-            lblProgreso.Text = $"0 / {dt.Rows.Count}";
 
             try
             {
+                using var ofd = new OpenFileDialog
+                {
+                    Title = "Selecciona un archivo de Excel",
+                    Filter = "Archivos de Excel|*.xlsx;*.xls;*.xlsb"
+                };
+
+                if (ofd.ShowDialog() != DialogResult.OK)
+                {
+                    btnCargarArchivo.Enabled = true; // ✅ CORREGIDO: Rehabilitar el botón si se cancela
+                    return;
+                }
+
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+                using var stream = File.Open(ofd.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = ExcelReaderFactory.CreateReader(stream);
+
+                var conf = new ExcelDataSetConfiguration
+                {
+                    ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
+                };
+
+                var ds = reader.AsDataSet(conf);
+                if (ds.Tables.Count == 0)
+                {
+                    MessageBox.Show("El archivo no contiene hojas.");
+                    btnCargarArchivo.Enabled = true; // ✅ CORREGIDO: Rehabilitar el botón si hay error
+                    return;
+                }
+
+                DataTable dt = ds.Tables[0];
+
+                // --- Progreso: inicializar ---
+                progressBar1.Visible = true;
+                progressBar1.Value = 0;
+                progressBar1.Minimum = 0;
+                progressBar1.Maximum = dt.Rows.Count;   // determinate
+                lblProgreso.Visible = true;
+                lblProgreso.Text = $"0 / {dt.Rows.Count}";
+
                 listaNormal = new List<MovimientoDocumentoDto>();
                 var itemsParaAgrupar = new List<(DateTime Fecha, string EmpresaTransporte, long CodCamion, long CodConductor, MovimientoDocumentoDto Movimiento)>();
 
@@ -459,9 +466,9 @@ namespace ALISTAMIENTO_IE
                     string empresa = fila["EMPRESA"]?.ToString()?.Trim() ?? "";
                     string tipoDocumento = fila["TIPO DOCUMENTO"]?.ToString()?.Trim() ?? "";
                     string idDocumentoTxt = fila["ID DOCUMENTO"]?.ToString()?.Trim() ?? "";
-                    string ciaTransporteTxt = fila["ID CIA TRANSPORTE"]?.ToString()?.Trim() ?? "";
+                    string ciaTransporteTxt = fila["CIA TRANSPORTE"]?.ToString()?.Trim() ?? "";
                     string codConductorTxt = fila["COD_CONDUCTOR"]?.ToString()?.Trim() ?? "";
-                    string codCamionTxt = fila["COD CAMION"]?.ToString()?.Trim() ?? "";
+                    string codCamionTxt = fila["COD_CAMION"]?.ToString()?.Trim() ?? "";
 
                     if (!int.TryParse(idDocumentoTxt, out var idDocumento)) { /*...*/ continue; }
                     if (!int.TryParse(ciaTransporteTxt, out var rowIdTransporte)) { /*...*/ continue; }
@@ -551,13 +558,17 @@ namespace ALISTAMIENTO_IE
                 dtgCargueMasivo.AutoResizeColumns();
                 dtgAgrupada.DataSource = listaAgrupada;
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error procesando el archivo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             finally
             {
                 // --- Progreso: finalizar ---
                 lblProgreso.Text = "";
                 progressBar1.Visible = false;
                 lblProgreso.Visible = false;
-                btnCargarArchivo.Enabled = true;
+                btnCargarArchivo.Enabled = true; // ✅ SIEMPRE rehabilitar el botón
             }
         }
         private static string HtmlMessageBody(GrupoMovimientosDto grupo, string? placas, string? nombreConductor, string? docPrincipal)
@@ -702,6 +713,37 @@ namespace ALISTAMIENTO_IE
             }
         }
 
+        private async void button1_Click_1(object sender, EventArgs e)
+        {
+            IEnumerable<CamionItemsDto> items = await alistamientoService.ObtenerItemsPorAlistarCamion(codCamionSeleccionado);
 
+
+            // Extraemos el código numérico del DTO
+            var validItems = items
+                .Select(x => x.Item).ToList();
+
+            if (validItems.Count == 0)
+            {
+                MessageBox.Show("No hay ítems válidos para el camión seleccionado.",
+                                "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DataTable dt1 = _dataGridViewExporter.ToDataTable(await alistamientoService.ObtenerItemsPorAlistarCamion(codCamionSeleccionado));
+
+            DataTable dt2 = _kardexService.ObtenerDatosDeItems(validItems);
+
+
+            // Items del camión, Ubicaciones de esos Items y Placa como título.
+            _pdfService.Generate(dt1, dt2, $"PLACA: {placaCamionSeleccionado}");
+
+            MessageBox.Show("PDF generado exitosamente:\n");
+
+        }
+
+        private void btnRecargar_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

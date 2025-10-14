@@ -1,10 +1,12 @@
-﻿using ClosedXML.Excel;
+﻿using ALISTAMIENTO_IE.Interfaces;
+using ClosedXML.Excel;
 using System.Data;
+using System.Reflection;
 using System.Text;
 
-public static class DataGridViewExporter
+public class DataGridViewExporter : IDataGridViewExporter
 {
-    public static void ExportToCsv(DataGridView dgv, string filePath)
+    public void ExportToCsv(DataGridView dgv, string filePath)
     {
         var sb = new StringBuilder();
         // Header
@@ -32,7 +34,7 @@ public static class DataGridViewExporter
         File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
     }
 
-    public static void ExportToExcel(DataGridView dgv, string filePath)
+    public void ExportToExcel(DataGridView dgv, string filePath)
     {
         var dt = new DataTable();
         // Add columns
@@ -57,9 +59,7 @@ public static class DataGridViewExporter
         }
     }
 
-
-
-    public static DataTable ConvertDynamicToDataTable(IEnumerable<dynamic> items)
+    public DataTable ConvertDynamicToDataTable(IEnumerable<dynamic> items)
     {
         var dt = new DataTable();
         bool colsCreated = false;
@@ -104,4 +104,50 @@ public static class DataGridViewExporter
         }
         return dt;
     }
+
+
+    public DataTable ToDataTable<T>(IEnumerable<T> list)
+    {
+        var tb = new DataTable(typeof(T).Name);
+        PropertyInfo[] props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+        foreach (var prop in props)
+        {
+            tb.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
+        }
+
+        foreach (var item in list)
+        {
+            var values = new object[props.Length];
+            for (var i = 0; i < props.Length; i++)
+            {
+                values[i] = props[i].GetValue(item, null) ?? DBNull.Value;
+            }
+            tb.Rows.Add(values);
+        }
+
+        return tb;
+    }
+
+    public DataTable ConvertToDataTable(DataGridView dgv)
+    {
+        DataTable dt = new DataTable();
+
+        foreach (DataGridViewColumn col in dgv.Columns)
+            dt.Columns.Add(col.HeaderText);
+
+        foreach (DataGridViewRow row in dgv.Rows)
+        {
+            if (!row.IsNewRow)
+            {
+                var valores = row.Cells.Cast<DataGridViewCell>()
+                                       .Select(c => c.Value?.ToString() ?? "")
+                                       .ToArray();
+                dt.Rows.Add(valores);
+            }
+        }
+
+        return dt;
+    }
+
 }

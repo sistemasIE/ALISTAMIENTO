@@ -28,6 +28,9 @@ namespace ALISTAMIENTO_IE
         private readonly CamionService _camionService;
         private readonly Camion CAMION_ACTUAL;
 
+
+
+        private readonly DataGridViewExporter _dataGridViewExporter = new DataGridViewExporter();
         // Cache en memoria para acelerar cálculos sin tocar DB
         private List<string> etiquetasLeidas = new List<string>();
         private Dictionary<int, int> _conteoPorItem = new Dictionary<int, int>();
@@ -56,7 +59,7 @@ namespace ALISTAMIENTO_IE
             btnBuscar.Click += btnBuscar_Click;
 
             CAMION_ACTUAL = _camionService.GetCamionByCamionXDiaId(idCamion);
-            lblPlaca.Text = CAMION_ACTUAL != null ? $"PLACAS: {CAMION_ACTUAL.PLACAS}" : "Desconocida";
+            lblPlaca.Text = CAMION_ACTUAL != null ? $"PLACAS: " + CAMION_ACTUAL.PLACAS.ToString() : "Desconocida";
         }
 
         /// <summary>
@@ -77,38 +80,42 @@ namespace ALISTAMIENTO_IE
         /// </summary>
         private async void BtnTerminar_Click(object sender, EventArgs e)
         {
-            if (VerificarAlistamientoCompleto())
-            {
-                // Alistamiento completo - actualizar estado a ALISTADO
-                _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "ALISTADO", "Alistamiento completado exitosamente", DateTime.Now);
-                _estadoAlistamiento = "ALISTADO";
-                MessageBox.Show("Alistamiento completado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.Close();
-            }
-            else
-            {
-                // Alistamiento incompleto - preguntar si desea cerrar con observaciones
-                var result = MessageBox.Show(
-                    "No se puede terminar el alistamiento porque hay algunas unidades que no han sido alistadas completamente.\n\n¿Desea cerrar el alistamiento con observaciones?",
-                    "Alistamiento Incompleto",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
 
-                if (result == DialogResult.Yes)
+            var res = MessageBox.Show("¡¿Desea TERMINAR el alistamiento?!", "Confirmar",
+                                        MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (res.Equals(true))
+                if (VerificarAlistamientoCompleto())
                 {
-                    using (var obsForm = new OBSERVACIONES(_idAlistamiento, "Indique el motivo del alistamiento incompleto"))
+                    // Alistamiento completo - actualizar estado a ALISTADO
+                    _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "ALISTADO", "Alistamiento completado exitosamente", DateTime.Now);
+                    _estadoAlistamiento = "ALISTADO";
+                    MessageBox.Show("Alistamiento completado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close();
+                }
+                else
+                {
+                    // Alistamiento incompleto - preguntar si desea cerrar con observaciones
+                    var result = MessageBox.Show(
+                        "No se puede terminar el alistamiento porque hay algunas unidades que no han sido alistadas completamente.\n\n¿Desea cerrar el alistamiento con observaciones?",
+                        "Alistamiento Incompleto",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.Yes)
                     {
-                        var obsResult = obsForm.ShowDialog(this);
-                        if (obsResult == DialogResult.OK && obsForm.AlistamientoIncompleto)
+                        using (var obsForm = new OBSERVACIONES(_idAlistamiento, "Indique el motivo del alistamiento incompleto"))
                         {
-                            // El estado ya fue actualizado en el form de observaciones
-                            _estadoAlistamiento = "ALISTADO_INCOMPLETO";
-                            MessageBox.Show("Alistamiento cerrado como incompleto.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            this.Close();
+                            var obsResult = obsForm.ShowDialog(this);
+                            if (obsResult == DialogResult.OK && obsForm.AlistamientoIncompleto)
+                            {
+                                // El estado ya fue actualizado en el form de observaciones
+                                _estadoAlistamiento = "ALISTADO_INCOMPLETO";
+                                MessageBox.Show("Alistamiento cerrado como incompleto.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                this.Close();
+                            }
                         }
                     }
                 }
-            }
         }
 
         private async void ALISTAMIENTO_Load(object sender, EventArgs e)
@@ -198,7 +205,7 @@ namespace ALISTAMIENTO_IE
                 await RecalcularCantidadesAlistadas();
 
                 // Obtener los ítems pendientes del camión
-                var items = _alistamientoService.ObtenerItemsPorAlistarCamion(_idCamion).ToList();
+                IEnumerable<CamionItemsDto> items = await _alistamientoService.ObtenerItemsPorAlistarCamion(_idCamion);
                 ITEMS_PENDIENTES = items.Select(i => i.Item.ToString()).ToList();
             }
             catch (Exception ex)
@@ -340,16 +347,17 @@ namespace ALISTAMIENTO_IE
             lblTimer.Text = transcurrido.ToString(@"hh\:mm\:ss");
         }
 
-        private void btnBuscar_Click(object sender, EventArgs e)
+        private async void btnBuscar_Click(object sender, EventArgs e)
         {
             var placa = CAMION_ACTUAL?.PLACAS ?? string.Empty;
-            var consultaForm = new LECTURA_DE_BANDA.CONSULTA_ITEMS_ETIQUETAS(ITEMS_PENDIENTES, placa);
-            consultaForm.ShowDialog(this);
-        }
 
-        private void btnLimpiar_Click(object sender, EventArgs e)
-        {
-            txtEtiqueta.Text = string.Empty;
+            // Create a properly initialized DataGridView with the current main data
+            var dgvNew = new DataGridView();
+            var itemsData = await _alistamientoService.ObtenerItemsPorAlistarCamion(_idCamion);
+            dgvNew.DataSource = itemsData;
+
+            var consultaForm = new LECTURA_DE_BANDA.CONSULTA_ITEMS_ETIQUETAS(ITEMS_PENDIENTES, placa, _dataGridViewExporter.ToDataTable<CamionItemsDto>(itemsData));
+            consultaForm.ShowDialog(this);
         }
 
         private void ALISTAMIENTO_FormClosing(object sender, FormClosingEventArgs e)
@@ -691,5 +699,20 @@ namespace ALISTAMIENTO_IE
                 System.Diagnostics.Debug.WriteLine($"Error al reproducir sonido de éxito: {ex.Message}");
             }
         }
+
+        private void btnPausa_Click(object sender, EventArgs e)
+        {
+            var res = MessageBox.Show("¿Desea PONER EN PAUSA el Alistamiento?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+
+            if (res.Equals(true))
+            {
+                _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "ALISTADO_INCOMPLETO", "Alistamiento pausado por el usuario", DateTime.Now);
+                MessageBox.Show("Alistamiento PAUSADO.", "Pausa", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+
+            this.Close();
+
+        }
     }
+
 }

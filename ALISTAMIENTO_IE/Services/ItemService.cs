@@ -22,5 +22,26 @@ namespace ALISTAMIENTO_IE.Services
                 return items.ToDictionary(x => x.f120_id, x => x.f120_descripcion);
             }
         }
+
+
+        public string[] ParseItemsFromTextArea(string rawItems)
+        {
+            var allItems = rawItems
+                .Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(i => i.Trim())
+                .Where(i => !string.IsNullOrWhiteSpace(i))
+                .ToArray();
+
+            var validItems = allItems.Where(i => int.TryParse(i, out _)).ToArray();
+            var invalidItems = allItems.Except(validItems).ToArray();
+
+            if (invalidItems.Length > 0)
+            {
+                MessageBox.Show($"Los siguientes items no son válidos y serán ignorados:\n\n{string.Join("\r\n", invalidItems)}",
+                    "Items inválidos", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            return validItems;
+        }
     }
 }

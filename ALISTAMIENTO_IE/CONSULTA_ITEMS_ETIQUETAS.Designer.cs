@@ -30,7 +30,7 @@
         {
             label1 = new Label();
             txtItems = new TextBox();
-            btnBuscarEtiquetado = new Button();
+            btnBuscarItems = new Button();
             dgv = new DataGridView();
             btnImprimirEtiquetado = new Button();
             btnLimpiar = new Button();
@@ -54,26 +54,27 @@
             // 
             txtItems.Font = new Font("Segoe UI", 12F);
             txtItems.Location = new Point(40, 105);
-            txtItems.Margin = new Padding(4, 4, 4, 4);
+            txtItems.Margin = new Padding(4);
             txtItems.Multiline = true;
             txtItems.Name = "txtItems";
             txtItems.ScrollBars = ScrollBars.Vertical;
             txtItems.Size = new Size(316, 382);
             txtItems.TabIndex = 2;
             // 
-            // btnBuscarEtiquetado
+            // btnBuscarItems
             // 
-            btnBuscarEtiquetado.BackColor = Color.ForestGreen;
-            btnBuscarEtiquetado.Cursor = Cursors.Hand;
-            btnBuscarEtiquetado.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            btnBuscarEtiquetado.ForeColor = SystemColors.ButtonHighlight;
-            btnBuscarEtiquetado.Location = new Point(182, 506);
-            btnBuscarEtiquetado.Margin = new Padding(4, 4, 4, 4);
-            btnBuscarEtiquetado.Name = "btnBuscarEtiquetado";
-            btnBuscarEtiquetado.Size = new Size(108, 40);
-            btnBuscarEtiquetado.TabIndex = 5;
-            btnBuscarEtiquetado.Text = "Buscar 🔍️";
-            btnBuscarEtiquetado.UseVisualStyleBackColor = false;
+            btnBuscarItems.BackColor = Color.ForestGreen;
+            btnBuscarItems.Cursor = Cursors.Hand;
+            btnBuscarItems.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            btnBuscarItems.ForeColor = SystemColors.ButtonHighlight;
+            btnBuscarItems.Location = new Point(182, 506);
+            btnBuscarItems.Margin = new Padding(4);
+            btnBuscarItems.Name = "btnBuscarItems";
+            btnBuscarItems.Size = new Size(108, 40);
+            btnBuscarItems.TabIndex = 5;
+            btnBuscarItems.Text = "Buscar 🔍️";
+            btnBuscarItems.UseVisualStyleBackColor = false;
+            btnBuscarItems.Click += btnBuscarItems_Click;
             // 
             // dgv
             // 
@@ -92,7 +93,7 @@
             btnImprimirEtiquetado.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             btnImprimirEtiquetado.ForeColor = SystemColors.ButtonHighlight;
             btnImprimirEtiquetado.Location = new Point(880, 506);
-            btnImprimirEtiquetado.Margin = new Padding(4, 4, 4, 4);
+            btnImprimirEtiquetado.Margin = new Padding(4);
             btnImprimirEtiquetado.Name = "btnImprimirEtiquetado";
             btnImprimirEtiquetado.Size = new Size(108, 40);
             btnImprimirEtiquetado.TabIndex = 7;
@@ -147,7 +148,7 @@
             Controls.Add(btnLimpiar);
             Controls.Add(btnImprimirEtiquetado);
             Controls.Add(dgv);
-            Controls.Add(btnBuscarEtiquetado);
+            Controls.Add(btnBuscarItems);
             Controls.Add(txtItems);
             Controls.Add(label1);
             Name = "CONSULTA_ITEMS_ETIQUETAS";
@@ -168,5 +169,6 @@
         private System.Windows.Forms.Button btnLimpiar;
         private System.Windows.Forms.Button btnExportarExcel;
         private System.Windows.Forms.Label label2;
+        private Button btnBuscarItems;
     }
 }

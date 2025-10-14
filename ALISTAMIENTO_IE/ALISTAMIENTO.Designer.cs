@@ -13,8 +13,6 @@
         private System.Windows.Forms.Label lblTimer;
         private System.Windows.Forms.Label lblEtiqueta;
         private System.Windows.Forms.TextBox txtEtiqueta;
-        private System.Windows.Forms.Button btnBuscar;
-        private System.Windows.Forms.Button btnTerminar; 
         private System.Windows.Forms.GroupBox grpErrores;
         private System.Windows.Forms.ListBox lstErrores;
         private System.Windows.Forms.Label lblNE;
@@ -47,13 +45,12 @@
             lblTimer = new Label();
             lblEtiqueta = new Label();
             txtEtiqueta = new TextBox();
-            btnBuscar = new Button();
-            btnTerminar = new Button();
             grpErrores = new GroupBox();
-            label1 = new Label();
+            tableLayoutPanel4 = new TableLayoutPanel();
             label5 = new Label();
-            lstErrores = new ListBox();
             lblNE = new Label();
+            label1 = new Label();
+            lstErrores = new ListBox();
             dgvLeidos = new DataGridView();
             dgvMain = new DataGridView();
             label2 = new Label();
@@ -62,7 +59,11 @@
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel2 = new TableLayoutPanel();
             tableLayoutPanel3 = new TableLayoutPanel();
+            btnPausa = new Button();
+            btnBuscar = new Button();
+            btnTerminar = new Button();
             grpErrores.SuspendLayout();
+            tableLayoutPanel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvLeidos).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvMain).BeginInit();
             tableLayoutPanel1.SuspendLayout();
@@ -74,12 +75,12 @@
             // 
             lblPlaca.AutoSize = true;
             lblPlaca.BackColor = Color.Transparent;
-            lblPlaca.Dock = DockStyle.Fill;
-            lblPlaca.Font = new Font("Segoe UI", 36F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblPlaca.Dock = DockStyle.Left;
+            lblPlaca.Font = new Font("Segoe UI", 24F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblPlaca.Location = new Point(7, 0);
             lblPlaca.Margin = new Padding(7, 0, 7, 0);
             lblPlaca.Name = "lblPlaca";
-            lblPlaca.Size = new Size(251, 66);
+            lblPlaca.Size = new Size(162, 71);
             lblPlaca.TabIndex = 0;
             lblPlaca.Text = "PLACA: X";
             lblPlaca.TextAlign = ContentAlignment.MiddleCenter;
@@ -90,10 +91,10 @@
             lblLlevas.BackColor = Color.Transparent;
             lblLlevas.Dock = DockStyle.Fill;
             lblLlevas.Font = new Font("Segoe UI", 16.2F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
-            lblLlevas.Location = new Point(272, 0);
+            lblLlevas.Location = new Point(368, 0);
             lblLlevas.Margin = new Padding(7, 0, 7, 0);
             lblLlevas.Name = "lblLlevas";
-            lblLlevas.Size = new Size(227, 66);
+            lblLlevas.Size = new Size(132, 71);
             lblLlevas.TabIndex = 1;
             lblLlevas.Text = "LLEVAS:";
             lblLlevas.TextAlign = ContentAlignment.MiddleCenter;
@@ -105,10 +106,10 @@
             lblTimer.Dock = DockStyle.Fill;
             lblTimer.Font = new Font("Segoe UI", 18F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
             lblTimer.ForeColor = Color.MidnightBlue;
-            lblTimer.Location = new Point(513, 0);
+            lblTimer.Location = new Point(514, 0);
             lblTimer.Margin = new Padding(7, 0, 7, 0);
             lblTimer.Name = "lblTimer";
-            lblTimer.Size = new Size(239, 66);
+            lblTimer.Size = new Size(173, 71);
             lblTimer.TabIndex = 2;
             lblTimer.Text = "00:00:00";
             lblTimer.TextAlign = ContentAlignment.MiddleCenter;
@@ -118,12 +119,12 @@
             lblEtiqueta.AutoSize = true;
             lblEtiqueta.BackColor = Color.Transparent;
             lblEtiqueta.Dock = DockStyle.Fill;
-            lblEtiqueta.Font = new Font("Microsoft Sans Serif", 18F, FontStyle.Bold);
+            lblEtiqueta.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblEtiqueta.ForeColor = Color.DarkGreen;
             lblEtiqueta.Location = new Point(7, 0);
             lblEtiqueta.Margin = new Padding(7, 0, 7, 0);
             lblEtiqueta.Name = "lblEtiqueta";
-            lblEtiqueta.Size = new Size(937, 37);
+            lblEtiqueta.Size = new Size(937, 55);
             lblEtiqueta.TabIndex = 5;
             lblEtiqueta.Text = "ETIQUETA";
             lblEtiqueta.TextAlign = ContentAlignment.MiddleCenter;
@@ -134,7 +135,7 @@
             txtEtiqueta.BorderStyle = BorderStyle.FixedSingle;
             txtEtiqueta.Dock = DockStyle.Fill;
             txtEtiqueta.Font = new Font("Segoe UI", 14F);
-            txtEtiqueta.Location = new Point(7, 42);
+            txtEtiqueta.Location = new Point(7, 60);
             txtEtiqueta.Margin = new Padding(7, 5, 7, 5);
             txtEtiqueta.Name = "txtEtiqueta";
             txtEtiqueta.Size = new Size(937, 32);
@@ -142,39 +143,11 @@
             txtEtiqueta.TextAlign = HorizontalAlignment.Center;
             txtEtiqueta.TextChanged += txtEtiqueta_TextChanged;
             // 
-            // btnBuscar
-            // 
-            btnBuscar.Cursor = Cursors.Hand;
-            btnBuscar.Font = new Font("Segoe UI", 15.4F);
-            btnBuscar.ForeColor = Color.DarkGreen;
-            btnBuscar.Location = new Point(766, 5);
-            btnBuscar.Margin = new Padding(7, 5, 7, 5);
-            btnBuscar.Name = "btnBuscar";
-            btnBuscar.Size = new Size(57, 56);
-            btnBuscar.TabIndex = 8;
-            btnBuscar.Text = "🔍";
-            // 
-            // btnTerminar
-            // 
-            btnTerminar.BackColor = Color.Red;
-            btnTerminar.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
-            btnTerminar.ForeColor = Color.White;
-            btnTerminar.Location = new Point(1263, 123);
-            btnTerminar.Margin = new Padding(7, 5, 7, 5);
-            btnTerminar.Name = "btnTerminar";
-            btnTerminar.Size = new Size(150, 50);
-            btnTerminar.TabIndex = 19;
-            btnTerminar.Text = "TERMINAR";
-            btnTerminar.UseVisualStyleBackColor = false;
-            btnTerminar.Click += BtnTerminar_Click;
-            // 
             // grpErrores
             // 
             grpErrores.BackColor = Color.Transparent;
-            grpErrores.Controls.Add(label1);
-            grpErrores.Controls.Add(label5);
+            grpErrores.Controls.Add(tableLayoutPanel4);
             grpErrores.Controls.Add(lstErrores);
-            grpErrores.Controls.Add(lblNE);
             grpErrores.Dock = DockStyle.Fill;
             grpErrores.Font = new Font("Segoe UI", 14F);
             grpErrores.ForeColor = Color.Red;
@@ -182,34 +155,65 @@
             grpErrores.Margin = new Padding(7, 5, 7, 5);
             grpErrores.Name = "grpErrores";
             grpErrores.Padding = new Padding(7, 5, 7, 5);
-            grpErrores.Size = new Size(409, 699);
+            grpErrores.Size = new Size(329, 574);
             grpErrores.TabIndex = 0;
             grpErrores.TabStop = false;
             grpErrores.Text = "Lista de Errores";
             // 
-            // label1
+            // tableLayoutPanel4
             // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 13.8F, FontStyle.Bold);
-            label1.ForeColor = Color.Black;
-            label1.Location = new Point(36, 669);
-            label1.Margin = new Padding(7, 0, 7, 0);
-            label1.Name = "label1";
-            label1.Size = new Size(211, 25);
-            label1.TabIndex = 4;
-            label1.Text = "N.P -> NO PERTENECE";
+            tableLayoutPanel4.ColumnCount = 1;
+            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel4.Controls.Add(label5, 0, 0);
+            tableLayoutPanel4.Controls.Add(lblNE, 0, 1);
+            tableLayoutPanel4.Controls.Add(label1, 0, 2);
+            tableLayoutPanel4.Location = new Point(25, 462);
+            tableLayoutPanel4.Name = "tableLayoutPanel4";
+            tableLayoutPanel4.RowCount = 3;
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Absolute, 41F));
+            tableLayoutPanel4.Size = new Size(275, 116);
+            tableLayoutPanel4.TabIndex = 5;
             // 
             // label5
             // 
             label5.AutoSize = true;
+            label5.Dock = DockStyle.Fill;
             label5.Font = new Font("Segoe UI", 13.8F, FontStyle.Bold);
             label5.ForeColor = Color.Black;
-            label5.Location = new Point(36, 606);
+            label5.Location = new Point(7, 0);
             label5.Margin = new Padding(7, 0, 7, 0);
             label5.Name = "label5";
-            label5.Size = new Size(174, 25);
+            label5.Size = new Size(261, 37);
             label5.TabIndex = 3;
             label5.Text = "DUP -> Duplicado";
+            // 
+            // lblNE
+            // 
+            lblNE.AutoSize = true;
+            lblNE.Dock = DockStyle.Fill;
+            lblNE.Font = new Font("Segoe UI", 13.8F, FontStyle.Bold);
+            lblNE.ForeColor = Color.Black;
+            lblNE.Location = new Point(7, 37);
+            lblNE.Margin = new Padding(7, 0, 7, 0);
+            lblNE.Name = "lblNE";
+            lblNE.Size = new Size(261, 37);
+            lblNE.TabIndex = 1;
+            lblNE.Text = "N.E -> No existe";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Dock = DockStyle.Fill;
+            label1.Font = new Font("Segoe UI", 13.8F, FontStyle.Bold);
+            label1.ForeColor = Color.Black;
+            label1.Location = new Point(7, 74);
+            label1.Margin = new Padding(7, 0, 7, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(261, 42);
+            label1.TabIndex = 4;
+            label1.Text = "N.P -> NO PERTENECE";
             // 
             // lstErrores
             // 
@@ -219,37 +223,26 @@
             lstErrores.Location = new Point(7, 30);
             lstErrores.Margin = new Padding(7, 5, 7, 5);
             lstErrores.Name = "lstErrores";
-            lstErrores.Size = new Size(395, 571);
+            lstErrores.Size = new Size(315, 424);
             lstErrores.TabIndex = 0;
-            // 
-            // lblNE
-            // 
-            lblNE.AutoSize = true;
-            lblNE.Font = new Font("Segoe UI", 13.8F, FontStyle.Bold);
-            lblNE.ForeColor = Color.Black;
-            lblNE.Location = new Point(35, 638);
-            lblNE.Margin = new Padding(7, 0, 7, 0);
-            lblNE.Name = "lblNE";
-            lblNE.Size = new Size(156, 25);
-            lblNE.TabIndex = 1;
-            lblNE.Text = "N.E -> No existe";
             // 
             // dgvLeidos
             // 
             dgvLeidos.AllowUserToAddRows = false;
             dgvLeidos.AllowUserToDeleteRows = false;
             dgvLeidos.AllowUserToOrderColumns = true;
+            dgvLeidos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvLeidos.BackgroundColor = Color.Silver;
-            dgvLeidos.ColumnHeadersHeight = 29;
+            dgvLeidos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvLeidos.Cursor = Cursors.No;
             dgvLeidos.Dock = DockStyle.Fill;
             dgvLeidos.Font = new Font("Segoe UI", 12F);
-            dgvLeidos.Location = new Point(7, 372);
+            dgvLeidos.Location = new Point(7, 393);
             dgvLeidos.Margin = new Padding(7, 5, 7, 5);
             dgvLeidos.Name = "dgvLeidos";
             dgvLeidos.ReadOnly = true;
-            dgvLeidos.RowHeadersWidth = 51;
-            dgvLeidos.Size = new Size(937, 248);
+            dgvLeidos.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            dgvLeidos.Size = new Size(937, 192);
             dgvLeidos.TabIndex = 13;
             // 
             // dgvMain
@@ -257,18 +250,19 @@
             dgvMain.AllowUserToAddRows = false;
             dgvMain.AllowUserToDeleteRows = false;
             dgvMain.AllowUserToOrderColumns = true;
+            dgvMain.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvMain.BackgroundColor = Color.Silver;
-            dgvMain.ColumnHeadersHeight = 29;
+            dgvMain.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvMain.Cursor = Cursors.No;
             dgvMain.Dock = DockStyle.Fill;
             dgvMain.Font = new Font("Segoe UI", 12F);
             dgvMain.GridColor = SystemColors.ScrollBar;
-            dgvMain.Location = new Point(7, 134);
+            dgvMain.Location = new Point(7, 137);
             dgvMain.Margin = new Padding(7, 5, 7, 5);
             dgvMain.Name = "dgvMain";
             dgvMain.ReadOnly = true;
-            dgvMain.RowHeadersWidth = 51;
-            dgvMain.Size = new Size(937, 228);
+            dgvMain.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            dgvMain.Size = new Size(937, 246);
             dgvMain.TabIndex = 14;
             // 
             // label2
@@ -314,12 +308,13 @@
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.Controls.Add(grpErrores, 0, 0);
-            tableLayoutPanel1.Location = new Point(12, 22);
+            tableLayoutPanel1.Dock = DockStyle.Left;
+            tableLayoutPanel1.Location = new Point(0, 71);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.Size = new Size(429, 715);
+            tableLayoutPanel1.Size = new Size(349, 590);
             tableLayoutPanel1.TabIndex = 20;
             // 
             // tableLayoutPanel2
@@ -332,45 +327,93 @@
             tableLayoutPanel2.Controls.Add(txtEtiqueta, 0, 1);
             tableLayoutPanel2.Controls.Add(dgvMain, 0, 2);
             tableLayoutPanel2.Controls.Add(dgvLeidos, 0, 3);
+            tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.GrowStyle = TableLayoutPanelGrowStyle.AddColumns;
-            tableLayoutPanel2.Location = new Point(466, 112);
+            tableLayoutPanel2.Location = new Point(349, 71);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
             tableLayoutPanel2.RowCount = 4;
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 28.68217F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 71.31783F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 238F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 257F));
-            tableLayoutPanel2.Size = new Size(951, 625);
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 41.48936F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 58.51064F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 256F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 201F));
+            tableLayoutPanel2.Size = new Size(951, 590);
             tableLayoutPanel2.TabIndex = 21;
             // 
             // tableLayoutPanel3
             // 
             tableLayoutPanel3.BackColor = Color.Transparent;
-            tableLayoutPanel3.ColumnCount = 4;
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 52.3592072F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 47.6407928F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 253F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 83F));
+            tableLayoutPanel3.ColumnCount = 6;
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 71.2031555F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 28.7968445F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 187F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 95F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 251F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 259F));
+            tableLayoutPanel3.Controls.Add(btnPausa, 4, 0);
+            tableLayoutPanel3.Controls.Add(btnBuscar, 3, 0);
             tableLayoutPanel3.Controls.Add(lblPlaca, 0, 0);
             tableLayoutPanel3.Controls.Add(lblLlevas, 1, 0);
+            tableLayoutPanel3.Controls.Add(btnTerminar, 5, 0);
             tableLayoutPanel3.Controls.Add(lblTimer, 2, 0);
-            tableLayoutPanel3.Controls.Add(btnBuscar, 3, 0);
-            tableLayoutPanel3.Location = new Point(513, 22);
+            tableLayoutPanel3.Dock = DockStyle.Top;
+            tableLayoutPanel3.Location = new Point(0, 0);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
             tableLayoutPanel3.RowCount = 1;
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel3.Size = new Size(843, 66);
+            tableLayoutPanel3.Size = new Size(1300, 71);
             tableLayoutPanel3.TabIndex = 22;
+            // 
+            // btnPausa
+            // 
+            btnPausa.BackColor = Color.Teal;
+            btnPausa.Dock = DockStyle.Fill;
+            btnPausa.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            btnPausa.ForeColor = Color.White;
+            btnPausa.Location = new Point(796, 5);
+            btnPausa.Margin = new Padding(7, 5, 7, 5);
+            btnPausa.Name = "btnPausa";
+            btnPausa.Size = new Size(237, 61);
+            btnPausa.TabIndex = 21;
+            btnPausa.Text = "PAUSAR";
+            btnPausa.UseVisualStyleBackColor = false;
+            btnPausa.Click += btnPausa_Click;
+            // 
+            // btnBuscar
+            // 
+            btnBuscar.Cursor = Cursors.Hand;
+            btnBuscar.Dock = DockStyle.Fill;
+            btnBuscar.Font = new Font("Segoe UI", 15.4F);
+            btnBuscar.ForeColor = Color.DarkGreen;
+            btnBuscar.Location = new Point(701, 5);
+            btnBuscar.Margin = new Padding(7, 5, 7, 5);
+            btnBuscar.Name = "btnBuscar";
+            btnBuscar.Size = new Size(81, 61);
+            btnBuscar.TabIndex = 20;
+            btnBuscar.Text = "🔍";
+            // 
+            // btnTerminar
+            // 
+            btnTerminar.BackColor = Color.Red;
+            btnTerminar.Dock = DockStyle.Fill;
+            btnTerminar.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            btnTerminar.ForeColor = Color.White;
+            btnTerminar.Location = new Point(1047, 5);
+            btnTerminar.Margin = new Padding(7, 5, 7, 5);
+            btnTerminar.Name = "btnTerminar";
+            btnTerminar.Size = new Size(246, 61);
+            btnTerminar.TabIndex = 19;
+            btnTerminar.Text = "TERMINAR";
+            btnTerminar.UseVisualStyleBackColor = false;
+            btnTerminar.Click += BtnTerminar_Click;
             // 
             // ALISTAMIENTO
             // 
             AutoScaleDimensions = new SizeF(15F, 29F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = Properties.Resources.Background_IE;
-            ClientSize = new Size(1429, 761);
+            ClientSize = new Size(1300, 661);
             Controls.Add(tableLayoutPanel2);
             Controls.Add(tableLayoutPanel1);
-            Controls.Add(btnTerminar);
             Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -381,7 +424,8 @@
             Name = "ALISTAMIENTO";
             Text = "ALISTAMIENTO";
             grpErrores.ResumeLayout(false);
-            grpErrores.PerformLayout();
+            tableLayoutPanel4.ResumeLayout(false);
+            tableLayoutPanel4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvLeidos).EndInit();
             ((System.ComponentModel.ISupportInitialize)dgvMain).EndInit();
             tableLayoutPanel1.ResumeLayout(false);
@@ -404,5 +448,9 @@
         private TableLayoutPanel tableLayoutPanel1;
         private TableLayoutPanel tableLayoutPanel2;
         private TableLayoutPanel tableLayoutPanel3;
+        private TableLayoutPanel tableLayoutPanel4;
+        private Button btnPausa;
+        private Button btnBuscar;
+        private Button btnTerminar;
     }
 }

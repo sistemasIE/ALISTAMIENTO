@@ -1,5 +1,5 @@
 using LECTURA_DE_BANDA;
-
+using QuestPDF.Infrastructure;
 namespace ALISTAMIENTO_IE
 {
     internal static class Program
@@ -8,6 +8,8 @@ namespace ALISTAMIENTO_IE
         static void Main()
         {
             ApplicationConfiguration.Initialize();
+
+            QuestPDF.Settings.License = LicenseType.Community;
 
             using (var loginForm = new Login())
             {

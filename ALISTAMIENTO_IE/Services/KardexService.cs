@@ -8,7 +8,7 @@ namespace ALISTAMIENTO_IE.Services
     public interface IKardexService
     {
         List<int> ObtenerItemsValidos(string entrada, out List<string> itemsInvalidos);
-        DataTable ObtenerDatosDeItems(IEnumerable<int> items);
+        DataTable ObtenerDatosDeItems(IEnumerable<string> items);
         Task<int> UpdateAsync(KardexBodega kardex);
         Task<KardexBodega?> ObtenerKardexDeEtiqueta(string etiqueta);
     }
@@ -70,7 +70,7 @@ namespace ALISTAMIENTO_IE.Services
             return await connection.QueryFirstOrDefaultAsync<KardexBodega>(sql, new { etiqueta });
         }
 
-        public DataTable ObtenerDatosDeItems(IEnumerable<int> items)
+        public DataTable ObtenerDatosDeItems(IEnumerable<string> items)
         {
             var parametros = new List<SqlParameter>();
             string inClauseSacos = string.Join(",", items.Select((i, idx) => "@itemS" + idx));
@@ -113,5 +113,7 @@ namespace ALISTAMIENTO_IE.Services
             adaptador.Fill(tabla);
             return tabla;
         }
+
+
     }
 }
