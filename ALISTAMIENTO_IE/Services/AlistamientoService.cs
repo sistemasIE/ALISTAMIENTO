@@ -3,6 +3,7 @@ using ALISTAMIENTO_IE.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Configuration;
+using System.Data;
 
 namespace ALISTAMIENTO_IE.Services
 {
@@ -20,6 +21,7 @@ namespace ALISTAMIENTO_IE.Services
             _detalleCamionXDiaService = new DetalleCamionXDiaService();
             _itemService = new ItemService();
         }
+
         public async Task<IEnumerable<CamionItemsDto>> ObtenerItemsPorAlistarCamion(int camionId)
         {
 
@@ -69,6 +71,75 @@ namespace ALISTAMIENTO_IE.Services
                 return result.ToList();
             }
 
+        }
+
+        /// <summary>
+        /// Calcula los totales de un conjunto de ítems de camión
+        /// </summary>
+        /// <param name="items">Colección de ítems del camión</param>
+        /// <returns>DTO con los totales calculados</returns>
+        public ReporteImpresionTotalesDto CalcularTotalesReporte(IEnumerable<CamionItemsDto> items)
+        {
+            return new ReporteImpresionTotalesDto
+            {
+                TotalCantTotalPedido = items.Sum(x => x.CantTotalPedido),
+                TotalPacasEsperadas = items.Sum(x => x.PacasEsperadas ?? 0),
+                TotalKilosEsperados = items.Sum(x => x.KilosEsperados ?? 0)
+            };
+        }
+
+        /// <summary>
+        /// Agrega una fila de totales a un DataTable con los valores calculados
+        /// </summary>
+        /// <param name="dataTable">DataTable al que se agregará la fila de totales</param>
+        /// <param name="totales">Objeto con los totales calculados</param>
+        public void AgregarFilaTotalesADataTable(DataTable dataTable, ReporteImpresionTotalesDto totales)
+        {
+            if (dataTable == null || dataTable.Rows.Count == 0)
+                return;
+
+            DataRow totalRow = dataTable.NewRow();
+
+            // Asignar valores a las columnas numéricas si existen
+            if (dataTable.Columns.Contains("CantTotalPedido"))
+                totalRow["CantTotalPedido"] = totales.TotalCantTotalPedido;
+
+            if (dataTable.Columns.Contains("PacasEsperadas"))
+                totalRow["PacasEsperadas"] = totales.TotalPacasEsperadas;
+
+            if (dataTable.Columns.Contains("KilosEsperados"))
+                totalRow["KilosEsperados"] = totales.TotalKilosEsperados;
+
+            // Buscar una columna de tipo string para poner el label "TOTALES"
+            bool totalLabelSet = false;
+
+            // Primero intentar con columnas conocidas
+            string[] possibleColumns = { "Item", "Descripcion", "Descripción", "Nombre", "Producto" };
+            foreach (var colName in possibleColumns)
+            {
+                if (dataTable.Columns.Contains(colName) && dataTable.Columns[colName].DataType == typeof(string))
+                {
+                    totalRow[colName] = "TOTALES";
+                    totalLabelSet = true;
+                    break;
+                }
+            }
+
+            // Si no se encontró, buscar la primera columna de tipo string
+            if (!totalLabelSet)
+            {
+                foreach (DataColumn col in dataTable.Columns)
+                {
+                    if (col.DataType == typeof(string))
+                    {
+                        totalRow[col.ColumnName] = "TOTALES";
+                        break;
+                    }
+                }
+            }
+
+            // Agregar la fila de totales al final del DataTable
+            dataTable.Rows.Add(totalRow);
         }
 
 

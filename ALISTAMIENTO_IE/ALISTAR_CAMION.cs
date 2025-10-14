@@ -715,12 +715,11 @@ namespace ALISTAMIENTO_IE
 
         private async void button1_Click_1(object sender, EventArgs e)
         {
+            // Obtener los ítems del camión
             IEnumerable<CamionItemsDto> items = await alistamientoService.ObtenerItemsPorAlistarCamion(codCamionSeleccionado);
 
-
-            // Extraemos el código numérico del DTO
-            var validItems = items
-                .Select(x => x.Item).ToList();
+            // Extraer códigos de ítems para el kardex
+            var validItems = items.Select(x => x.Item).ToList();
 
             if (validItems.Count == 0)
             {
@@ -729,21 +728,28 @@ namespace ALISTAMIENTO_IE
                 return;
             }
 
-            DataTable dt1 = _dataGridViewExporter.ToDataTable(await alistamientoService.ObtenerItemsPorAlistarCamion(codCamionSeleccionado));
+            // Calcular totales usando el servicio
+            ReporteImpresionTotalesDto totales = alistamientoService.CalcularTotalesReporte(items);
 
+            // Convertir items a DataTable
+            DataTable dt1 = _dataGridViewExporter.ToDataTable(items);
+
+            // Agregar fila de totales usando el servicio
+            alistamientoService.AgregarFilaTotalesADataTable(dt1, totales);
+
+            // Obtener datos del kardex
             DataTable dt2 = _kardexService.ObtenerDatosDeItems(validItems);
 
-
-            // Items del camión, Ubicaciones de esos Items y Placa como título.
+            // Generar PDF
             _pdfService.Generate(dt1, dt2, $"PLACA: {placaCamionSeleccionado}");
 
-            MessageBox.Show("PDF generado exitosamente:\n");
-
+            // Mostrar mensaje de éxito con los totales
+            MessageBox.Show($"PDF generado exitosamente.\n\nTotales:\n" +
+                          $"Cantidad Total: {totales.TotalCantTotalPedido:N2}\n" +
+                          $"Pacas Esperadas: {totales.TotalPacasEsperadas:N2}\n" +
+                          $"Kilos Esperados: {totales.TotalKilosEsperados:N2}");
         }
 
-        private void btnRecargar_Click_1(object sender, EventArgs e)
-        {
 
-        }
     }
 }

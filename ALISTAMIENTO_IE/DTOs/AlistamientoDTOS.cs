@@ -32,4 +32,12 @@
         public decimal? KilosEsperados { get; set; }
     }
 
+    // DTO para los totales calculados del reporte de impresión
+    public class ReporteImpresionTotalesDto
+    {
+        public decimal TotalCantTotalPedido { get; set; }
+        public decimal TotalPacasEsperadas { get; set; }
+        public decimal TotalKilosEsperados { get; set; }
+    }
+
 }
