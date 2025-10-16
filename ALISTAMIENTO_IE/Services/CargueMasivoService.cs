@@ -54,6 +54,9 @@ namespace ALISTAMIENTO_IE.Services
     {
         public DateTime FECHA { get; set; }
         public string NUM_DOCUMENTO { get; set; } = "";
+        public string TIPO_DOCUMENTO { get; set; } = "";
+        public string EMPRESA_TRANSPORTE { get; set; } = "";
+
         public string ESTADO { get; set; } = "";
         public string NOMBRE_CONDUCTOR { get; set; } = "";
         public string BOD_SALIDA { get; set; } = "";
@@ -443,6 +446,32 @@ namespace ALISTAMIENTO_IE.Services
             {
                 return null;
             }
+        }
+        public string[] ejecuta_script(string sqlsentence)
+        {
+            using (SqlConnection conexion = new SqlConnection(_connectionStringSIIE))
+            {
+                conexion.Open();
+                using (SqlCommand comando = new SqlCommand(sqlsentence, conexion))
+                using (SqlDataReader lector = comando.ExecuteReader())
+                {
+                    if (lector.Read())
+                    {
+                        int columnas = lector.FieldCount;
+                        string[] valores = new string[columnas];
+
+                        for (int i = 0; i < columnas; i++)
+                        {
+                            valores[i] = lector.IsDBNull(i) ? "0" : lector.GetValue(i).ToString().Trim();
+                        }
+
+                        return valores; // Retorna arreglo con los valores de esa única fila
+                    }
+                }
+            }
+
+            // Si no hay registros, devuelve un arreglo vacío
+            return Array.Empty<string>();
         }
     }
 
