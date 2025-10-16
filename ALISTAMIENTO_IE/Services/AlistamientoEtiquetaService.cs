@@ -173,40 +173,47 @@ namespace ALISTAMIENTO_IE.Services
         {
             const string sql = @"
             SELECT 
-                dcxd.ITEM AS Item,
-                i.f120_descripcion AS Descripcion,
-                CASE 
-                    WHEN i.f120_id_unidad_inventario = 'UND' 
-                    THEN SUM(dcxd.CANTIDAD_PLANIFICADA) / 
-                         TRY_CAST(SUBSTRING(i.f120_id_unidad_empaque, 2, LEN(i.f120_id_unidad_empaque)) AS INT)
-                    ELSE NULL
-                END AS PacasEsperadas,
-                CASE 
-                    WHEN i.f120_id_unidad_inventario = 'KLS'
-                    THEN SUM(dcxd.CANTIDAD_PLANIFICADA)
-                    ELSE NULL
-                END AS KilosEsperados
-            FROM [SIE].dbo.DETALLE_CAMION_X_DIA dcxd
-            JOIN [SIE].dbo.CAMION_X_DIA cxd
-                ON dcxd.COD_CAMION = cxd.COD_CAMION
-            JOIN [SIE].dbo.CAMION c
-                ON cxd.COD_REGISTRO_CAMION = c.COD_CAMION
-            LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items i
-                ON dcxd.ITEM = i.f120_id
-            WHERE 
-              cxd.COD_CAMION = @CodCamion
-              AND cxd.ESTADO = 'C'
-              AND i.f120_id_cia = 2
-              AND cxd.FECHA >= DATEADD(DAY, -1, GETDATE())
-            GROUP BY 
-                c.placas, 
-                cxd.COD_CAMION, 
-                dcxd.ITEM, 
-                cxd.FECHA,
-                i.f120_id_unidad_empaque, 
-                i.f120_descripcion,
-                i.f120_id_unidad_inventario
-            ORDER BY cxd.FECHA ASC;";
+    dcxd.ITEM AS Item,
+    i.f120_descripcion AS Descripcion,
+    CASE 
+        WHEN i.f120_id_unidad_inventario = 'UND' 
+        THEN SUM(dcxd.CANTIDAD_PLANIFICADA) / 
+             TRY_CAST(SUBSTRING(i.f120_id_unidad_empaque, 2, LEN(i.f120_id_unidad_empaque)) AS INT)
+        ELSE NULL
+    END AS PacasEsperadas,
+    CASE 
+        WHEN i.f120_id_unidad_inventario = 'KLS'
+        THEN SUM(dcxd.CANTIDAD_PLANIFICADA)
+        ELSE NULL
+    END AS KilosEsperados,
+    CASE 
+        WHEN i.f120_id_unidad_inventario = 'MTS' 
+        THEN dcxd.CANTIDAD_PLANIFICADA
+        ELSE NULL
+    END AS MetrosEsperados,
+    dcxd.CANTIDAD_PLANIFICADA as CantidadPlanificada
+FROM [SIE].dbo.DETALLE_CAMION_X_DIA dcxd
+JOIN [SIE].dbo.CAMION_X_DIA cxd
+    ON dcxd.COD_CAMION = cxd.COD_CAMION
+JOIN [SIE].dbo.CAMION c
+    ON cxd.COD_REGISTRO_CAMION = c.COD_CAMION
+LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items i
+    ON dcxd.ITEM = i.f120_id
+WHERE 
+  cxd.COD_CAMION = @CodCamion
+  AND cxd.ESTADO = 'C'
+  AND i.f120_id_cia = 2
+  AND cxd.FECHA >= DATEADD(DAY, -1, GETDATE())
+GROUP BY 
+    c.placas, 
+    cxd.COD_CAMION, 
+    dcxd.ITEM, 
+    cxd.FECHA,
+    i.f120_id_unidad_empaque, 
+    i.f120_descripcion,
+    i.f120_id_unidad_inventario,
+    dcxd.CANTIDAD_PLANIFICADA 
+    ORDER BY cxd.FECHA ASC;";
 
             using (var connection = new SqlConnection(_connectionString))
             {

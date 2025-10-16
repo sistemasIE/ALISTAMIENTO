@@ -250,7 +250,6 @@
             dgvMain.AllowUserToAddRows = false;
             dgvMain.AllowUserToDeleteRows = false;
             dgvMain.AllowUserToOrderColumns = true;
-            dgvMain.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvMain.BackgroundColor = Color.Silver;
             dgvMain.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvMain.Cursor = Cursors.No;

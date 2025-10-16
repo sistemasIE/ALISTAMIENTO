@@ -179,7 +179,7 @@ namespace ALISTAMIENTO_IE.Services
                      sum(dcxd.CANTIDAD_PLANIFICADA ) as cantTotalPedido
                      FROM [SIE].dbo.CAMION_X_DIA cxd
                      JOIN [SIE].dbo.DETALLE_CAMION_X_DIA dcxd
-                         ON cxd.COD_registro_CAMION = dcxd.COD_CAMION
+                         ON cxd.COD_CAMION = dcxd.COD_CAMION
                      JOIN [SIE].dbo.CAMION c
                          ON c.COD_CAMION = cxd.COD_REGISTRO_CAMION 
                      LEFT JOIN ALISTAMIENTO a

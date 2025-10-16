@@ -1,4 +1,4 @@
-using ALISTAMIENTO_IE.DTOs;
+Ôªøusing ALISTAMIENTO_IE.DTOs;
 using ALISTAMIENTO_IE.Model;
 using ALISTAMIENTO_IE.Models;
 using ALISTAMIENTO_IE.Services;
@@ -19,6 +19,7 @@ namespace ALISTAMIENTO_IE
         private readonly KardexService _kardexService;
         private EtiquetaService _etiquetaService;
         private EtiquetaLinerService _etiquetaLinerService;
+        private EtiquetaRolloService _etiquetaRolloService; // ‚úÖ NUEVO
 
         private List<string> ITEMS_PENDIENTES = new List<string>();
         private int _idAlistamiento;
@@ -31,7 +32,7 @@ namespace ALISTAMIENTO_IE
 
 
         private readonly DataGridViewExporter _dataGridViewExporter = new DataGridViewExporter();
-        // Cache en memoria para acelerar c·lculos sin tocar DB
+        // Cache en memoria para acelerar c√°lculos sin tocar DB
         private List<string> etiquetasLeidas = new List<string>();
         private Dictionary<int, int> _conteoPorItem = new Dictionary<int, int>();
         private BindingList<DTOs.EtiquetaLeidaDTO> _leidasBinding = new BindingList<DTOs.EtiquetaLeidaDTO>();
@@ -53,6 +54,7 @@ namespace ALISTAMIENTO_IE
             _alistamientoEtiquetaService = new AlistamientoEtiquetaService();
             _etiquetaService = new EtiquetaService();
             _etiquetaLinerService = new EtiquetaLinerService();
+            _etiquetaRolloService = new EtiquetaRolloService(); // ‚úÖ NUEVO
             _kardexService = new KardexService();
             this.FormClosing += ALISTAMIENTO_FormClosing;
             this.Load += ALISTAMIENTO_Load;
@@ -63,9 +65,9 @@ namespace ALISTAMIENTO_IE
         }
 
         /// <summary>
-        /// Verifica si todas las columnas restantes (PacasRestantes y KilosRestantes) est·n en cero
+        /// Verifica si todas las columnas restantes (PacasRestantes y KilosRestantes) est√°n en cero
         /// </summary>
-        /// <returns>True si todas las columnas restantes est·n en cero, False en caso contrario</returns>
+        /// <returns>True si todas las columnas restantes est√°n en cero, False en caso contrario</returns>
         private bool VerificarAlistamientoCompleto()
         {
             var lista = (List<InformacionCamionDTO>)dgvMain.DataSource;
@@ -76,12 +78,12 @@ namespace ALISTAMIENTO_IE
         }
 
         /// <summary>
-        /// Maneja el evento click del botÛn TERMINAR
+        /// Maneja el evento click del bot√≥n TERMINAR
         /// </summary>
         private async void BtnTerminar_Click(object sender, EventArgs e)
         {
 
-            var res = MessageBox.Show("°øDesea TERMINAR el alistamiento?!", "Confirmar",
+            var res = MessageBox.Show("¬°¬øDesea TERMINAR el alistamiento?!", "Confirmar",
                                         MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (res.Equals(true))
                 if (VerificarAlistamientoCompleto())
@@ -89,14 +91,14 @@ namespace ALISTAMIENTO_IE
                     // Alistamiento completo - actualizar estado a ALISTADO
                     _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "ALISTADO", "Alistamiento completado exitosamente", DateTime.Now);
                     _estadoAlistamiento = "ALISTADO";
-                    MessageBox.Show("Alistamiento completado exitosamente.", "…xito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Alistamiento completado exitosamente.", "√âxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     this.Close();
                 }
                 else
                 {
                     // Alistamiento incompleto - preguntar si desea cerrar con observaciones
                     var result = MessageBox.Show(
-                        "No se puede terminar el alistamiento porque hay algunas unidades que no han sido alistadas completamente.\n\nøDesea cerrar el alistamiento con observaciones?",
+                        "No se puede terminar el alistamiento porque hay algunas unidades que no han sido alistadas completamente.\n\n¬øDesea cerrar el alistamiento con observaciones?",
                         "Alistamiento Incompleto",
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Warning);
@@ -110,7 +112,7 @@ namespace ALISTAMIENTO_IE
                             {
                                 // El estado ya fue actualizado en el form de observaciones
                                 _estadoAlistamiento = "ALISTADO_INCOMPLETO";
-                                MessageBox.Show("Alistamiento cerrado como incompleto.", "InformaciÛn", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                MessageBox.Show("Alistamiento cerrado como incompleto.", "Informaci√≥n", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 this.Close();
                             }
                         }
@@ -131,7 +133,7 @@ namespace ALISTAMIENTO_IE
 
                     if (alistamientoIncompleto == null)
                     {
-                        MessageBox.Show("Error: No se encontrÛ un alistamiento en estado 'ALISTADO_INCOMPLETO' para este camiÛn.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Error: No se encontr√≥ un alistamiento en estado 'ALISTADO_INCOMPLETO' para este cami√≥n.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         this.Close();
                         return;
                     }
@@ -143,12 +145,12 @@ namespace ALISTAMIENTO_IE
                     _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "EN_PROCESO", "Continuando alistamiento incompleto", null);
                     _estadoAlistamiento = "EN_PROCESO";
 
-                    // Cargar etiquetas ya leÌdas en cachÈ
+                    // Cargar etiquetas ya le√≠das en cach√©
                     await CargarEtiquetasLeidasEnCache();
                 }
                 else if (_estadoAlistamientoInicial == "EN_PROCESO" || _estadoAlistamientoInicial == "SIN_ALISTAR")
                 {
-                    // Verificar si ya existe un alistamiento en proceso para este camiÛn
+                    // Verificar si ya existe un alistamiento en proceso para este cami√≥n
                     var alistamientoExistente = _alistamientoService.ObtenerAlistamientoPorCodCamionYEstado(_idCamion, "EN_PROCESO");
 
                     if (alistamientoExistente != null)
@@ -157,7 +159,7 @@ namespace ALISTAMIENTO_IE
                         _idAlistamiento = alistamientoExistente.IdAlistamiento;
                         _fechaInicio = alistamientoExistente.FechaInicio;
 
-                        // Cargar etiquetas ya leÌdas en cachÈ
+                        // Cargar etiquetas ya le√≠das en cach√©
                         await CargarEtiquetasLeidasEnCache();
                     }
                     else
@@ -168,12 +170,12 @@ namespace ALISTAMIENTO_IE
                 }
                 else
                 {
-                    // Para otros estados (visualizaciÛn ˙nicamente)
+                    // Para otros estados (visualizaci√≥n √∫nicamente)
                     var alistamientoExistente = _alistamientoService.ObtenerAlistamientoPorCodCamionYEstado(_idCamion, _estadoAlistamientoInicial);
 
                     if (alistamientoExistente == null)
                     {
-                        MessageBox.Show($"No se encontrÛ un alistamiento con estado '{_estadoAlistamientoInicial}' para este camiÛn.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"No se encontr√≥ un alistamiento con estado '{_estadoAlistamientoInicial}' para este cami√≥n.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         this.Close();
                         return;
                     }
@@ -181,11 +183,11 @@ namespace ALISTAMIENTO_IE
                     _idAlistamiento = alistamientoExistente.IdAlistamiento;
                     _fechaInicio = alistamientoExistente.FechaInicio;
 
-                    // Deshabilitar controles para visualizaciÛn ˙nicamente
+                    // Deshabilitar controles para visualizaci√≥n √∫nicamente
                     txtEtiqueta.Enabled = false;
                     btnTerminar.Enabled = false;
 
-                    // Cargar etiquetas ya leÌdas en cachÈ
+                    // Cargar etiquetas ya le√≠das en cach√©
                     await CargarEtiquetasLeidasEnCache();
                 }
 
@@ -195,16 +197,16 @@ namespace ALISTAMIENTO_IE
                 _timer.Start();
                 ActualizarTimer();
 
-                // Cargar etiquetas leÌdas para la UI
+                // Cargar etiquetas le√≠das para la UI
                 await CargarEtiquetasLeidas();
 
                 // Construir resumen inicial
                 await cargarDgvMain();
 
-                // Recalcular cantidades alistadas bas·ndose en las etiquetas ya leÌdas
+                // Recalcular cantidades alistadas bas√°ndose en las etiquetas ya le√≠das
                 await RecalcularCantidadesAlistadas();
 
-                // Obtener los Ìtems pendientes del camiÛn
+                // Obtener los √≠tems pendientes del cami√≥n
                 IEnumerable<CamionItemsDto> items = await _alistamientoService.ObtenerItemsPorAlistarCamion(_idCamion);
                 ITEMS_PENDIENTES = items.Select(i => i.Item.ToString()).ToList();
             }
@@ -216,7 +218,7 @@ namespace ALISTAMIENTO_IE
         }
 
         /// <summary>
-        /// Carga en cachÈ las etiquetas ya leÌdas de un alistamiento existente
+        /// Carga en cach√© las etiquetas ya le√≠das de un alistamiento existente
         /// </summary>
         private async Task CargarEtiquetasLeidasEnCache()
         {
@@ -224,11 +226,11 @@ namespace ALISTAMIENTO_IE
             {
                 var etiquetas = await _alistamientoEtiquetaService.ObtenerEtiquetasLeidas(_idAlistamiento);
 
-                // Limpiar cachÈs antes de cargar
+                // Limpiar cach√©s antes de cargar
                 _conteoPorItem.Clear();
                 etiquetasLeidas.Clear();
 
-                // Reconstruir el conteo por item y la lista de etiquetas leÌdas
+                // Reconstruir el conteo por item y la lista de etiquetas le√≠das
                 foreach (var etiqueta in etiquetas)
                 {
                     if (!string.IsNullOrWhiteSpace(etiqueta.ETIQUETA))
@@ -243,17 +245,17 @@ namespace ALISTAMIENTO_IE
                 }
 
                 // Log para debug (opcional)
-                System.Diagnostics.Debug.WriteLine($"Cargadas {etiquetasLeidas.Count} etiquetas en cachÈ para alistamiento {_idAlistamiento}");
+                System.Diagnostics.Debug.WriteLine($"Cargadas {etiquetasLeidas.Count} etiquetas en cach√© para alistamiento {_idAlistamiento}");
                 System.Diagnostics.Debug.WriteLine($"Conteo por item: {string.Join(", ", _conteoPorItem.Select(kvp => $"{kvp.Key}:{kvp.Value}"))}");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al cargar etiquetas en cachÈ: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error al cargar etiquetas en cach√©: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         /// <summary>
-        /// Recalcula las cantidades alistadas en el DataGridView bas·ndose en las etiquetas ya leÌdas
+        /// Recalcula las cantidades alistadas en el DataGridView bas√°ndose en las etiquetas ya le√≠das
         /// </summary>
         private async Task RecalcularCantidadesAlistadas()
         {
@@ -262,13 +264,13 @@ namespace ALISTAMIENTO_IE
                 var lista = (List<InformacionCamionDTO>)dgvMain.DataSource;
                 if (lista == null) return;
 
-                // Obtener todas las etiquetas leÌdas para este alistamiento
+                // Obtener todas las etiquetas le√≠das para este alistamiento
                 var etiquetasLeidasBD = await _alistamientoEtiquetaService.ObtenerEtiquetasLeidas(_idAlistamiento);
 
                 // Crear un diccionario para acumular pesos por item
                 var pesosPorItem = new Dictionary<int, float>();
 
-                // Procesar cada etiqueta leÌda para calcular pesos
+                // Procesar cada etiqueta le√≠da para calcular pesos
                 foreach (var etiquetaLeida in etiquetasLeidasBD)
                 {
                     if (etiquetaLeida.ITEM.HasValue && !string.IsNullOrWhiteSpace(etiquetaLeida.ETIQUETA))
@@ -313,9 +315,9 @@ namespace ALISTAMIENTO_IE
         }
 
         /// <summary>
-        /// Obtiene el peso de una etiqueta especÌfica
+        /// Obtiene el peso de una etiqueta espec√≠fica
         /// </summary>
-        /// <param name="codigoEtiqueta">CÛdigo de la etiqueta</param>
+        /// <param name="codigoEtiqueta">C√≥digo de la etiqueta</param>
         /// <returns>Peso de la etiqueta</returns>
         private async Task<float> ObtenerPesoDeEtiqueta(string codigoEtiqueta)
         {
@@ -370,13 +372,13 @@ namespace ALISTAMIENTO_IE
                     var result = obsForm.ShowDialog(this);
                     if (result == DialogResult.OK && obsForm.AlistamientoAnulado)
                     {
-                        // Se aceptÛ la observaciÛn y se anulÛ el alistamiento
+                        // Se acept√≥ la observaci√≥n y se anul√≥ el alistamiento
                         _estadoAlistamiento = "ALISTADO_INCOMPLETO";
                         e.Cancel = false;
                     }
                     else
                     {
-                        // CancelÛ o no completÛ la observaciÛn
+                        // Cancel√≥ o no complet√≥ la observaci√≥n
                         e.Cancel = true;
                     }
                 }
@@ -398,12 +400,12 @@ namespace ALISTAMIENTO_IE
             {
                 dgvLeidos.Columns["ETIQUETA"].HeaderText = "ETIQUETA";
                 dgvLeidos.Columns["ITEM"].HeaderText = "ITEM";
-                dgvLeidos.Columns["DESCRIPCION"].HeaderText = "DESCRIPCI”N";
-                dgvLeidos.Columns["AREA"].HeaderText = "¡REA";
+                dgvLeidos.Columns["DESCRIPCION"].HeaderText = "DESCRIPCI√ìN";
+                dgvLeidos.Columns["AREA"].HeaderText = "√ÅREA";
                 dgvLeidos.Columns["FECHA"].HeaderText = "FECHA";
             }
 
-            // Reconstruir el conteo por item con lo ya leÌdo desde DB (solo al cargar)
+            // Reconstruir el conteo por item con lo ya le√≠do desde DB (solo al cargar)
             _conteoPorItem.Clear();
             etiquetasLeidas.Clear();
             foreach (var et in etiquetas)
@@ -418,7 +420,7 @@ namespace ALISTAMIENTO_IE
 
         private async Task cargarDgvMain()
         {
-            // Traes la planificaciÛn
+            // Traes la planificaci√≥n
             IEnumerable<PlanificacionCamionDTO> planificado =
                 await _alistamientoEtiquetaService.ObtenerPlanificacionCamionAsync(this._idCamion);
 
@@ -429,12 +431,16 @@ namespace ALISTAMIENTO_IE
                 Descripcion = p.Descripcion,
                 PacasEsperadas = p.PacasEsperadas,
                 KilosEsperados = p.KilosEsperados,
+                MetrosEsperados = p.MetrosEsperados,
 
-                // Inicialmente en 0 (se recalculan despuÈs)
+                // Inicialmente en 0 (se recalculan despu√©s)
                 PacasAlistadas = 0,
                 KilosAlistados = 0,
+                MetrosAlistados = 0,
                 PacasRestantes = p.PacasEsperadas,
-                KilosRestantes = p.KilosEsperados
+                KilosRestantes = p.KilosEsperados,
+                MetrosRestantes = p.MetrosEsperados,
+                CantidadPlanificada = p.CantidadPlanificada
             }).ToList();
 
             // Asignas al DataGridView
@@ -449,6 +455,10 @@ namespace ALISTAMIENTO_IE
             this.dgvMain.Columns["KilosEsperados"].DisplayIndex = 5;
             this.dgvMain.Columns["KilosAlistados"].DisplayIndex = 6;
             this.dgvMain.Columns["KilosRestantes"].DisplayIndex = 7;
+            this.dgvMain.Columns["MetrosEsperados"].DisplayIndex = 8;
+            this.dgvMain.Columns["MetrosAlistados"].DisplayIndex = 9;
+            this.dgvMain.Columns["MetrosRestantes"].DisplayIndex = 10;
+            this.dgvMain.Columns["CantidadPlanificada"].DisplayIndex = 11;
 
             // Para las columnas "Restantes"
             this.dgvMain.Columns["PacasRestantes"].DefaultCellStyle.BackColor = Color.Green;
@@ -456,6 +466,9 @@ namespace ALISTAMIENTO_IE
 
             this.dgvMain.Columns["KilosRestantes"].DefaultCellStyle.BackColor = Color.Green;
             this.dgvMain.Columns["KilosRestantes"].DefaultCellStyle.ForeColor = Color.White;
+
+            this.dgvMain.Columns["MetrosRestantes"].DefaultCellStyle.BackColor = Color.Green;
+            this.dgvMain.Columns["MetrosRestantes"].DefaultCellStyle.ForeColor = Color.White;
 
 
         }
@@ -472,22 +485,38 @@ namespace ALISTAMIENTO_IE
                 etiquetaNormal = await _etiquetaService.ObtenerEtiquetaPorCodigoAsync(etiqueta);
             }
 
-            // 3. Determinar los datos base de la etiqueta
+            // 3. Si no existe en ninguna de las anteriores, buscar en EtiquetaRollo
+            EtiquetaRollo etiquetaRollo = null;
+            if (etiquetaLiner == null && etiquetaNormal == null)
+            {
+                etiquetaRollo = await _etiquetaRolloService.ObtenerEtiquetaRolloPorCodigoAsync(etiqueta);
+            }
+
+            // 4. Determinar los datos base de la etiqueta
             int item;
-            float cantidad;
-            float peso;
+            float cantidad = 0;
+            float peso = 0;
+            int metros = 0;
 
             if (etiquetaLiner != null)
             {
+                // KILOS (ETIQUETA_LINER)
                 item = etiquetaLiner.ITEM;
                 cantidad = etiquetaLiner.CANTIDAD;
                 peso = (float)etiquetaLiner.PESO_NETO;
             }
             else if (etiquetaNormal != null)
             {
+                // PACAS (ETIQUETA)
                 item = etiquetaNormal.COD_ITEM;
                 cantidad = etiquetaNormal.CANTIDAD;
                 peso = etiquetaNormal.PESO;
+            }
+            else if (etiquetaRollo != null)
+            {
+                // METROS (ETIQUETA_ROLLO)
+                item = etiquetaRollo.Item;
+                metros = etiquetaRollo.Metros ?? 0;
             }
             else
             {
@@ -495,26 +524,38 @@ namespace ALISTAMIENTO_IE
                 return;
             }
 
-            // 4. Actualizar el cachÈ (el DataSource del DataGridView)
+            // 5. Actualizar el cach√© (el DataSource del DataGridView)
             var lista = (List<InformacionCamionDTO>)this.dgvMain.DataSource;
             var registro = lista.FirstOrDefault(r => r.Item == item);
 
             if (registro != null)
             {
-                // Sumar cantidades alistadas
-                registro.PacasAlistadas += 1; // cada etiqueta cuenta como 1 paca
-                registro.KilosAlistados += peso;
-
-                // Recalcular restantes
-                registro.PacasRestantes = registro.PacasEsperadas - registro.PacasAlistadas;
-                registro.KilosRestantes = registro.KilosEsperados - registro.KilosAlistados;
+                // Sumar cantidades alistadas seg√∫n el tipo de producto
+                if (etiquetaLiner != null)
+                {
+                    // KILOS
+                    registro.KilosAlistados += peso;
+                    registro.KilosRestantes = registro.KilosEsperados - registro.KilosAlistados;
+                }
+                else if (etiquetaNormal != null)
+                {
+                    // PACAS
+                    registro.PacasAlistadas += 1; // cada etiqueta cuenta como 1 paca
+                    registro.PacasRestantes = registro.PacasEsperadas - registro.PacasAlistadas;
+                }
+                else if (etiquetaRollo != null)
+                {
+                    // METROS
+                    registro.MetrosAlistados += metros;
+                    registro.MetrosRestantes = registro.MetrosEsperados - registro.MetrosAlistados;
+                }
 
                 // Refrescar el grid
                 this.dgvMain.Refresh();
             }
             else
             {
-                MessageBox.Show($"El item {item} de la etiqueta no est· en la planificaciÛn.");
+                MessageBox.Show($"El item {item} de la etiqueta no est√° en la planificaci√≥n.");
                 lstErrores.Items.Insert(0, $"N.P: {etiqueta}");
             }
         }
@@ -526,7 +567,7 @@ namespace ALISTAMIENTO_IE
             // Procesar solo si la longitud limpia es 10
             if (etiqueta.Length == 10)
             {
-                // DetecciÛn de duplicados en memoria (turno vigente)
+                // Detecci√≥n de duplicados en memoria (turno vigente)
                 if (etiquetasLeidas.Contains(etiqueta))
                 {
                     // SONIDO DE ERROR FUERTE
@@ -546,8 +587,13 @@ namespace ALISTAMIENTO_IE
                     return;
                 }
 
-                // Validar si el item de la etiqueta est· en los Ìtems del camiÛn
-                int itemEtiqueta = resultado.TipoEtiqueta == "ETIQUETA" ? resultado.Etiqueta.COD_ITEM : resultado.EtiquetaLiner.ITEM;
+                // Validar si el item de la etiqueta est√° en los √≠tems del cami√≥n
+                int itemEtiqueta = resultado.TipoEtiqueta == "ETIQUETA"
+                    ? resultado.Etiqueta.COD_ITEM
+                    : (resultado.TipoEtiqueta == "ETIQUETA_LINER"
+                        ? resultado.EtiquetaLiner.ITEM
+                        : resultado.EtiquetaRollo.Item); // ‚úÖ MANEJO DE ROLLO
+
                 if (!ITEMS_PENDIENTES.Contains(itemEtiqueta.ToString()))
                 {
                     // SONIDO DE ERROR FUERTE
@@ -557,36 +603,55 @@ namespace ALISTAMIENTO_IE
                     return;
                 }
 
-                // Validar si la cantidad de pacas restantes es mayor a cero, usando conteo local
+                // Validar si hay cantidad restante seg√∫n el tipo de producto
                 var filaPedido = dgvMain.Rows
                     .Cast<DataGridViewRow>()
                     .FirstOrDefault(r => r.Cells["Item"].Value != null && r.Cells["Item"].Value.ToString() == itemEtiqueta.ToString());
 
                 if (filaPedido != null)
                 {
-                    int plan = 0;
-                    int.TryParse(filaPedido.Cells["PacasEsperadas"].Value?.ToString(), out plan);
-                    int yaLeidas = _conteoPorItem.TryGetValue(itemEtiqueta, out var c) ? c : 0;
-                    if (yaLeidas >= plan)
+                    // Validar seg√∫n el tipo de producto
+                    string tipoColumna = "";
+                    if (resultado.TipoEtiqueta == "ETIQUETA")
                     {
-                        // SONIDO DE ERROR FUERTE
-                        ReproducirSonidoError();
-                        lstErrores.Items.Insert(0, $"No hay pacas restantes para el Ìtem: {etiqueta}");
-                        txtEtiqueta.Clear();
-                        return;
+                        tipoColumna = "PacasEsperadas";
+                    }
+                    else if (resultado.TipoEtiqueta == "ETIQUETA_LINER")
+                    {
+                        tipoColumna = "KilosEsperados";
+                    }
+                    else if (resultado.TipoEtiqueta == "ETIQUETA_ROLLO")
+                    {
+                        tipoColumna = "MetrosEsperados";
+                    }
+
+                    // Solo validar duplicados para PACAS (ETIQUETA), no para Kilos ni Metros
+                    if (resultado.TipoEtiqueta == "ETIQUETA")
+                    {
+                        int plan = 0;
+                        int.TryParse(filaPedido.Cells[tipoColumna].Value?.ToString(), out plan);
+                        int yaLeidas = _conteoPorItem.TryGetValue(itemEtiqueta, out var c) ? c : 0;
+                        if (yaLeidas >= plan)
+                        {
+                            // SONIDO DE ERROR FUERTE
+                            ReproducirSonidoError();
+                            lstErrores.Items.Insert(0, $"No hay pacas restantes para el √≠tem: {etiqueta}");
+                            txtEtiqueta.Clear();
+                            return;
+                        }
                     }
                 }
                 else
                 {
                     // SONIDO DE ERROR FUERTE
                     ReproducirSonidoError();
-                    lstErrores.Items.Insert(0, $"No se encontrÛ el Ìtem de la etiqueta en el pedido: {etiqueta}");
+                    lstErrores.Items.Insert(0, $"No se encontr√≥ el √≠tem de la etiqueta en el pedido: {etiqueta}");
                     txtEtiqueta.Clear();
                     return;
                 }
 
                 // Insertar en ALISTAMIENTO_ETIQUETA
-                string areaFinal = "ALISTAMIENTO-" + CAMION_ACTUAL.PLACAS; // Area din·mica seg˙n el camiÛn
+                string areaFinal = "ALISTAMIENTO-" + CAMION_ACTUAL.PLACAS; // Area din√°mica seg√∫n el cami√≥n
 
                 KardexBodega ubicacionBodega = await _kardexService.ObtenerKardexDeEtiqueta(etiqueta);
 
@@ -594,7 +659,7 @@ namespace ALISTAMIENTO_IE
                 {
                     // SONIDO DE ERROR FUERTE
                     ReproducirSonidoError();
-                    lstErrores.Items.Insert(0, $"Error al obtener la ubicaciÛn en bodega para la etiqueta: {etiqueta}");
+                    lstErrores.Items.Insert(0, $"Error al obtener la ubicaci√≥n en bodega para la etiqueta: {etiqueta}");
                     txtEtiqueta.Clear();
                     return;
                 }
@@ -605,22 +670,30 @@ namespace ALISTAMIENTO_IE
 
                 // ACTUALIZAR KARDEX_BODEGA para reflejar el movimiento
                 ubicacionBodega.Area = areaFinal;
-                ubicacionBodega.IdBodega = 1; // Bodega PRINCIPAL donde se est· alistando todo.
+                ubicacionBodega.IdBodega = 1; // Bodega PRINCIPAL donde se est√° alistando todo.
                 _kardexService.UpdateAsync(ubicacionBodega);
 
-                // GUARDAR EN CACH… LOCAL
+                // ‚úÖ GUARDAR EN CACH√â LOCAL - TODAS LAS ETIQUETAS (PACAS, KILOS, METROS)
                 etiquetasLeidas.Add(etiqueta);
-                _conteoPorItem[itemEtiqueta] = _conteoPorItem.TryGetValue(itemEtiqueta, out var cnt) ? cnt + 1 : 1;
+
+                // Solo incrementar el contador para PACAS (para validar l√≠mite de cantidad)
+                if (resultado.TipoEtiqueta == "ETIQUETA")
+                {
+                    _conteoPorItem[itemEtiqueta] = _conteoPorItem.TryGetValue(itemEtiqueta, out var cnt) ? cnt + 1 : 1;
+                }
 
                 // Actualizar resumen principal
-                this.actualizarDgvMain(etiqueta);
+                await this.actualizarDgvMain(etiqueta);
 
-                // SONIDO DE …XITO
+                // SONIDO DE √âXITO
                 ReproducirSonidoExito();
 
-                // Mostrar mensaje flotante sin bloquear la UI (autocierre r·pido)
+                // Mostrar mensaje flotante sin bloquear la UI (autocierre r√°pido)
                 string descripcionItem = filaPedido.Cells["Descripcion"].Value?.ToString() ?? "";
-                var msg = new MensajeFlotanteForm($"ETIQUETA LEIDA: {etiqueta}\nITEM: {itemEtiqueta}\nDESCRIPCI”N: {descripcionItem}");
+                string tipoProducto = resultado.TipoEtiqueta == "ETIQUETA" ? "PACA"
+                    : (resultado.TipoEtiqueta == "ETIQUETA_LINER" ? "KILOS" : "METROS");
+
+                var msg = new MensajeFlotanteForm($"ETIQUETA LEIDA: {etiqueta}\nTIPO: {tipoProducto}\nITEM: {itemEtiqueta}\nDESCRIPCI√ìN: {descripcionItem}");
                 msg.Show();
                 var closeTimer = new Timer { Interval = 2000 };
                 closeTimer.Tick += (s2, e2) =>
@@ -660,7 +733,7 @@ namespace ALISTAMIENTO_IE
         {
             try
             {
-                // M˙ltiples beeps cortos y fuertes para mayor alerta
+                // M√∫ltiples beeps cortos y fuertes para mayor alerta
                 Task.Run(() =>
                 {
                     for (int i = 0; i < 3; i++)
@@ -670,7 +743,7 @@ namespace ALISTAMIENTO_IE
                     }
                 });
 
-                // TambiÈn reproducir el sonido de exclamaciÛn del sistema
+                // Tambi√©n reproducir el sonido de exclamaci√≥n del sistema
                 SystemSounds.Exclamation.Play();
             }
             catch (Exception ex)
@@ -681,28 +754,28 @@ namespace ALISTAMIENTO_IE
         }
 
         /// <summary>
-        /// Reproduce un sonido de Èxito cuando la etiqueta se lee correctamente
+        /// Reproduce un sonido de √©xito cuando la etiqueta se lee correctamente
         /// </summary>
         private void ReproducirSonidoExito()
         {
             try
             {
-                // Un beep suave de confirmaciÛn
+                // Un beep suave de confirmaci√≥n
                 Task.Run(() =>
                 {
-                    Console.Beep(1000, 150); // Frecuencia m·s alta (1000 Hz) por 150ms
+                    Console.Beep(1000, 150); // Frecuencia m√°s alta (1000 Hz) por 150ms
                 });
             }
             catch (Exception ex)
             {
                 // En caso de error al reproducir sonido, registrar en debug pero no interrumpir el flujo
-                System.Diagnostics.Debug.WriteLine($"Error al reproducir sonido de Èxito: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error al reproducir sonido de √©xito: {ex.Message}");
             }
         }
 
         private void btnPausa_Click(object sender, EventArgs e)
         {
-            var res = MessageBox.Show("øDesea PONER EN PAUSA el Alistamiento?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+            var res = MessageBox.Show("¬øDesea PONER EN PAUSA el Alistamiento?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
 
             if (res.Equals(true))
             {
