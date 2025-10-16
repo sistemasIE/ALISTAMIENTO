@@ -5,7 +5,7 @@ using ALISTAMIENTO_IE.Services;
 using Common.cache;
 using System.ComponentModel; // Added for BindingList
 using System.Data;
-using System.Media; // Para SystemSounds
+using System.Sound;
 using Timer = System.Windows.Forms.Timer;
 
 namespace ALISTAMIENTO_IE
@@ -515,8 +515,8 @@ namespace ALISTAMIENTO_IE
             else if (etiquetaRollo != null)
             {
                 // METROS (ETIQUETA_ROLLO)
-                item = etiquetaRollo.Item;
-                metros = etiquetaRollo.Metros ?? 0;
+                item = etiquetaRollo.Item; // ✅ Propiedad PascalCase
+                metros = etiquetaRollo.Metros ?? 0; // ✅ Propiedad PascalCase
             }
             else
             {
@@ -592,7 +592,7 @@ namespace ALISTAMIENTO_IE
                     ? resultado.Etiqueta.COD_ITEM
                     : (resultado.TipoEtiqueta == "ETIQUETA_LINER"
                         ? resultado.EtiquetaLiner.ITEM
-                        : resultado.EtiquetaRollo.Item); // ✅ MANEJO DE ROLLO
+                        : resultado.EtiquetaRollo.Item); // ✅ Propiedad PascalCase
 
                 if (!ITEMS_PENDIENTES.Contains(itemEtiqueta.ToString()))
                 {

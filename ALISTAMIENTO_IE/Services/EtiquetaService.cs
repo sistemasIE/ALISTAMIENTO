@@ -24,7 +24,7 @@ public class EtiquetaService
     private readonly string _connectionStringUnoE = ConfigurationManager.ConnectionStrings["stringConexionUnoe"].ConnectionString;
 
     public EtiquetaService() { }
-    
+
     public async Task<Etiqueta?> ObtenerEtiquetaPorCodigoAsync(string codigoEtiqueta)
     {
         await using var connection = new SqlConnection(_connectionString);
@@ -53,32 +53,17 @@ public class EtiquetaService
             // Buscar en las tres tablas
             var etiqueta = await connection.QueryFirstOrDefaultAsync<Etiqueta>(
                 "SELECT * FROM ETIQUETA WHERE COD_ETIQUETA = @codigo", new { codigo = codigoEtiqueta });
-            
+
             var etiquetaLiner = await connection.QueryFirstOrDefaultAsync<EtiquetaLiner>(
                 "SELECT * FROM ETIQUETA_LINER WHERE COD_ETIQUETA_LINER = @codigo", new { codigo = codigoEtiqueta });
-            
+
             var etiquetaRollo = await connection.QueryFirstOrDefaultAsync<EtiquetaRollo>(
                 @"SELECT 
-                    CodEtiquetaRollo,
-                    CodBarras,
-                    Fecha,
-                    Item,
-                    Telar,
-                    Tejedor,
-                    PesoBruto,
-                    PesoNeto,
-                    Estado,
-                    CodTipoEtiquetado,
-                    Metros,
-                    EstadoPaIpt,
-                    CiOperador,
-                    Turno,
-                    ConsumidaEn,
-                    DespachadaEn
+                   *
                 FROM ETIQUETA_ROLLO 
-                WHERE CodEtiquetaRollo = @codigo", 
+                WHERE Cod_Etiqueta_Rollo = @codigo",
                 new { codigo = codigoEtiqueta });
-            
+
             var kardex = await connection.QueryFirstOrDefaultAsync<dynamic>(
                 "SELECT * FROM KARDEX_BODEGA WHERE enBodega = 1 and etiqueta = @codigo", new { codigo = codigoEtiqueta });
             result.ExisteEnKardex = kardex != null;
@@ -86,7 +71,7 @@ public class EtiquetaService
             if ((etiqueta != null || etiquetaLiner != null || etiquetaRollo != null))
             {
                 result.Existe = true;
-                
+
                 // Determinar el tipo de etiqueta (prioridad: ETIQUETA > ETIQUETA_LINER > ETIQUETA_ROLLO)
                 if (etiqueta != null)
                 {
@@ -103,7 +88,7 @@ public class EtiquetaService
                     result.TipoEtiqueta = "ETIQUETA_ROLLO";
                     result.EtiquetaRollo = etiquetaRollo;
                 }
-                
+
                 if (!result.ExisteEnKardex)
                 {
                     await connection.ExecuteAsync(@"INSERT INTO KARDEX_BODEGA (etiqueta, idBodega, area, fechaIngreso, TipoEntrada) VALUES (@etiqueta, @idBodega, @area, @fechaIngreso, @tipoEntrada)",
