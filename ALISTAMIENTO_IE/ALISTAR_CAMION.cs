@@ -466,7 +466,7 @@ namespace ALISTAMIENTO_IE
                     string empresa = fila["EMPRESA"]?.ToString()?.Trim() ?? "";
                     string tipoDocumento = fila["TIPO DOCUMENTO"]?.ToString()?.Trim() ?? "";
                     string idDocumentoTxt = fila["ID DOCUMENTO"]?.ToString()?.Trim() ?? "";
-                    string ciaTransporteTxt = fila["CIA TRANSPORTE"]?.ToString()?.Trim() ?? "";
+                    string ciaTransporteTxt = fila["ID CIA TRANSPORTE"]?.ToString()?.Trim() ?? "";
                     string codConductorTxt = fila["COD_CONDUCTOR"]?.ToString()?.Trim() ?? "";
                     string codCamionTxt = fila["COD_CAMION"]?.ToString()?.Trim() ?? "";
 
