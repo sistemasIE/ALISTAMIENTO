@@ -91,16 +91,18 @@ public class EtiquetaService
 
                 if (!result.ExisteEnKardex)
                 {
-                    await connection.ExecuteAsync(@"INSERT INTO KARDEX_BODEGA (etiqueta, idBodega, area, fechaIngreso, TipoEntrada) VALUES (@etiqueta, @idBodega, @area, @fechaIngreso, @tipoEntrada)",
+                    await connection.ExecuteAsync(@"INSERT INTO KARDEX_BODEGA (etiqueta, idBodega, area, fechaIngreso, TipoEntrada, enBodega, idUsuarioEntrante) VALUES (@etiqueta, @idBodega, @area, @fechaIngreso, @tipoEntrada, @enBodega, @idUsuarioEntrante)",
                         new
                         {
                             etiqueta = codigoEtiqueta,
                             idBodega = 1,
                             area = "ALISTAMIENTO",
                             fechaIngreso = DateTime.Now,
-                            tipoEntrada = "M"
+                            tipoEntrada = "M",
+                            enBodega = true,
+                            idUsuarioEntrante = Common.cache.UserLoginCache.IdUser
                         });
-                    result.Mensaje = "Etiqueta insertada en KARDEX_BODEGA.";
+                    result.Mensaje = "ETIQUETA INSERTADA A KARDEX_BODEGA y ALISTADA";
                 }
                 else
                 {

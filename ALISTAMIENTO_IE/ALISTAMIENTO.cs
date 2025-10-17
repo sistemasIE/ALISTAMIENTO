@@ -5,7 +5,7 @@ using ALISTAMIENTO_IE.Services;
 using Common.cache;
 using System.ComponentModel; // Added for BindingList
 using System.Data;
-using System.Sound;
+using System.Media;
 using Timer = System.Windows.Forms.Timer;
 
 namespace ALISTAMIENTO_IE
@@ -65,7 +65,7 @@ namespace ALISTAMIENTO_IE
         }
 
         /// <summary>
-        /// Verifica si todas las columnas restantes (PacasRestantes y KilosRestantes) están en cero
+        /// Verifica si todas las columnas restantes (PacasRestantes, KilosRestantes y MetrosRestantes) están en cero
         /// </summary>
         /// <returns>True si todas las columnas restantes están en cero, False en caso contrario</returns>
         private bool VerificarAlistamientoCompleto()
@@ -74,7 +74,7 @@ namespace ALISTAMIENTO_IE
             if (lista == null || !lista.Any())
                 return true;
 
-            return lista.All(item => item.PacasRestantes <= 0 && item.KilosRestantes <= 0);
+            return lista.All(item => item.PacasRestantes <= 0 && item.KilosRestantes <= 0 && item.MetrosRestantes <= 0);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace ALISTAMIENTO_IE
                 if (_estadoAlistamientoInicial == "ALISTADO_INCOMPLETO")
                 {
                     // CASO ESPECIAL: Continuar un alistamiento incompleto
-                    var alistamientoIncompleto = _alistamientoService.ObtenerAlistamientoPorCodCamionYEstado(_idCamion, "ALISTADO_INCOMPLETO");
+                    Alistamiento alistamientoIncompleto = _alistamientoService.ObtenerAlistamientoPorCodCamionYEstado(_idCamion, "ALISTADO_INCOMPLETO");
 
                     if (alistamientoIncompleto == null)
                     {
@@ -267,24 +267,50 @@ namespace ALISTAMIENTO_IE
                 // Obtener todas las etiquetas leídas para este alistamiento
                 var etiquetasLeidasBD = await _alistamientoEtiquetaService.ObtenerEtiquetasLeidas(_idAlistamiento);
 
-                // Crear un diccionario para acumular pesos por item
-                var pesosPorItem = new Dictionary<int, float>();
+                // Crear diccionarios para acumular por item según tipo de producto
+                var pesosPorItem = new Dictionary<int, float>(); // Para ETIQUETA_LINER (kilos)
+                var unidadesPorItem = new Dictionary<int, int>(); // Para ETIQUETA (pacas/unidades)
+                var metrosPorItem = new Dictionary<int, float>(); // Para ETIQUETA_ROLLO (metros)
 
-                // Procesar cada etiqueta leída para calcular pesos
+                // Procesar cada etiqueta leída para calcular según su tipo
                 foreach (var etiquetaLeida in etiquetasLeidasBD)
                 {
                     if (etiquetaLeida.ITEM.HasValue && !string.IsNullOrWhiteSpace(etiquetaLeida.ETIQUETA))
                     {
                         try
                         {
-                            float peso = await ObtenerPesoDeEtiqueta(etiquetaLeida.ETIQUETA);
                             int item = etiquetaLeida.ITEM.Value;
+                            string codigoEtiqueta = etiquetaLeida.ETIQUETA;
 
-                            pesosPorItem[item] = pesosPorItem.TryGetValue(item, out var pesoActual) ? pesoActual + peso : peso;
+                            // 1. Buscar en ETIQUETA_ROLLO (METROS)
+                            var etiquetaRollo = await _etiquetaRolloService.ObtenerEtiquetaRolloPorCodigoAsync(codigoEtiqueta);
+                            if (etiquetaRollo != null)
+                            {
+                                float metros = etiquetaRollo.Metros ?? 0;
+                                metrosPorItem[item] = metrosPorItem.TryGetValue(item, out var metrosActual) ? metrosActual + metros : metros;
+                                continue;
+                            }
+
+                            // 2. Buscar en ETIQUETA_LINER (KILOS/PESO)
+                            var etiquetaLiner = await _etiquetaLinerService.ObtenerEtiquetaLinerPorCodigoAsync(codigoEtiqueta);
+                            if (etiquetaLiner != null)
+                            {
+                                float peso = (float)etiquetaLiner.PESO_NETO;
+                                pesosPorItem[item] = pesosPorItem.TryGetValue(item, out var pesoActual) ? pesoActual + peso : peso;
+                                continue;
+                            }
+
+                            // 3. Buscar en ETIQUETA (UNIDADES/PACAS)
+                            var etiquetaNormal = await _etiquetaService.ObtenerEtiquetaPorCodigoAsync(codigoEtiqueta);
+                            if (etiquetaNormal != null)
+                            {
+                                unidadesPorItem[item] = unidadesPorItem.TryGetValue(item, out var unidadesActual) ? unidadesActual + 1 : 1;
+                                continue;
+                            }
                         }
                         catch (Exception ex)
                         {
-                            System.Diagnostics.Debug.WriteLine($"Error obteniendo peso para etiqueta {etiquetaLeida.ETIQUETA}: {ex.Message}");
+                            System.Diagnostics.Debug.WriteLine($"Error procesando etiqueta {etiquetaLeida.ETIQUETA}: {ex.Message}");
                         }
                     }
                 }
@@ -292,16 +318,25 @@ namespace ALISTAMIENTO_IE
                 // Actualizar el DataGridView con las cantidades recalculadas
                 foreach (var registro in lista)
                 {
-                    if (_conteoPorItem.TryGetValue(registro.Item, out var cantidadAlistada))
+                    // Actualizar PACAS/UNIDADES (ETIQUETA)
+                    if (unidadesPorItem.TryGetValue(registro.Item, out var cantidadAlistada))
                     {
                         registro.PacasAlistadas = cantidadAlistada;
                         registro.PacasRestantes = registro.PacasEsperadas - registro.PacasAlistadas;
                     }
 
+                    // Actualizar KILOS (ETIQUETA_LINER)
                     if (pesosPorItem.TryGetValue(registro.Item, out var pesoAlistado))
                     {
                         registro.KilosAlistados = pesoAlistado;
                         registro.KilosRestantes = registro.KilosEsperados - registro.KilosAlistados;
+                    }
+
+                    // Actualizar METROS (ETIQUETA_ROLLO)
+                    if (metrosPorItem.TryGetValue(registro.Item, out var metrosAlistados))
+                    {
+                        registro.MetrosAlistados = metrosAlistados;
+                        registro.MetrosRestantes = registro.MetrosEsperados - registro.MetrosAlistados;
                     }
                 }
 
@@ -578,7 +613,7 @@ namespace ALISTAMIENTO_IE
                 }
 
                 var resultado = await _etiquetaService.ValidarEtiquetaEnKardexAsync(etiqueta);
-                if (!resultado.EsValida || !resultado.Existe || !resultado.ExisteEnKardex)
+                if (!resultado.EsValida || !resultado.Existe)
                 {
                     // SONIDO DE ERROR FUERTE
                     ReproducirSonidoError();
@@ -603,33 +638,68 @@ namespace ALISTAMIENTO_IE
                     return;
                 }
 
-                // Validar si hay cantidad restante según el tipo de producto
+                // Obtener la fila del pedido
+                var lista = (List<InformacionCamionDTO>)dgvMain.DataSource;
+                var registroItem = lista?.FirstOrDefault(r => r.Item == itemEtiqueta);
+
+                if (registroItem == null)
+                {
+                    // SONIDO DE ERROR FUERTE
+                    ReproducirSonidoError();
+                    lstErrores.Items.Insert(0, $"No se encontró el ítem de la etiqueta en el pedido: {etiqueta}");
+                    txtEtiqueta.Clear();
+                    return;
+                }
+
+                // ✅ VALIDACIÓN CRÍTICA: Verificar que haya cantidad restante según el tipo de producto
+                if (resultado.TipoEtiqueta == "ETIQUETA")
+                {
+                    // PACAS - Validar que haya pacas restantes
+                    if (registroItem.PacasRestantes <= 0)
+                    {
+                        ReproducirSonidoError();
+                        lstErrores.Items.Insert(0, $"No hay pacas restantes para el ítem {itemEtiqueta}: {etiqueta}");
+                        txtEtiqueta.Clear();
+                        return;
+                    }
+                }
+                else if (resultado.TipoEtiqueta == "ETIQUETA_LINER")
+                {
+                    // KILOS - Validar que haya kilos restantes
+                    float pesoEtiqueta = (float)resultado.EtiquetaLiner.PESO_NETO;
+                    if (registroItem.KilosRestantes <= 0 || registroItem.KilosRestantes - pesoEtiqueta < -0.01) // Tolerancia mínima
+                    {
+                        ReproducirSonidoError();
+                        lstErrores.Items.Insert(0, $"No hay kilos restantes para el ítem {itemEtiqueta}: {etiqueta}");
+                        txtEtiqueta.Clear();
+                        return;
+                    }
+                }
+                else if (resultado.TipoEtiqueta == "ETIQUETA_ROLLO")
+                {
+                    // METROS - Validar que haya metros restantes
+                    int metrosEtiqueta = resultado.EtiquetaRollo.Metros ?? 0;
+                    if (registroItem.MetrosRestantes <= 0 || registroItem.MetrosRestantes - metrosEtiqueta < 0)
+                    {
+                        ReproducirSonidoError();
+                        lstErrores.Items.Insert(0, $"No hay metros restantes para el ítem {itemEtiqueta}: {etiqueta}");
+                        txtEtiqueta.Clear();
+                        return;
+                    }
+                }
+
+                // Validar si hay cantidad restante según el tipo de producto (LEGACY - Puede eliminarse si la validación anterior es suficiente)
                 var filaPedido = dgvMain.Rows
                     .Cast<DataGridViewRow>()
                     .FirstOrDefault(r => r.Cells["Item"].Value != null && r.Cells["Item"].Value.ToString() == itemEtiqueta.ToString());
 
                 if (filaPedido != null)
                 {
-                    // Validar según el tipo de producto
-                    string tipoColumna = "";
-                    if (resultado.TipoEtiqueta == "ETIQUETA")
-                    {
-                        tipoColumna = "PacasEsperadas";
-                    }
-                    else if (resultado.TipoEtiqueta == "ETIQUETA_LINER")
-                    {
-                        tipoColumna = "KilosEsperados";
-                    }
-                    else if (resultado.TipoEtiqueta == "ETIQUETA_ROLLO")
-                    {
-                        tipoColumna = "MetrosEsperados";
-                    }
-
                     // Solo validar duplicados para PACAS (ETIQUETA), no para Kilos ni Metros
                     if (resultado.TipoEtiqueta == "ETIQUETA")
                     {
                         int plan = 0;
-                        int.TryParse(filaPedido.Cells[tipoColumna].Value?.ToString(), out plan);
+                        int.TryParse(filaPedido.Cells["PacasEsperadas"].Value?.ToString(), out plan);
                         int yaLeidas = _conteoPorItem.TryGetValue(itemEtiqueta, out var c) ? c : 0;
                         if (yaLeidas >= plan)
                         {
@@ -640,14 +710,6 @@ namespace ALISTAMIENTO_IE
                             return;
                         }
                     }
-                }
-                else
-                {
-                    // SONIDO DE ERROR FUERTE
-                    ReproducirSonidoError();
-                    lstErrores.Items.Insert(0, $"No se encontró el ítem de la etiqueta en el pedido: {etiqueta}");
-                    txtEtiqueta.Clear();
-                    return;
                 }
 
                 // Insertar en ALISTAMIENTO_ETIQUETA
@@ -689,7 +751,7 @@ namespace ALISTAMIENTO_IE
                 ReproducirSonidoExito();
 
                 // Mostrar mensaje flotante sin bloquear la UI (autocierre rápido)
-                string descripcionItem = filaPedido.Cells["Descripcion"].Value?.ToString() ?? "";
+                string descripcionItem = filaPedido?.Cells["Descripcion"].Value?.ToString() ?? "";
                 string tipoProducto = resultado.TipoEtiqueta == "ETIQUETA" ? "PACA"
                     : (resultado.TipoEtiqueta == "ETIQUETA_LINER" ? "KILOS" : "METROS");
 

@@ -173,47 +173,46 @@ namespace ALISTAMIENTO_IE.Services
         {
             const string sql = @"
             SELECT 
-    dcxd.ITEM AS Item,
-    i.f120_descripcion AS Descripcion,
-    CASE 
-        WHEN i.f120_id_unidad_inventario = 'UND' 
-        THEN SUM(dcxd.CANTIDAD_PLANIFICADA) / 
-             TRY_CAST(SUBSTRING(i.f120_id_unidad_empaque, 2, LEN(i.f120_id_unidad_empaque)) AS INT)
-        ELSE NULL
-    END AS PacasEsperadas,
-    CASE 
-        WHEN i.f120_id_unidad_inventario = 'KLS'
-        THEN SUM(dcxd.CANTIDAD_PLANIFICADA)
-        ELSE NULL
-    END AS KilosEsperados,
-    CASE 
-        WHEN i.f120_id_unidad_inventario = 'MTS' 
-        THEN dcxd.CANTIDAD_PLANIFICADA
-        ELSE NULL
-    END AS MetrosEsperados,
-    dcxd.CANTIDAD_PLANIFICADA as CantidadPlanificada
-FROM [SIE].dbo.DETALLE_CAMION_X_DIA dcxd
-JOIN [SIE].dbo.CAMION_X_DIA cxd
-    ON dcxd.COD_CAMION = cxd.COD_CAMION
-JOIN [SIE].dbo.CAMION c
-    ON cxd.COD_REGISTRO_CAMION = c.COD_CAMION
-LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items i
-    ON dcxd.ITEM = i.f120_id
-WHERE 
-  cxd.COD_CAMION = @CodCamion
-  AND cxd.ESTADO = 'C'
-  AND i.f120_id_cia = 2
-  AND cxd.FECHA >= DATEADD(DAY, -1, GETDATE())
-GROUP BY 
-    c.placas, 
-    cxd.COD_CAMION, 
-    dcxd.ITEM, 
-    cxd.FECHA,
-    i.f120_id_unidad_empaque, 
-    i.f120_descripcion,
-    i.f120_id_unidad_inventario,
-    dcxd.CANTIDAD_PLANIFICADA 
-    ORDER BY cxd.FECHA ASC;";
+            dcxd.ITEM AS Item,
+            i.f120_descripcion AS Descripcion,
+            sum(dcxd.CANTIDAD_PLANIFICADA) as CantidadPlanificada,
+            CASE 
+                WHEN i.f120_id_unidad_inventario = 'UND' 
+                THEN SUM(dcxd.CANTIDAD_PLANIFICADA) / 
+                     TRY_CAST(SUBSTRING(i.f120_id_unidad_empaque, 2, LEN(i.f120_id_unidad_empaque)) AS INT)
+                ELSE NULL
+            END AS PacasEsperadas,
+            CASE 
+                WHEN i.f120_id_unidad_inventario = 'KLS'
+                THEN SUM(dcxd.CANTIDAD_PLANIFICADA)
+                ELSE NULL
+            END AS KilosEsperados,
+            CASE 
+                WHEN i.f120_id_unidad_inventario = 'MTS' 
+                THEN sum(dcxd.CANTIDAD_PLANIFICADA)
+                ELSE NULL
+            END AS MetrosEsperados
+        FROM [SIE].dbo.DETALLE_CAMION_X_DIA dcxd
+        JOIN [SIE].dbo.CAMION_X_DIA cxd
+            ON dcxd.COD_CAMION = cxd.COD_CAMION
+        JOIN [SIE].dbo.CAMION c
+            ON cxd.COD_REGISTRO_CAMION = c.COD_CAMION
+        LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items i
+            ON dcxd.ITEM = i.f120_id
+        WHERE 
+          cxd.COD_CAMION =@CodCamion
+          AND cxd.ESTADO = 'C'
+          AND i.f120_id_cia = 2
+          AND cxd.FECHA >= DATEADD(DAY, -1, GETDATE())
+        GROUP BY 
+            c.placas, 
+            cxd.COD_CAMION, 
+            dcxd.ITEM, 
+            cxd.FECHA,
+            i.f120_id_unidad_empaque, 
+            i.f120_descripcion,
+            i.f120_id_unidad_inventario
+            ORDER BY cxd.FECHA ASC";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -255,26 +254,27 @@ GROUP BY
             using (var connection = new SqlConnection(_connectionString))
             {
                 string sql = @"
-                  SELECT 
-                    ae.etiqueta AS ETIQUETA,
-                    ISNULL(e.COD_ITEM, el.ITEM) AS ITEM,
-                    ISNULL(d1.F120_DESCRIPCION, d2.F120_DESCRIPCION) AS DESCRIPCION,
-                    ae.areaFinal AS AREA,
-                    ae.fecha AS FECHA
-                FROM ALISTAMIENTO_ETIQUETA ae
-                LEFT JOIN ETIQUETA e 
-                    ON ae.etiqueta = e.COD_ETIQUETA
-                LEFT JOIN ETIQUETA_LINER el 
-                    ON ae.etiqueta = el.COD_ETIQUETA_LINER
-                LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items d1 
-                    ON e.COD_ITEM = d1.F120_ID 
-                    AND d1.f120_id_cia = 2
-                LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items d2 
-                    ON el.ITEM = d2.F120_ID 
-                    AND d2.f120_id_cia = 2
-                WHERE ae.idAlistamiento = @idAlistamiento
-                ORDER BY ae.fecha DESC
-
+SELECT 
+    ae.etiqueta AS ETIQUETA,
+    COALESCE(e.COD_ITEM, el.ITEM, elr.ITEM) AS ITEM,
+    COALESCE(d1.F120_DESCRIPCION, d2.F120_DESCRIPCION) AS DESCRIPCION,
+    ae.areaFinal AS AREA,
+    ae.fecha AS FECHA
+FROM ALISTAMIENTO_ETIQUETA ae
+LEFT JOIN ETIQUETA e 
+    ON ae.etiqueta = e.COD_ETIQUETA
+LEFT JOIN ETIQUETA_LINER el 
+    ON ae.etiqueta = el.COD_ETIQUETA_LINER
+LEFT JOIN ETIQUETA_ROLLO elr 
+    ON ae.etiqueta = elr.COD_ETIQUETA_ROLLO
+LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items d1 
+    ON e.COD_ITEM = d1.F120_ID 
+    AND d1.f120_id_cia = 2
+LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items d2 
+    ON el.ITEM = d2.F120_ID 
+    AND d2.f120_id_cia = 2
+WHERE ae.idAlistamiento = @idAlistamiento
+ORDER BY ae.fecha DESC;
             ";
 
                 return await connection.QueryAsync<EtiquetaLeidaDTO>(sql, new { idAlistamiento });

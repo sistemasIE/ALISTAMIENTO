@@ -277,13 +277,13 @@ namespace ALISTAMIENTO_IE
             // Obtener el estado actual del camión seleccionado
             string estadoActual = GetSelectedCamionEstado();
 
-            //// Validar que el estado permita el alistamiento
-            //if (estadoActual == "EN_PROCESO")
-            //{
-            //    MessageBox.Show("Este camión ya tiene un alistamiento en proceso. No se puede iniciar un nuevo alistamiento.",
-            //                  "Estado No Válido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            //    return;
-            //}
+            // Validar que el estado permita el alistamiento
+            if (estadoActual == "EN_PROCESO")
+            {
+                MessageBox.Show("Este camión ya tiene un alistamiento en proceso. No se puede iniciar un nuevo alistamiento.",
+                              "Estado No Válido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             if (estadoActual == "ALISTADO")
             {
@@ -300,12 +300,12 @@ namespace ALISTAMIENTO_IE
             }
 
             // Solo permitir alistamiento para estados: SIN_ALISTAR y ALISTADO_INCOMPLETO
-            //if (estadoActual != "SIN_ALISTAR" && estadoActual != "ALISTADO_INCOMPLETO")
-            //{
-            //    MessageBox.Show($"No se puede alistar un camión con estado '{estadoActual}'.",
-            //                  "Estado No Válido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            //    return;
-            //}
+            if (estadoActual != "SIN_ALISTAR" && estadoActual != "ALISTADO_INCOMPLETO")
+            {
+                MessageBox.Show($"No se puede alistar un camión con estado '{estadoActual}'.",
+                              "Estado No Válido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             // Si llegamos aquí, el estado es válido para alistamiento
             string mensaje = estadoActual == "ALISTADO_INCOMPLETO"
