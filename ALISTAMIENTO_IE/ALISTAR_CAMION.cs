@@ -3,6 +3,7 @@ using ALISTAMIENTO_IE.Interfaces;
 using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
 using ExcelDataReader;
+using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Text;
 
@@ -418,7 +419,7 @@ namespace ALISTAMIENTO_IE
                 using var ofd = new OpenFileDialog
                 {
                     Title = "Selecciona un archivo de Excel",
-                    Filter = "Archivos de Excel|*.xlsx;*.xls;*.xlsb"
+                    Filter = "Archivos de Excel|*.xlsx;*.xls;*.xlsb;*.xlsm"
                 };
 
                 if (ofd.ShowDialog() != DialogResult.OK)
@@ -483,7 +484,7 @@ namespace ALISTAMIENTO_IE
 
                     if (documento == null || tercero == null || conductor == null || camion == null) { /*...*/ continue; }
 
-                    string empresaTransporte = tercero.f200_id;
+                    string empresaTransporte = tercero.f200_id.Trim();
 
                     foreach (var m in movsDoc)
                     {
@@ -494,6 +495,8 @@ namespace ALISTAMIENTO_IE
                         {
                             FECHA = m.FECHA,
                             NUM_DOCUMENTO = documento.Documento,
+                            TIPO_DOCUMENTO = tipoDocumento,
+                            EMPRESA_TRANSPORTE = empresaTransporte,
                             ESTADO = m.ESTADO,
                             NOMBRE_CONDUCTOR = conductor.NOMBRES ?? "",
                             BOD_SALIDA = m.BOD_SALIDA,
@@ -571,6 +574,7 @@ namespace ALISTAMIENTO_IE
                 btnCargarArchivo.Enabled = true; // ✅ SIEMPRE rehabilitar el botón
             }
         }
+        
         private static string HtmlMessageBody(GrupoMovimientosDto grupo, string? placas, string? nombreConductor, string? docPrincipal)
         {
             var sb = new StringBuilder();
@@ -646,6 +650,8 @@ namespace ALISTAMIENTO_IE
                     var placas = camion?.PLACAS;
                     var nombreConductor = grupo.Movimientos.FirstOrDefault()?.NOMBRE_CONDUCTOR ?? "";
                     var docPrincipal = grupo.Movimientos.FirstOrDefault()?.NUM_DOCUMENTO ?? "";
+                    var tipoDocPrincipal = grupo.Movimientos.FirstOrDefault()?.TIPO_DOCUMENTO ?? "";
+                    var empresaTransporte = grupo.Movimientos.FirstOrDefault()?.EMPRESA_TRANSPORTE ?? "";
 
                     string asunto = $"Programacion y Despacho camion: {placas ?? $"CAMION {grupo.CodCamion}"} " +
                                     $"Conductor: {nombreConductor} de: <<{docPrincipal}>>";
@@ -657,26 +663,58 @@ namespace ALISTAMIENTO_IE
 
                     // Por la sintaxis correcta de inicialización de arrays en C#:
                     var destinatarios = new string[] { "jefedesistemas@integraldeempaques.com", "otro@correo.com" };
-                    using (var client = new System.Net.Mail.SmtpClient("192.168.16.215"))
+
+                    if (tipoDocPrincipal == "TTS")
                     {
-                        client.UseDefaultCredentials = false;
-                        client.Port = 2727;
-                        client.Credentials = new System.Net.NetworkCredential("cabana\\notificaciones", "Notifica@inte");
-                        client.EnableSsl = false;
-
-                        foreach (var correo in destinatarios)
+                        destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='GRUPO4'");
+                    }
+                    else  if (tipoDocPrincipal == "RMV")
+                    {
+                        string grupos ="";
+                        if(empresaTransporte == "900859908")
                         {
-                            using (var msg = new System.Net.Mail.MailMessage("notificaciones@integraldeempaques.com", correo))
-                            {
-                                msg.Subject = asunto;
-                                msg.IsBodyHtml = true;
-                                msg.BodyEncoding = System.Text.Encoding.UTF8;
-                                msg.Body = html;
+                            grupos= "GRUPO1";//escobar
+                        }
+                        else if(empresaTransporte== "900745904")
+                        {
+                            grupos= "GRUPO2";//turbotrans
+                        }
+                        else if(empresaTransporte == "800090323")
+                        {
+                            grupos = "GRUPO4";//fidelizado
+                        }
+                        else
+                        {
+                            grupos = "";
+                        }
+                        destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='"+grupos+"'");
+                    }
+                    else
+                    {
+                        destinatarios = new string[] { "jefedesistemas@integraldeempaques.com", "desarrollador@integraldeempaques.com" };
 
-                                await client.SendMailAsync(msg);
+                    }
+
+                    using (var client = new System.Net.Mail.SmtpClient("192.168.16.215"))
+                        {
+                            client.UseDefaultCredentials = false;
+                            client.Port = 2727;
+                            client.Credentials = new System.Net.NetworkCredential("cabana\\notificaciones", "Notifica@inte");
+                            client.EnableSsl = false;
+
+                            foreach (var correo in destinatarios)
+                            {
+                                using (var msg = new System.Net.Mail.MailMessage("notificaciones@integraldeempaques.com", correo))
+                                {
+                                    msg.Subject = asunto;
+                                    msg.IsBodyHtml = true;
+                                    msg.BodyEncoding = System.Text.Encoding.UTF8;
+                                    msg.Body = html;
+
+                                    await client.SendMailAsync(msg);
+                                }
                             }
                         }
-                    }
 
 
                 }
