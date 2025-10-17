@@ -419,7 +419,7 @@ namespace ALISTAMIENTO_IE
                 using var ofd = new OpenFileDialog
                 {
                     Title = "Selecciona un archivo de Excel",
-                    Filter = "Archivos de Excel|*.xlsx;*.xls;*.xlsb"
+                    Filter = "Archivos de Excel|*.xlsx;*.xls;*.xlsb;*.xlsm"
                 };
 
                 if (ofd.ShowDialog() != DialogResult.OK)
