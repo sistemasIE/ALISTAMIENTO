@@ -33,16 +33,29 @@ namespace ALISTAMIENTO_IE
             // Verificar si es para alistamiento incompleto o anulación
             bool esAlistamientoIncompleto = _accion.Contains("incompleto", StringComparison.OrdinalIgnoreCase);
 
-            if (MessageBox.Show("¿Está seguro de Pausar el alistamiento?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (esAlistamientoIncompleto)
             {
-
-                _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "ALISTADO_INCOMPLETO", obs, DateTime.Now);
-                AlistamientoAnulado = true;
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-
+                if (MessageBox.Show("¿Está seguro de cerrar el alistamiento como incompleto?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "ALISTADO_INCOMPLETO", obs, DateTime.Now);
+                    AlistamientoIncompleto = true;
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
             }
-
+            else
+            {
+                if (MessageBox.Show("¿Está seguro de anular el alistamiento?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    if (MessageBox.Show("Esta acción es irreversible. ¿Desea continuar?", "Doble confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                    {
+                        _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "ALISTADO_INCOMPLETO", obs, DateTime.Now);
+                        AlistamientoAnulado = true;
+                        this.DialogResult = DialogResult.OK;
+                        this.Close();
+                    }
+                }
+            }
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)
