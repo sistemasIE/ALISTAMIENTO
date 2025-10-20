@@ -85,7 +85,7 @@ namespace ALISTAMIENTO_IE
 
             var res = MessageBox.Show("¡¿Desea TERMINAR el alistamiento?!", "Confirmar",
                                         MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (res.Equals(true))
+            if (res == DialogResult.Yes)
                 if (VerificarAlistamientoCompleto())
                 {
                     // Alistamiento completo - actualizar estado a ALISTADO

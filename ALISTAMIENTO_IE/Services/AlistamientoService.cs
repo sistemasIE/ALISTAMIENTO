@@ -186,7 +186,7 @@ namespace ALISTAMIENTO_IE.Services
                          ON a.idCamionDia = cxd.COD_CAMION
                      WHERE
  	                     cxd.ESTADO = 'C' -- Sin alistar
-	                     AND cxd.FECHA > DATEADD(DAY, -2, GETDATE())
+	                     AND cxd.FECHA > DATEADD(DAY, -7, GETDATE())
                          AND (a.ESTADO IS NULL OR a.ESTADO LIKE '%INCOMPLETO%' OR a.ESTADO = 'EN_PROCESO' OR a.ESTADO = 'ALISTADO' OR a.ESTADO = 'ANULADO')
                     GROUP BY
                         cxd.COD_CAMION, c.PLACAS, cxd.FECHA, cxd.ESTADO, a.estado 
