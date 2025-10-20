@@ -40,4 +40,13 @@
         public decimal TotalKilosEsperados { get; set; }
     }
 
+    public class ReporteAlistamientoPorTurnoDto
+    {
+        public string usuario { get; set; }
+        public int etiquetasPorHora { get; set; }
+
+        public int carrosDespachados { get; set; }
+
+    }
+
 }

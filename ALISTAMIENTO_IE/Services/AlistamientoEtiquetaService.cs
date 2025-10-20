@@ -44,7 +44,7 @@ namespace ALISTAMIENTO_IE.Services
             return (fechaInicio, fechaFin);
         }
 
-        public async Task<IEnumerable<dynamic>> ObtenerReportePacasPorHora(DateTime fechaConsulta)
+        public async Task<IEnumerable<ReporteAlistamientoPorTurnoDto>> ObtenerReportePacasPorHora(DateTime fechaConsulta)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -52,30 +52,30 @@ namespace ALISTAMIENTO_IE.Services
                 var (fechaInicio, fechaFin) = ObtenerRangoFechas(fechaConsulta);
 
                 string sql = @"
-                    SELECT 
-                        u.loginNombre AS USUARIO,
-                        ROUND(CAST(COUNT(ae.etiqueta) AS DECIMAL(10, 2)) / 8,0) AS ""PACAS / H"",
-                        COUNT(DISTINCT d.COD_CAMION) AS ""CARROS DESPACHADOS""
-                    FROM 
-                        ALISTAMIENTO a
-                    JOIN 
-                        USUARIOS u ON u.UsuarioID = a.idUsuario 
-                    JOIN 
-                        ALISTAMIENTO_ETIQUETA ae ON ae.idAlistamiento = a.idAlistamiento
-                    LEFT JOIN 
-                        etiqueta e ON e.COD_ETIQUETA = ae.etiqueta
-                    LEFT JOIN 
-                        ETIQUETA_LINER el ON el.COD_ETIQUETA_LINER = ae.etiqueta
-                    LEFT JOIN
-                        [SIE].dbo.DETALLE_CAMION_X_DIA d ON a.idCamionDia = d.COD_CAMION
-                    WHERE 
+                     SELECT 
+                         u.loginNombre AS usuario,
+                         ROUND(CAST(COUNT(ae.etiqueta) AS DECIMAL(10, 2)) / 8,0) AS etiquetasPorHora,
+                         COUNT(DISTINCT d.COD_CAMION) AS carrosDespachados
+                     FROM 
+                         ALISTAMIENTO a
+                     JOIN 
+                         USUARIOS u ON u.UsuarioID = a.idUsuario 
+                     JOIN 
+                         ALISTAMIENTO_ETIQUETA ae ON ae.idAlistamiento = a.idAlistamiento
+                     LEFT JOIN 
+                         etiqueta e ON e.COD_ETIQUETA = ae.etiqueta
+                     LEFT JOIN 
+                         ETIQUETA_LINER el ON el.COD_ETIQUETA_LINER = ae.etiqueta
+                     LEFT JOIN
+                         [SIE].dbo.DETALLE_CAMION_X_DIA d ON a.idCamionDia = d.COD_CAMION
+                     WHERE 
                         ae.fecha >= @fechaInicio
                         AND ae.fecha < @fechaFin
                         AND a.estado LIKE '%alistado%'
                     GROUP BY 
                         u.loginNombre;";
 
-                return await connection.QueryAsync(sql, new { fechaInicio, fechaFin });
+                return await connection.QueryAsync<ReporteAlistamientoPorTurnoDto>(sql, new { fechaInicio, fechaFin });
             }
         }
 
@@ -203,7 +203,6 @@ namespace ALISTAMIENTO_IE.Services
           cxd.COD_CAMION =@CodCamion
           AND cxd.ESTADO = 'C'
           AND i.f120_id_cia = 2
-          AND cxd.FECHA >= DATEADD(DAY, -1, GETDATE())
         GROUP BY 
             c.placas, 
             cxd.COD_CAMION, 
@@ -254,27 +253,36 @@ namespace ALISTAMIENTO_IE.Services
             using (var connection = new SqlConnection(_connectionString))
             {
                 string sql = @"
-SELECT 
-    ae.etiqueta AS ETIQUETA,
-    COALESCE(e.COD_ITEM, el.ITEM, elr.ITEM) AS ITEM,
-    COALESCE(d1.F120_DESCRIPCION, d2.F120_DESCRIPCION) AS DESCRIPCION,
-    ae.areaFinal AS AREA,
-    ae.fecha AS FECHA
-FROM ALISTAMIENTO_ETIQUETA ae
-LEFT JOIN ETIQUETA e 
-    ON ae.etiqueta = e.COD_ETIQUETA
-LEFT JOIN ETIQUETA_LINER el 
-    ON ae.etiqueta = el.COD_ETIQUETA_LINER
-LEFT JOIN ETIQUETA_ROLLO elr 
-    ON ae.etiqueta = elr.COD_ETIQUETA_ROLLO
-LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items d1 
-    ON e.COD_ITEM = d1.F120_ID 
-    AND d1.f120_id_cia = 2
-LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items d2 
-    ON el.ITEM = d2.F120_ID 
-    AND d2.f120_id_cia = 2
-WHERE ae.idAlistamiento = @idAlistamiento
-ORDER BY ae.fecha DESC;
+                SELECT 
+                ae.etiqueta AS ETIQUETA,
+                COALESCE(e.COD_ITEM, el.ITEM, elr.ITEM) AS ITEM,
+                d1.F120_DESCRIPCION AS DESCRIPCION,
+                ae.areaFinal AS AREA,
+                ae.fecha AS FECHA,
+                CASE 
+                    WHEN e.COD_ITEM IS NOT NULL THEN 'SACOS'
+                    WHEN el.ITEM IS NOT NULL THEN 'LINER'
+                    WHEN elr.ITEM IS NOT NULL THEN 'ROLLO'
+                    ELSE 'DESCONOCIDO'
+                END AS DESDE,
+                CASE
+                    WHEN e.COD_ITEM IS NOT NULL THEN e.CANTIDAD
+                    WHEN el.ITEM IS NOT NULL THEN el.PESO_NETO
+                    WHEN elr.ITEM IS NOT NULL THEN elr.METROS
+                    ELSE NULL
+                END AS VALOR
+            FROM ALISTAMIENTO_ETIQUETA ae
+            LEFT JOIN ETIQUETA e 
+                ON ae.etiqueta = e.COD_ETIQUETA
+            LEFT JOIN ETIQUETA_LINER el 
+                ON ae.etiqueta = el.COD_ETIQUETA_LINER
+            LEFT JOIN ETIQUETA_ROLLO elr 
+                ON ae.etiqueta = elr.COD_ETIQUETA_ROLLO
+            LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items d1 
+                ON COALESCE(e.COD_ITEM, el.ITEM, elr.ITEM) = d1.F120_ID 
+                AND d1.f120_id_cia = 2
+            WHERE ae.idAlistamiento = 32
+            ORDER BY ae.fecha DESC;
             ";
 
                 return await connection.QueryAsync<EtiquetaLeidaDTO>(sql, new { idAlistamiento });

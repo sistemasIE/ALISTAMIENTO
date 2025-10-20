@@ -134,6 +134,7 @@
             txtEtiqueta.BackColor = SystemColors.InactiveBorder;
             txtEtiqueta.BorderStyle = BorderStyle.FixedSingle;
             txtEtiqueta.Dock = DockStyle.Fill;
+            txtEtiqueta.Enabled = false;
             txtEtiqueta.Font = new Font("Segoe UI", 14F);
             txtEtiqueta.Location = new Point(7, 60);
             txtEtiqueta.Margin = new Padding(7, 5, 7, 5);
@@ -365,6 +366,7 @@
             // btnPausa
             // 
             btnPausa.BackColor = Color.Teal;
+            btnPausa.Cursor = Cursors.WaitCursor;
             btnPausa.Dock = DockStyle.Fill;
             btnPausa.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             btnPausa.ForeColor = Color.White;
@@ -379,7 +381,7 @@
             // 
             // btnBuscar
             // 
-            btnBuscar.Cursor = Cursors.Hand;
+            btnBuscar.Cursor = Cursors.WaitCursor;
             btnBuscar.Dock = DockStyle.Fill;
             btnBuscar.Font = new Font("Segoe UI", 15.4F);
             btnBuscar.ForeColor = Color.DarkGreen;
@@ -393,6 +395,7 @@
             // btnTerminar
             // 
             btnTerminar.BackColor = Color.Red;
+            btnTerminar.Cursor = Cursors.WaitCursor;
             btnTerminar.Dock = DockStyle.Fill;
             btnTerminar.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             btnTerminar.ForeColor = Color.White;
