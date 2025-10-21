@@ -281,7 +281,7 @@ namespace ALISTAMIENTO_IE.Services
             LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items d1 
                 ON COALESCE(e.COD_ITEM, el.ITEM, elr.ITEM) = d1.F120_ID 
                 AND d1.f120_id_cia = 2
-            WHERE ae.idAlistamiento = 32
+            WHERE ae.idAlistamiento = @idAlistamiento
             ORDER BY ae.fecha DESC;
             ";
 
@@ -290,10 +290,6 @@ namespace ALISTAMIENTO_IE.Services
 
 
         }
-
-
-
-
 
     }
 

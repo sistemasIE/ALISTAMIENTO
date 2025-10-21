@@ -113,13 +113,13 @@ public class EtiquetaService
             else if (!result.ExisteEnKardex)
             {
                 result.Existe = false;
-                result.Mensaje = $"N.E – Etiqueta: {codigoEtiqueta}";
+                result.Mensaje = $"✗✗✗✗✗ N.E – {codigoEtiqueta} ✗✗✗✗✗";
                 return result;
             }
             else
             {
                 result.Existe = false;
-                result.Mensaje = $"N.E – Etiqueta: {codigoEtiqueta}";
+                result.Mensaje = $"✗✗✗✗✗ N.E – {codigoEtiqueta} ✗✗✗✗✗";
                 return result;
             }
         }

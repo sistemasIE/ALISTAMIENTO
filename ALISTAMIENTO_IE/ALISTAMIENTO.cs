@@ -539,6 +539,9 @@ namespace ALISTAMIENTO_IE
             }
             else
             {
+
+            }
+            {
                 MessageBox.Show($"El item {item} de la etiqueta no está en la planificación.");
                 lstErrores.Items.Insert(0, $"N.P: {etiqueta}");
             }
@@ -583,7 +586,7 @@ namespace ALISTAMIENTO_IE
                 if (!ITEMS_PENDIENTES.Contains(itemEtiqueta.ToString()))
                 {
                     ReproducirSonidoError();
-                    lstErrores.Items.Insert(0, $"N.P: {etiqueta}");
+                    lstErrores.Items.Insert(0, $"!!!!!! N.P: {etiqueta} !!!!!! ");
                     txtEtiqueta.Clear();
                     return;
                 }
@@ -705,31 +708,7 @@ namespace ALISTAMIENTO_IE
                 string tipoProductoTexto = tipoProducto == TipoProductoEnum.SACOS ? "PACA"
                     : (tipoProducto == TipoProductoEnum.LINER ? "KILOS" : "METROS");
 
-                var msg = new MensajeFlotanteForm(
-                    $"ETIQUETA LEIDA: {etiqueta}\n" +
-                    $"TIPO: {tipoProductoTexto}\n" +
-                    $"ITEM: {itemEtiqueta}\n" +
-                    $"DESCRIPCIÓN: {registroItem.Descripcion}\n" +
-                    $"VALOR: {valorEtiqueta:N2}");
-
-                msg.Show();
-
-                var closeTimer = new Timer { Interval = 2000 };
-                closeTimer.Tick += (s2, e2) =>
-                {
-                    try
-                    {
-                        closeTimer.Stop();
-                        closeTimer.Dispose();
-                        if (!msg.IsDisposed)
-                        {
-                            msg.Close();
-                            msg.Dispose();
-                        }
-                    }
-                    catch { }
-                };
-                closeTimer.Start();
+                lstErrores.Items.Insert(0, $"✓REC: {etiqueta} ITEM: {itemEtiqueta} DES: {registroItem.Descripcion.Substring(0, 10)}");
 
                 txtEtiqueta.Clear();
             }

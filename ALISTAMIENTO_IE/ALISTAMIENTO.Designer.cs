@@ -151,7 +151,7 @@
             grpErrores.Controls.Add(lstErrores);
             grpErrores.Dock = DockStyle.Fill;
             grpErrores.Font = new Font("Segoe UI", 14F);
-            grpErrores.ForeColor = Color.Red;
+            grpErrores.ForeColor = Color.Blue;
             grpErrores.Location = new Point(10, 8);
             grpErrores.Margin = new Padding(7, 5, 7, 5);
             grpErrores.Name = "grpErrores";
@@ -159,7 +159,7 @@
             grpErrores.Size = new Size(329, 574);
             grpErrores.TabIndex = 0;
             grpErrores.TabStop = false;
-            grpErrores.Text = "Lista de Errores";
+            grpErrores.Text = "Lista de Mensajes";
             // 
             // tableLayoutPanel4
             // 
