@@ -709,7 +709,7 @@ namespace ALISTAMIENTO_IE
                     {
                         destinatarios = new string[] { "jefedesistemas@integraldeempaques.com", "desarrollador@integraldeempaques.com" };
 
-                    //}
+                    }
 
                     using (var client = new System.Net.Mail.SmtpClient("192.168.16.215"))
                     {
