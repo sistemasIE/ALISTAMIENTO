@@ -3,7 +3,6 @@ using ALISTAMIENTO_IE.Interfaces;
 using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
 using ExcelDataReader;
-using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Text;
 
@@ -591,7 +590,7 @@ namespace ALISTAMIENTO_IE
                 btnCargarArchivo.Enabled = true; // ✅ SIEMPRE rehabilitar el botón
             }
         }
-        
+
         private static string HtmlMessageBody(GrupoMovimientosDto grupo, string? placas, string? nombreConductor, string? docPrincipal)
         {
             var sb = new StringBuilder();
@@ -681,57 +680,57 @@ namespace ALISTAMIENTO_IE
                     // Por la sintaxis correcta de inicialización de arrays en C#:
                     var destinatarios = new string[] { "jefedesistemas@integraldeempaques.com", "otro@correo.com" };
 
-                    //if (tipoDocPrincipal == "TTS")
-                    //{
-                    //    destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='GRUPO4'");
-                    //}
-                    //else  if (tipoDocPrincipal == "RMV")
-                    //{
-                    //    string grupos ="";
-                    //    if(empresaTransporte == "900859908")
-                    //    {
-                    //        grupos= "GRUPO1";//escobar
-                    //    }
-                    //    else if(empresaTransporte== "900745904")
-                    //    {
-                    //        grupos= "GRUPO2";//turbotrans
-                    //    }
-                    //    else if(empresaTransporte == "800090323")
-                    //    {
-                    //        grupos = "GRUPO4";//fidelizado
-                    //    }
-                    //    else
-                    //    {
-                    //        grupos = "";
-                    //    }
-                    //    destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='"+grupos+"'");
-                    //}
-                    //else
-                    //{
-                    //    destinatarios = new string[] { "jefedesistemas@integraldeempaques.com", "desarrollador@integraldeempaques.com" };
+                    if (tipoDocPrincipal == "TTS")
+                    {
+                        destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='GRUPO4'");
+                    }
+                    else  if (tipoDocPrincipal == "RMV")
+                    {
+                        string grupos ="";
+                        if(empresaTransporte == "900859908")
+                        {
+                            grupos= "GRUPO1";//escobar
+                        }
+                        else if(empresaTransporte== "900745904")
+                        {
+                            grupos= "GRUPO2";//turbotrans
+                        }
+                        else if(empresaTransporte == "800090323")
+                        {
+                            grupos = "GRUPO4";//fidelizado
+                        }
+                        else
+                        {
+                            grupos = "";
+                        }
+                        destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='"+grupos+"'");
+                    }
+                    else
+                    {
+                        destinatarios = new string[] { "jefedesistemas@integraldeempaques.com", "desarrollador@integraldeempaques.com" };
 
                     //}
 
                     using (var client = new System.Net.Mail.SmtpClient("192.168.16.215"))
+                    {
+                        client.UseDefaultCredentials = false;
+                        client.Port = 2727;
+                        client.Credentials = new System.Net.NetworkCredential("cabana\\notificaciones", "Notifica@inte");
+                        client.EnableSsl = false;
+
+                        foreach (var correo in destinatarios)
                         {
-                            client.UseDefaultCredentials = false;
-                            client.Port = 2727;
-                            client.Credentials = new System.Net.NetworkCredential("cabana\\notificaciones", "Notifica@inte");
-                            client.EnableSsl = false;
-
-                            foreach (var correo in destinatarios)
+                            using (var msg = new System.Net.Mail.MailMessage("notificaciones@integraldeempaques.com", correo))
                             {
-                                using (var msg = new System.Net.Mail.MailMessage("notificaciones@integraldeempaques.com", correo))
-                                {
-                                    msg.Subject = asunto;
-                                    msg.IsBodyHtml = true;
-                                    msg.BodyEncoding = System.Text.Encoding.UTF8;
-                                    msg.Body = html;
+                                msg.Subject = asunto;
+                                msg.IsBodyHtml = true;
+                                msg.BodyEncoding = System.Text.Encoding.UTF8;
+                                msg.Body = html;
 
-                                    await client.SendMailAsync(msg);
-                                }
+                                await client.SendMailAsync(msg);
                             }
                         }
+                    }
 
 
                 }
