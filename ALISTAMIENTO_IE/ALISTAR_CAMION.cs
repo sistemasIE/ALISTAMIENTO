@@ -481,9 +481,26 @@ namespace ALISTAMIENTO_IE
                     var camion = await _cargueMasivoService.ObtenerCamionPorCodigoAsync(codCamionLong);
                     var movsDoc = await _cargueMasivoService.ObtenerMovimientosPorConsecutivoAsync(idDocumento, tipoDocumento, int.Parse(empresa));
 
-                    if (documento == null || tercero == null || conductor == null || camion == null) { /*...*/ continue; }
+
+                    if(documento == null)
+                    {
+                        MessageBox.Show("Documento no existe o Empresa Incorrecta: " + tipoDocumento + "/" + idDocumento);
+                        return;
+                    }
+
+
+                    if (tercero == null || conductor == null || camion == null) { /*...*/ continue; }
 
                     string empresaTransporte = tercero.f200_id.Trim();
+
+
+                    var documentoDespachado = await  _cargueMasivoService.ObtenerDocumentoDespachado(documento.Documento.ToString());
+
+                    if(documentoDespachado != null)
+                    {
+                        MessageBox.Show("El documento " + documentoDespachado.SECUENCIAL + " ya ha se ha programado anteriormente");
+                        return;
+                    }
 
                     foreach (var m in movsDoc)
                     {
@@ -667,18 +684,18 @@ namespace ALISTAMIENTO_IE
                     {
                         destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='GRUPO4'");
                     }
-                    else if (tipoDocPrincipal == "RMV")
+                    else  if (tipoDocPrincipal == "RMV")
                     {
-                        string grupos = "";
-                        if (empresaTransporte == "900859908")
+                        string grupos ="";
+                        if(empresaTransporte == "900859908")
                         {
-                            grupos = "GRUPO1";//escobar
+                            grupos= "GRUPO1";//escobar
                         }
-                        else if (empresaTransporte == "900745904")
+                        else if(empresaTransporte== "900745904")
                         {
-                            grupos = "GRUPO2";//turbotrans
+                            grupos= "GRUPO2";//turbotrans
                         }
-                        else if (empresaTransporte == "800090323")
+                        else if(empresaTransporte == "800090323")
                         {
                             grupos = "GRUPO4";//fidelizado
                         }
@@ -686,7 +703,7 @@ namespace ALISTAMIENTO_IE
                         {
                             grupos = "";
                         }
-                        destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='" + grupos + "'");
+                        destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='"+grupos+"'");
                     }
                     else
                     {
