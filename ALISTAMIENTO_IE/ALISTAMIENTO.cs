@@ -543,7 +543,7 @@ namespace ALISTAMIENTO_IE
             }
             {
                 MessageBox.Show($"El item {item} de la etiqueta no está en la planificación.");
-                lstErrores.Items.Insert(0, $"N.P: {etiqueta}");
+                lstMensajes.Items.Insert(0, $"N.P: {etiqueta}");
             }
         }
 
@@ -560,7 +560,7 @@ namespace ALISTAMIENTO_IE
                 if (etiquetasLeidas.Contains(etiqueta))
                 {
                     ReproducirSonidoError();
-                    lstErrores.Items.Insert(0, $"DUP: {etiqueta}");
+                    lstMensajes.Items.Insert(0, $"DUP: {etiqueta}");
                     txtEtiqueta.Clear();
                     return;
                 }
@@ -570,7 +570,7 @@ namespace ALISTAMIENTO_IE
                 if (!resultado.EsValida || !resultado.Existe)
                 {
                     ReproducirSonidoError();
-                    lstErrores.Items.Insert(0, resultado.Mensaje);
+                    lstMensajes.Items.Insert(0, resultado.Mensaje);
                     txtEtiqueta.Clear();
                     return;
                 }
@@ -586,7 +586,7 @@ namespace ALISTAMIENTO_IE
                 if (!ITEMS_PENDIENTES.Contains(itemEtiqueta.ToString()))
                 {
                     ReproducirSonidoError();
-                    lstErrores.Items.Insert(0, $"!!!!!! N.P: {etiqueta} !!!!!! ");
+                    lstMensajes.Items.Insert(0, $"!!!!!! N.P: {etiqueta} !!!!!! ");
                     txtEtiqueta.Clear();
                     return;
                 }
@@ -598,7 +598,7 @@ namespace ALISTAMIENTO_IE
                 if (registroItem == null)
                 {
                     ReproducirSonidoError();
-                    lstErrores.Items.Insert(0, $"No se encontró el ítem de la etiqueta en el pedido: {etiqueta}");
+                    lstMensajes.Items.Insert(0, $"No se encontró el ítem de la etiqueta en el pedido: {etiqueta}");
                     txtEtiqueta.Clear();
                     return;
                 }
@@ -614,7 +614,7 @@ namespace ALISTAMIENTO_IE
                     if (registroItem.PacasRestantes <= 0)
                     {
                         ReproducirSonidoError();
-                        lstErrores.Items.Insert(0, $"No hay pacas restantes para el ítem {itemEtiqueta}: {etiqueta}");
+                        lstMensajes.Items.Insert(0, $"No hay pacas restantes para el ítem {itemEtiqueta}: {etiqueta}");
                         txtEtiqueta.Clear();
                         return;
                     }
@@ -628,7 +628,7 @@ namespace ALISTAMIENTO_IE
                     if (registroItem.KilosRestantes <= 0 || registroItem.KilosRestantes - pesoEtiqueta < -0.01)
                     {
                         ReproducirSonidoError();
-                        lstErrores.Items.Insert(0, $"No hay kilos restantes para el ítem {itemEtiqueta}: {etiqueta}");
+                        lstMensajes.Items.Insert(0, $"No hay kilos restantes para el ítem {itemEtiqueta}: {etiqueta}");
                         txtEtiqueta.Clear();
                         return;
                     }
@@ -642,7 +642,7 @@ namespace ALISTAMIENTO_IE
                     if (registroItem.MetrosRestantes <= 0 || registroItem.MetrosRestantes - metrosEtiqueta < 0)
                     {
                         ReproducirSonidoError();
-                        lstErrores.Items.Insert(0, $"No hay metros restantes para el ítem {itemEtiqueta}: {etiqueta}");
+                        lstMensajes.Items.Insert(0, $"No hay metros restantes para el ítem {itemEtiqueta}: {etiqueta}");
                         txtEtiqueta.Clear();
                         return;
                     }
@@ -658,7 +658,7 @@ namespace ALISTAMIENTO_IE
                 if (ubicacionBodega == null)
                 {
                     ReproducirSonidoError();
-                    lstErrores.Items.Insert(0, $"Error al obtener la ubicación en bodega para la etiqueta: {etiqueta}");
+                    lstMensajes.Items.Insert(0, $"Error al obtener la ubicación en bodega para la etiqueta: {etiqueta}");
                     txtEtiqueta.Clear();
                     return;
                 }
@@ -708,7 +708,7 @@ namespace ALISTAMIENTO_IE
                 string tipoProductoTexto = tipoProducto == TipoProductoEnum.SACOS ? "PACA"
                     : (tipoProducto == TipoProductoEnum.LINER ? "KILOS" : "METROS");
 
-                lstErrores.Items.Insert(0, $"✓REC: {etiqueta} ITEM: {itemEtiqueta} DES: {registroItem.Descripcion.Substring(0, 10)}");
+                lstMensajes.Items.Insert(0, $"✓REC: {etiqueta} ITEM: {itemEtiqueta} DES: {registroItem.Descripcion.Substring(0, 10)}");
 
                 txtEtiqueta.Clear();
             }

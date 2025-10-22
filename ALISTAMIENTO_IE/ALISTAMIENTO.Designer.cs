@@ -14,7 +14,7 @@
         private System.Windows.Forms.Label lblEtiqueta;
         private System.Windows.Forms.TextBox txtEtiqueta;
         private System.Windows.Forms.GroupBox grpErrores;
-        private System.Windows.Forms.ListBox lstErrores;
+        private System.Windows.Forms.ListBox lstMensajes;
         private System.Windows.Forms.Label lblNE;
         private System.Windows.Forms.DataGridView dgvLeidos;
         private System.Windows.Forms.Label lblPedido;
@@ -50,7 +50,7 @@
             label5 = new Label();
             lblNE = new Label();
             label1 = new Label();
-            lstErrores = new ListBox();
+            lstMensajes = new ListBox();
             dgvLeidos = new DataGridView();
             dgvMain = new DataGridView();
             label2 = new Label();
@@ -148,7 +148,7 @@
             // 
             grpErrores.BackColor = Color.Transparent;
             grpErrores.Controls.Add(tableLayoutPanel4);
-            grpErrores.Controls.Add(lstErrores);
+            grpErrores.Controls.Add(lstMensajes);
             grpErrores.Dock = DockStyle.Fill;
             grpErrores.Font = new Font("Segoe UI", 14F);
             grpErrores.ForeColor = Color.Blue;
@@ -216,16 +216,16 @@
             label1.TabIndex = 4;
             label1.Text = "N.P -> NO PERTENECE";
             // 
-            // lstErrores
+            // lstMensajes
             // 
-            lstErrores.Dock = DockStyle.Top;
-            lstErrores.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
-            lstErrores.ItemHeight = 21;
-            lstErrores.Location = new Point(7, 30);
-            lstErrores.Margin = new Padding(7, 5, 7, 5);
-            lstErrores.Name = "lstErrores";
-            lstErrores.Size = new Size(315, 424);
-            lstErrores.TabIndex = 0;
+            lstMensajes.Dock = DockStyle.Top;
+            lstMensajes.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
+            lstMensajes.ItemHeight = 21;
+            lstMensajes.Location = new Point(7, 30);
+            lstMensajes.Margin = new Padding(7, 5, 7, 5);
+            lstMensajes.Name = "lstMensajes";
+            lstMensajes.Size = new Size(315, 424);
+            lstMensajes.TabIndex = 0;
             // 
             // dgvLeidos
             // 
