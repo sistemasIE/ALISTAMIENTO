@@ -95,10 +95,8 @@ namespace ALISTAMIENTO_IE
             return true; // Todo completado
         }
 
-        /// <summary>
-        /// Maneja el evento click del botón TERMINAR
-        /// </summary>
-        private async void BtnTerminar_Click(object sender, EventArgs e)
+
+        private void BtnTerminar_Click(object sender, EventArgs e)
         {
 
             var res = MessageBox.Show("¡¿Desea TERMINAR el alistamiento?!", "Confirmar",
@@ -129,7 +127,7 @@ namespace ALISTAMIENTO_IE
                             if (obsResult == DialogResult.OK && obsForm.AlistamientoIncompleto)
                             {
                                 // El estado ya fue actualizado en el form de observaciones
-                                _estadoAlistamiento = "ALISTADO_INCOMPLETO";
+                                _estadoAlistamiento = "ALISTADO";
                                 MessageBox.Show("Alistamiento cerrado como incompleto.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 this.Close();
                             }
