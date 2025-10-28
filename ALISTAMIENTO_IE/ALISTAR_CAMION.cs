@@ -460,6 +460,19 @@ namespace ALISTAMIENTO_IE
 
                 int procesadas = 0;
 
+                var duplicados = dt.AsEnumerable()
+                                .GroupBy(f => f["ID DOCUMENTO"]?.ToString()?.Trim())
+                                .Where(g => !string.IsNullOrEmpty(g.Key) && g.Count() > 1)
+                                .Select(g => g.Key)
+                                .ToList();
+
+                if (duplicados.Any())
+                {
+                    string ids = string.Join(", ", duplicados);
+                    MessageBox.Show($"Los siguientes ID DOCUMENTO están repetidos: {ids}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 foreach (DataRow fila in dt.Rows)
                 {
                     // === tu lógica actual ===
