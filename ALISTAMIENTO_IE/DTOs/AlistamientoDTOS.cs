@@ -1,19 +1,29 @@
 ﻿namespace ALISTAMIENTO_IE.DTOs
 {
-    // DTO para manejar los totales de pacas y camiones en un reporte.
-    public class ReporteTotalesDto
+
+    public class AlistamientoDetalleDto
     {
-        public int TotalPacas { get; set; }
-        public int TotalCamiones { get; set; }
+        public int IdAlistamiento { get; set; }
+        public int IdCamionDia { get; set; }
+        public string Estado { get; set; }
+        public string Observaciones { get; set; }
+        public DateTime FechaInicio { get; set; }
+        public DateTime? FechaFin { get; set; }
+
+        public List<AlistamientoEtiqueta> Etiquetas { get; set; } = new();
     }
 
-    // DTO para manejar los ítems restantes en un reporte específico.
-    public class ItemRestanteDto
+
+
+    public class AlistamientoItemDTO
     {
-        public int Item { get; set; }
-        public string Descripcion { get; set; }
-        public int Restantes { get; set; }
+        public string Item { get; set; }
+        public string TipoProducto { get; set; }
+        public float CantidadAlistada { get; set; }
+        public float Total { get; set; }
     }
+
+
 
     // DTO 
     public class CamionItemsDto

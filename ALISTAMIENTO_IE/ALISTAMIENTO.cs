@@ -69,10 +69,6 @@ namespace ALISTAMIENTO_IE
             lblPlaca.Text = CAMION_ACTUAL != null ? $"PLACAS: " + CAMION_ACTUAL.PLACAS.ToString() : "Desconocida";
         }
 
-        /// <summary>
-        /// Verifica si todas las columnas restantes (PacasRestantes, KilosRestantes y MetrosRestantes) están en cero
-        /// </summary>
-        /// <returns>True si todas las columnas restantes están en cero, False en caso contrario</returns>
         private bool VerificarAlistamientoCompleto()
         {
             var lista = (List<InformacionCamionDTO>)dgvMain.DataSource;
@@ -537,12 +533,11 @@ namespace ALISTAMIENTO_IE
             }
             else
             {
-
-            }
-            {
                 MessageBox.Show($"El item {item} de la etiqueta no está en la planificación.");
                 lstMensajes.Items.Insert(0, $"N.P: {etiqueta}");
             }
+
+
         }
 
         private async void txtEtiqueta_TextChanged(object sender, EventArgs e)

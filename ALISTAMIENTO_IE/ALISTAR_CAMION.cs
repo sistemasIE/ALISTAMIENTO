@@ -182,7 +182,7 @@ namespace ALISTAMIENTO_IE
                     camion.Placas,
                     camion.Fecha.ToString("yyyy-MM-dd"),
                     camion.CantTotalPedido.ToString(),
-                    camion.EstadoAlistamiento // Agregar el estado del alistamiento
+                    camion.EstadoAlistamiento
                 });
                 // Guarda el CodCamion en Tag para fácil acceso
                 item.Tag = camion.CodCamion;
@@ -212,7 +212,7 @@ namespace ALISTAMIENTO_IE
             }
         }
 
-        private void lvwListasCamiones_DoubleClick(object sender, EventArgs e)
+        private async void lvwListasCamiones_DoubleClick(object sender, EventArgs e)
         {
             if (lvwListasCamiones.SelectedItems.Count == 0)
             {
@@ -225,6 +225,9 @@ namespace ALISTAMIENTO_IE
 
             // Recuperar el CodCamion que se guardó en el Tag
             codCamionSeleccionado = selectedItem.Tag is int tag ? tag : 0;
+            // Acceder al estado del alistamiento (columna índice 3)
+            string estadoAlistamiento = selectedItem.SubItems[3].Text;
+
 
             // Recuperar los valores de cada columna (SubItems)
             placaCamionSeleccionado = selectedItem.SubItems[0].Text;     // Placas
@@ -241,10 +244,21 @@ namespace ALISTAMIENTO_IE
                 return;
             }
 
-            if (codCamionSeleccionado > 0)
+            else if (codCamionSeleccionado > 0)
             {
-                MostrarItemsDeCamion(codCamionSeleccionado);
-                btnAlistar.Visible = true;
+
+                if (estadoAlistamiento == "ALISTADO" || estadoAlistamiento == "ALISTADO_INCOMPLETO")
+                {
+                    await alistamientoService.CargarCamionDia(codCamionSeleccionado, this.dgvItems);
+
+                }
+                else
+                {
+
+                    MostrarItemsDeCamion(codCamionSeleccionado);
+                    btnAlistar.Visible = true;
+
+                }
 
                 lblTituloCamion.Text = $"CAMIÓN - {placaCamionSeleccionado}";
                 lblFechaValor.Text = fecha.ToString("dd/MM/yyyy"); // lo muestras en formato lindo
@@ -256,6 +270,8 @@ namespace ALISTAMIENTO_IE
             List<CamionItemsDto> items = new List<CamionItemsDto>(await alistamientoService.ObtenerItemsPorAlistarCamion(codCamion));
             dgvItems.DataSource = items;
         }
+
+
 
         private int? GetSelectedCamionId()
         {
@@ -482,7 +498,7 @@ namespace ALISTAMIENTO_IE
                     var movsDoc = await _cargueMasivoService.ObtenerMovimientosPorConsecutivoAsync(idDocumento, tipoDocumento, int.Parse(empresa));
 
 
-                    if(documento == null)
+                    if (documento == null)
                     {
                         MessageBox.Show("Documento no existe o Empresa Incorrecta: " + tipoDocumento + "/" + idDocumento);
                         return;
@@ -494,9 +510,9 @@ namespace ALISTAMIENTO_IE
                     string empresaTransporte = tercero.f200_id.Trim();
 
 
-                    var documentoDespachado = await  _cargueMasivoService.ObtenerDocumentoDespachado(documento.Documento.ToString());
+                    var documentoDespachado = await _cargueMasivoService.ObtenerDocumentoDespachado(documento.Documento.ToString());
 
-                    if(documentoDespachado != null)
+                    if (documentoDespachado != null)
                     {
                         MessageBox.Show("El documento " + documentoDespachado.SECUENCIAL + " ya ha se ha programado anteriormente");
                         return;
@@ -684,18 +700,18 @@ namespace ALISTAMIENTO_IE
                     {
                         destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='GRUPO4'");
                     }
-                    else  if (tipoDocPrincipal == "RMV")
+                    else if (tipoDocPrincipal == "RMV")
                     {
-                        string grupos ="";
-                        if(empresaTransporte == "900859908")
+                        string grupos = "";
+                        if (empresaTransporte == "900859908")
                         {
-                            grupos= "GRUPO1";//escobar
+                            grupos = "GRUPO1";//escobar
                         }
-                        else if(empresaTransporte== "900745904")
+                        else if (empresaTransporte == "900745904")
                         {
-                            grupos= "GRUPO2";//turbotrans
+                            grupos = "GRUPO2";//turbotrans
                         }
-                        else if(empresaTransporte == "800090323")
+                        else if (empresaTransporte == "800090323")
                         {
                             grupos = "GRUPO4";//fidelizado
                         }
@@ -703,7 +719,7 @@ namespace ALISTAMIENTO_IE
                         {
                             grupos = "";
                         }
-                        destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='"+grupos+"'");
+                        destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='" + grupos + "'");
                     }
                     else
                     {
@@ -766,6 +782,14 @@ namespace ALISTAMIENTO_IE
                 MessageBox.Show($"Error al copiar el archivo : {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
+
+
+
+
+
+
 
         private async void button1_Click_1(object sender, EventArgs e)
         {

@@ -16,7 +16,7 @@
     public class InformacionCamionDTO : PlanificacionCamionDTO
     {
 
-
+        public float CantidadAlistada { get; set; }
         public float PacasAlistadas { get; set; }
         public float KilosAlistados { get; set; }
 
