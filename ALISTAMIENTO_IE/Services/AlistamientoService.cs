@@ -7,18 +7,20 @@ using System.Data;
 
 namespace ALISTAMIENTO_IE.Services
 {
-    public class AlistamientoService
+    public class AlistamientoService : IAlistamientoService
     {
         private readonly string _connectionStringSIE = ConfigurationManager.ConnectionStrings["stringConexionSIE"].ConnectionString;
         private readonly string _connectionStringMAIN = ConfigurationManager.ConnectionStrings["stringConexionLocal"].ConnectionString;
         private readonly CamionXDiaService _camionXDiaService;
         private readonly DetalleCamionXDiaService _detalleCamionXDiaService;
+        private readonly AlistamientoEtiquetaService _alistamientoEtiquetaService;
         private readonly ItemService _itemService;
 
         public AlistamientoService()
         {
             _camionXDiaService = new CamionXDiaService();
             _detalleCamionXDiaService = new DetalleCamionXDiaService();
+            _alistamientoEtiquetaService = new AlistamientoEtiquetaService();
             _itemService = new ItemService();
         }
 
@@ -184,9 +186,8 @@ namespace ALISTAMIENTO_IE.Services
                          ON c.COD_CAMION = cxd.COD_REGISTRO_CAMION 
                      LEFT JOIN ALISTAMIENTO a
                          ON a.idCamionDia = cxd.COD_CAMION
-                     WHERE
- 	                     cxd.ESTADO = 'C' -- Sin alistar
-	                     AND cxd.FECHA > DATEADD(DAY, -7, GETDATE())
+                     WHERE cxd.FECHA > DATEADD(DAY, -2, GETDATE())
+                            AND cxd.ESTADO = 'C'
                          AND (a.ESTADO IS NULL OR a.ESTADO LIKE '%INCOMPLETO%' OR a.ESTADO = 'EN_PROCESO' OR a.ESTADO = 'ALISTADO' OR a.ESTADO = 'ANULADO')
                     GROUP BY
                         cxd.COD_CAMION, c.PLACAS, cxd.FECHA, cxd.ESTADO, a.estado 
@@ -258,5 +259,146 @@ namespace ALISTAMIENTO_IE.Services
                 });
             }
         }
+
+        public Task<bool> ExisteAlistamientoActivo(int idCamionDia)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task FinalizarAlistamientoAsync(int idAlistamiento, string observaciones)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<object> ObtenerAlistamiento(int idAlistamiento)
+        {
+            throw new NotImplementedException();
+        }
+        public async Task<Alistamiento> ObtenerAlistamientoCompletoPorCamionDia(int idCamionDia)
+        {
+            using (var connection = new SqlConnection(_connectionStringMAIN))
+            {
+                string sql = @"SELECT * FROM ALISTAMIENTO
+                       WHERE idCamionDia = @idCamionDia;";
+                var parameters = new { idCamionDia = idCamionDia };
+                var alistamiento = connection.QueryFirstOrDefault<Alistamiento>(sql, parameters);
+                return alistamiento;
+
+            }
+        }
+
+        public Task<Alistamiento> ObtenerAlistamientoPorCamionDia(int idCamionDia)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public async Task CargarCamionDia(int idCamion, DataGridView dgv)
+        {
+            // Traes la planificación
+            IEnumerable<PlanificacionCamionDTO> planificado =
+                await _alistamientoEtiquetaService.ObtenerPlanificacionCamionAsync(idCamion);
+
+            // Intentas obtener los ítems alistados
+            List<AlistamientoItemDTO> alistados;
+            try
+            {
+                alistados = await _alistamientoEtiquetaService.GetItemsAlistadosAsync(idCamion);
+            }
+            catch
+            {
+                alistados = new List<AlistamientoItemDTO>();
+            }
+
+            alistados ??= new List<AlistamientoItemDTO>();
+
+            // Mapeas a InformacionCamionDTO
+            var informacion = planificado.Select(p =>
+            {
+                AlistamientoItemDTO itemAlistado = alistados.FirstOrDefault(a => a.Item == p.Item.ToString());
+
+                float kilosAlistados = 0;
+                float pacasAlistadas = 0;
+                float metrosAlistados = 0;
+                float cantidadAlistada = 0;
+
+                if (itemAlistado != null)
+                {
+                    if (Enum.TryParse<TipoProductoEnum>(itemAlistado.TipoProducto, out var tipoProducto))
+                    {
+                        switch (tipoProducto)
+                        {
+                            case TipoProductoEnum.LINER:
+                                kilosAlistados = itemAlistado.Total;
+                                break;
+
+                            case TipoProductoEnum.SACOS:
+                                pacasAlistadas = itemAlistado.Total;
+                                break;
+
+                            case TipoProductoEnum.ROLLO:
+                                metrosAlistados = itemAlistado.Total;
+                                break;
+                        }
+                    }
+
+                    cantidadAlistada = itemAlistado.CantidadAlistada;
+                }
+
+                return new InformacionCamionDTO
+                {
+                    Item = p.Item,
+                    Descripcion = p.Descripcion,
+                    PacasEsperadas = p.PacasEsperadas,
+                    KilosEsperados = p.KilosEsperados,
+                    MetrosEsperados = p.MetrosEsperados,
+
+                    PacasAlistadas = pacasAlistadas,
+                    KilosAlistados = kilosAlistados,
+                    MetrosAlistados = metrosAlistados,
+
+                    PacasRestantes = p.PacasEsperadas - pacasAlistadas,
+                    KilosRestantes = p.KilosEsperados - kilosAlistados,
+                    MetrosRestantes = p.MetrosEsperados - metrosAlistados,
+
+                    CantidadPlanificada = p.CantidadPlanificada,
+                    CantidadAlistada = cantidadAlistada
+                };
+            }).ToList();
+
+
+
+            // Asignas al DataGridView
+            dgv.AutoGenerateColumns = true;
+            dgv.DataSource = informacion;
+
+            dgv.Columns["Item"].DisplayIndex = 0;
+            dgv.Columns["Descripcion"].DisplayIndex = 1;
+            dgv.Columns["CantidadPlanificada"].DisplayIndex = 2;
+            dgv.Columns["CantidadAlistada"].DisplayIndex = 3;
+            dgv.Columns["PacasEsperadas"].DisplayIndex = 4;
+            dgv.Columns["PacasAlistadas"].DisplayIndex = 5;
+            dgv.Columns["PacasRestantes"].DisplayIndex = 6;
+            dgv.Columns["KilosEsperados"].DisplayIndex = 7;
+            dgv.Columns["KilosAlistados"].DisplayIndex = 8;
+            dgv.Columns["KilosRestantes"].DisplayIndex = 9;
+            dgv.Columns["MetrosEsperados"].DisplayIndex = 10;
+            dgv.Columns["MetrosAlistados"].DisplayIndex = 11;
+            dgv.Columns["MetrosRestantes"].DisplayIndex = 12;
+
+            // Para las columnas "Restantes"
+            dgv.Columns["PacasRestantes"].DefaultCellStyle.BackColor = Color.Green;
+            dgv.Columns["PacasRestantes"].DefaultCellStyle.ForeColor = Color.White;
+
+            dgv.Columns["KilosRestantes"].DefaultCellStyle.BackColor = Color.Green;
+            dgv.Columns["KilosRestantes"].DefaultCellStyle.ForeColor = Color.White;
+
+            dgv.Columns["MetrosRestantes"].DefaultCellStyle.BackColor = Color.Green;
+            dgv.Columns["MetrosRestantes"].DefaultCellStyle.ForeColor = Color.White;
+        }
+
+
+
+
     }
 }

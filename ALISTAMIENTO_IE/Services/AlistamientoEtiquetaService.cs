@@ -44,6 +44,76 @@ namespace ALISTAMIENTO_IE.Services
             return (fechaInicio, fechaFin);
         }
 
+
+
+
+        public async Task<List<AlistamientoItemDTO>> GetItemsAlistadosAsync(int idCamionDia)
+        {
+            var query = @"
+        
+
+SELECT 
+    COALESCE(e.COD_ITEM, el.ITEM, er.ITEM) AS Item,
+     SUM(
+        COALESCE(
+            CAST(e.CANTIDAD AS DECIMAL(18,4)),
+            CAST(el.PESO_NETO AS DECIMAL(18,4)),
+            CAST(er.METROS AS DECIMAL(18,4))
+        )
+    ) AS cantidadAlistada,
+    CASE
+    WHEN i.f120_id_unidad_inventario = 'KLS'
+        THEN SUM(CAST(el.PESO_NETO AS DECIMAL(18,4)))
+            WHEN i.f120_id_unidad_inventario = 'MTS'
+                THEN SUM(CAST(er.METROS AS DECIMAL(18,4)))
+            ELSE
+                SUM(CAST(e.CANTIDAD AS DECIMAL(18,4))) /
+                NULLIF(TRY_CAST(SUBSTRING(i.f120_id_unidad_empaque, 2, LEN(i.f120_id_unidad_empaque)) AS INT), 0)
+	        END AS Total,
+            CASE 
+                WHEN e.COD_ETIQUETA IS NOT NULL THEN 'SACOS'
+                WHEN el.COD_ETIQUETA_LINER IS NOT NULL THEN 'LINER'
+                WHEN er.COD_ETIQUETA_ROLLO IS NOT NULL THEN 'ROLLO'
+                ELSE 'DESCONOCIDO'
+            END AS TipoProducto
+        FROM ALISTAMIENTO_ETIQUETA ae
+        JOIN ALISTAMIENTO a 
+            ON a.IdAlistamiento = ae.IdAlistamiento
+        LEFT JOIN ETIQUETA e 
+            ON ae.etiqueta = e.COD_ETIQUETA
+        LEFT JOIN ETIQUETA_LINER el 
+            ON ae.etiqueta = el.COD_ETIQUETA_LINER
+        LEFT JOIN ETIQUETA_ROLLO er 
+            ON ae.etiqueta = er.COD_ETIQUETA_ROLLO
+        LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items i
+            ON COALESCE(e.COD_ITEM, el.ITEM, er.ITEM) = i.f120_id
+        WHERE a.IdCamionDia = @idCodCamionDia
+        GROUP BY 
+            COALESCE(e.COD_ITEM, el.ITEM, er.ITEM),
+            i.f120_id_unidad_empaque,
+	        f120_id_unidad_inventario,
+
+            CASE 
+                WHEN e.COD_ETIQUETA IS NOT NULL THEN 'SACOS'
+                WHEN el.COD_ETIQUETA_LINER IS NOT NULL THEN 'LINER'
+                WHEN er.COD_ETIQUETA_ROLLO IS NOT NULL THEN 'ROLLO'
+                ELSE 'DESCONOCIDO'
+            END;
+
+    ";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var result = await connection.QueryAsync<AlistamientoItemDTO>(
+                    query, new { idCodCamionDia = idCamionDia });
+                return result.ToList();
+            }
+        }
+
+
+
+
+
         public async Task<IEnumerable<ReporteAlistamientoPorTurnoDto>> ObtenerReportePacasPorHora(DateTime fechaConsulta)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -201,7 +271,6 @@ namespace ALISTAMIENTO_IE.Services
             ON dcxd.ITEM = i.f120_id
         WHERE 
           cxd.COD_CAMION =@CodCamion
-          AND cxd.ESTADO = 'C'
           AND i.f120_id_cia = 2
         GROUP BY 
             c.placas, 
@@ -241,11 +310,6 @@ namespace ALISTAMIENTO_IE.Services
 
             return alistamientoEtiqueta;
         }
-
-
-
-
-
 
 
         public async Task<IEnumerable<EtiquetaLeidaDTO>> ObtenerEtiquetasLeidas(int idAlistamiento)
