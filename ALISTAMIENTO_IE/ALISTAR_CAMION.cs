@@ -25,6 +25,7 @@ namespace ALISTAMIENTO_IE
 
         private List<MovimientoDocumentoDto> listaNormal = new();
         private List<GrupoMovimientosDto> listaAgrupada = new();
+        private Dictionary<string, string> _cacheItemsEquivalentes = new Dictionary<string, string>();
 
         private int codCamionSeleccionado;
         private String placaCamionSeleccionado;
@@ -377,52 +378,87 @@ namespace ALISTAMIENTO_IE
         }
         public static string? InputBox(string prompt, string title, string defaultValue = "")
         {
-            Form form = new Form();
-            Label label = new Label();
-            TextBox textBox = new TextBox();
-            Button buttonOk = new Button();
-            Button buttonCancel = new Button();
+            using (Form form = new Form())
+            using (Label label = new Label())
+            using (TextBox textBox = new TextBox())
+            using (Button buttonOk = new Button())
+            using (Button buttonCancel = new Button())
+            {
+                // Configuración del formulario
+                form.Text = title;
+                form.StartPosition = FormStartPosition.CenterScreen;
+                form.FormBorderStyle = FormBorderStyle.FixedDialog;
+                form.MinimizeBox = false;
+                form.MaximizeBox = false;
+                form.AutoSize = true;
+                form.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+                form.MinimumSize = new Size(500, 200);
+                form.BackColor = Color.White;
+                form.Padding = new Padding(15, 15, 15, 60);
 
-            form.Text = title;
+                // Configuración del label
+                label.AutoSize = true;
+                label.Text = prompt;
+                label.Location = new Point(15, 15);
+                label.MaximumSize = new Size(450, 0);
+                label.Font = new Font("Segoe UI", 9.75f, FontStyle.Regular);
+                label.ForeColor = Color.FromArgb(64, 64, 64);
 
-            label.Text = prompt;
-            textBox.Text = defaultValue;
+                // Ajustar altura del label si es necesario
+                form.Controls.Add(label);
+                int labelHeight = label.Height;
 
-            buttonOk.Text = "OK";
-            buttonCancel.Text = "Cancelar";
-            buttonOk.DialogResult = DialogResult.OK;
-            buttonCancel.DialogResult = DialogResult.Cancel;
+                // Configuración del textBox
+                textBox.Text = defaultValue;
+                textBox.Font = new Font("Segoe UI", 10f, FontStyle.Regular);
+                textBox.Location = new Point(15, label.Bottom + 15);
+                textBox.Size = new Size(450, 28);
+                textBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+                textBox.BorderStyle = BorderStyle.FixedSingle;
 
-            // --- tamaños más cómodos ---
-            form.ClientSize = new Size(600, 160);                 // ventana más ancha/alta
-            label.SetBounds(12, 12, 576, 0);
-            label.AutoSize = true;
-            label.MaximumSize = new Size(576, 0);                 // permite que el texto haga wrap
+                // Seleccionar todo el texto al abrir
+                textBox.SelectAll();
 
-            textBox.Font = new System.Drawing.Font(textBox.Font, FontStyle.Regular);
-            textBox.Font = new System.Drawing.Font(textBox.Font.FontFamily, 11f); // fuente más grande
-            textBox.SetBounds(12, 60, 576, 32);                   // textbox más alto y ancho
-            textBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+                // Configuración de los botones
+                buttonOk.Text = "OK";
+                buttonOk.DialogResult = DialogResult.OK;
+                buttonOk.Size = new Size(85, 32);
+                buttonOk.Location = new Point(290, 110);
+                buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+                buttonOk.Font = new Font("Segoe UI", 9f, FontStyle.Regular);
+                buttonOk.BackColor = Color.FromArgb(0, 120, 215);
+                buttonOk.ForeColor = Color.White;
+                buttonOk.FlatStyle = FlatStyle.Flat;
+                buttonOk.FlatAppearance.BorderSize = 0;
+                buttonOk.Cursor = Cursors.Hand;
 
-            buttonOk.SetBounds(440, 110, 75, 28);
-            buttonCancel.SetBounds(521, 110, 75, 28);
-            buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+                buttonCancel.Text = "Cancelar";
+                buttonCancel.DialogResult = DialogResult.Cancel;
+                buttonCancel.Size = new Size(85, 32);
+                buttonCancel.Location = new Point(380, 110);
+                buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+                buttonCancel.Font = new Font("Segoe UI", 9f, FontStyle.Regular);
+                buttonCancel.BackColor = Color.FromArgb(240, 240, 240);
+                buttonCancel.ForeColor = Color.FromArgb(64, 64, 64);
+                buttonCancel.FlatStyle = FlatStyle.Flat;
+                buttonCancel.FlatAppearance.BorderColor = Color.FromArgb(200, 200, 200);
+                buttonCancel.Cursor = Cursors.Hand;
 
-            form.Controls.AddRange(new Control[] { label, textBox, buttonOk, buttonCancel });
+                // Agregar controles al formulario
+                form.Controls.AddRange(new Control[] { label, textBox, buttonOk, buttonCancel });
 
-            // ⚠️ Importante: no volver a recalcular el ClientSize con label.Right (encogía la caja)
-            // form.ClientSize = new Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
+                // Configurar botones por defecto
+                form.AcceptButton = buttonOk;
+                form.CancelButton = buttonCancel;
 
-            form.FormBorderStyle = FormBorderStyle.FixedDialog;
-            form.StartPosition = FormStartPosition.CenterScreen;
-            form.MinimizeBox = false;
-            form.MaximizeBox = false;
-            form.AcceptButton = buttonOk;
-            form.CancelButton = buttonCancel;
+                // Enfocar el textBox al mostrar el formulario
+                form.Shown += (s, e) => textBox.Focus();
 
-            DialogResult dialogResult = form.ShowDialog();
-            return dialogResult == DialogResult.OK ? textBox.Text : null;
+                // Mostrar el diálogo
+                DialogResult dialogResult = form.ShowDialog();
+
+                return dialogResult == DialogResult.OK ? textBox.Text : null;
+            }
         }
 
         private async void btnCargarArchivo_Click(object sender, EventArgs e)
@@ -439,7 +475,7 @@ namespace ALISTAMIENTO_IE
 
                 if (ofd.ShowDialog() != DialogResult.OK)
                 {
-                    btnCargarArchivo.Enabled = true; // ✅ CORREGIDO: Rehabilitar el botón si se cancela
+                    btnCargarArchivo.Enabled = true; 
                     return;
                 }
 
@@ -457,7 +493,7 @@ namespace ALISTAMIENTO_IE
                 if (ds.Tables.Count == 0)
                 {
                     MessageBox.Show("El archivo no contiene hojas.");
-                    btnCargarArchivo.Enabled = true; // ✅ CORREGIDO: Rehabilitar el botón si hay error
+                    btnCargarArchivo.Enabled = true; 
                     return;
                 }
 
@@ -511,6 +547,8 @@ namespace ALISTAMIENTO_IE
                     var camion = await _cargueMasivoService.ObtenerCamionPorCodigoAsync(codCamionLong);
                     var movsDoc = await _cargueMasivoService.ObtenerMovimientosPorConsecutivoAsync(idDocumento, tipoDocumento, int.Parse(empresa));
 
+                    
+
 
                     if (documento == null)
                     {
@@ -531,17 +569,16 @@ namespace ALISTAMIENTO_IE
 
                     var documentoDespachado = await _cargueMasivoService.ObtenerDocumentoDespachado(documento.Documento.ToString());
 
-                    if (documentoDespachado != null)
-                    {
-                        MessageBox.Show("El documento " + documentoDespachado.SECUENCIAL + " ya ha se ha programado anteriormente");
-                        return;
-                    }
+                    //if (documentoDespachado != null)
+                    //{
+                    //    MessageBox.Show("El documento " + documentoDespachado.SECUENCIAL + " ya ha se ha programado anteriormente");
+                    //    return;
+                    //}
+
 
                     foreach (var m in movsDoc)
                     {
-
                         m.FECHA = DateTime.Now;
-
                         var movimiento = new MovimientoDocumentoDto
                         {
                             FECHA = Convert.ToDateTime(fechaDespacho),
@@ -556,38 +593,73 @@ namespace ALISTAMIENTO_IE
                             CANT_SALDO = m.CANT_SALDO,
                             NOTAS_DEL_DOCTO = m.NOTAS_DEL_DOCTO
                         };
-
                         if (movimiento.BOD_SALIDA is not ("BODEGA INTEGRAL EMPAQUES" or "BODEGA TERCEROS IE" or "017"))
                         {
                             MessageBox.Show("Por favor revise la bodega de salida del Documento " + movimiento.NUM_DOCUMENTO);
                             return;
                         }
-
-
                         if (int.Parse(empresa) == 1)
                         {
-                            string itemEquivalente = await _cargueMasivoService.SacaItemEquivalenteAsync(
-                                CargueMasivoService.ExtraerItemDesdeResumen(movimiento.ITEM_RESUMEN));
+                            string itemOriginal = CargueMasivoService.ExtraerItemDesdeResumen(movimiento.ITEM_RESUMEN);
+                            string itemEquivalente;
 
-                            if (itemEquivalente == "N/A")
+                            // Primero verificar si ya existe en el caché
+                            if (_cacheItemsEquivalentes.ContainsKey(itemOriginal))
                             {
-                                string? nuevoItem = InputBox(
-                                    $"El item {movimiento.ITEM_RESUMEN} no tiene equivalente en IE.\nPor favor ingrese el item equivalente:",
-                                    "Item Equivalente", "");
-
-                                if (!string.IsNullOrWhiteSpace(nuevoItem))
-                                {
-                                    string descripcion = await _cargueMasivoService.ObtenerDescripcionItemAsync(nuevoItem);
-                                    movimiento.ITEM_RESUMEN = nuevoItem.TrimEnd() + "->" + descripcion + "-------" + "ITEM INGRESADO MANUALMENTE";
-                                }
+                                // Usar el item equivalente del caché
+                                itemEquivalente = _cacheItemsEquivalentes[itemOriginal];
                             }
                             else
                             {
-                                movimiento.ITEM_RESUMEN = itemEquivalente.TrimEnd()
-                                    + "->" + await _cargueMasivoService.ObtenerDescripcionItemAsync(itemEquivalente);
+                                // Buscar en la base de datos
+                                itemEquivalente = await _cargueMasivoService.SacaItemEquivalenteAsync(itemOriginal);
+
+                                if (itemEquivalente == "N/A")
+                                {
+                                    string? nuevoItem = InputBox(
+                                        $"El item {movimiento.ITEM_RESUMEN} no tiene equivalente en IE.\nPor favor ingrese el item equivalente:",
+                                        "Item Equivalente", "");
+
+                                    if (!string.IsNullOrWhiteSpace(nuevoItem))
+                                    {
+                                        // Guardar en caché para usar en los siguientes documentos
+                                        _cacheItemsEquivalentes[itemOriginal] = nuevoItem;
+                                        itemEquivalente = nuevoItem;
+
+                                        string descripcion = await _cargueMasivoService.ObtenerDescripcionItemAsync(nuevoItem);
+                                        movimiento.ITEM_RESUMEN = nuevoItem.TrimEnd() + "->" + descripcion + "-------" + "ITEM INGRESADO MANUALMENTE";
+                                    }
+                                    else
+                                    {
+                                        // Si el usuario cancela, mantener el item original
+                                        movimiento.ITEM_RESUMEN = movimiento.ITEM_RESUMEN;
+                                    }
+                                }
+                                else
+                                {
+                                    // Guardar en caché el item equivalente encontrado
+                                    _cacheItemsEquivalentes[itemOriginal] = itemEquivalente;
+
+                                    movimiento.ITEM_RESUMEN = itemEquivalente.TrimEnd()
+                                        + "->" + await _cargueMasivoService.ObtenerDescripcionItemAsync(itemEquivalente);
+                                }
+                            }
+
+                            // Si el item ya estaba en caché, actualizarlo
+                            // Si el item ya estaba en caché y fue ingresado manualmente, aplicar el formato
+                            if (_cacheItemsEquivalentes.ContainsKey(itemOriginal))
+                            {
+                                string itemDelCache = _cacheItemsEquivalentes[itemOriginal];
+                                string descripcion = await _cargueMasivoService.ObtenerDescripcionItemAsync(itemDelCache);
+
+                                // Verificar si fue ingresado manualmente (comparando con el resultado de la BD)
+                                string itemDeBD = await _cargueMasivoService.SacaItemEquivalenteAsync(itemOriginal);
+                                bool esManual = itemDeBD == "N/A";
+
+                                movimiento.ITEM_RESUMEN = itemDelCache.TrimEnd() + "->" + descripcion +
+                                                         (esManual ? "-------ITEM INGRESADO MANUALMENTE" : "");
                             }
                         }
-
                         listaNormal.Add(movimiento);
                         itemsParaAgrupar.Add((m.FECHA.Date, empresaTransporte, camion.COD_CAMION, conductor.COD_CONDUCTOR, movimiento));
                     }
