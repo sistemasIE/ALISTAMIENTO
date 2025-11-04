@@ -476,6 +476,7 @@ namespace ALISTAMIENTO_IE
                 foreach (DataRow fila in dt.Rows)
                 {
                     // === tu lógica actual ===
+                    string fechaDespacho = fila["FECHA DESPACHO"]?.ToString()?.Trim() ?? "";
                     string empresa = fila["EMPRESA"]?.ToString()?.Trim() ?? "";
                     string tipoDocumento = fila["TIPO DOCUMENTO"]?.ToString()?.Trim() ?? "";
                     string idDocumentoTxt = fila["ID DOCUMENTO"]?.ToString()?.Trim() ?? "";
@@ -501,6 +502,11 @@ namespace ALISTAMIENTO_IE
                         return;
                     }
 
+                    if(fechaDespacho == "")
+                    {
+                        MessageBox.Show("Por favor ingrese la fecha de despacho del Documento " + tipoDocumento + "/" + idDocumento);
+                        return;
+                    }
 
                     if (tercero == null || conductor == null || camion == null) { /*...*/ continue; }
 
@@ -522,7 +528,7 @@ namespace ALISTAMIENTO_IE
 
                         var movimiento = new MovimientoDocumentoDto
                         {
-                            FECHA = m.FECHA,
+                            FECHA = Convert.ToDateTime(fechaDespacho),
                             NUM_DOCUMENTO = documento.Documento,
                             TIPO_DOCUMENTO = tipoDocumento,
                             EMPRESA_TRANSPORTE = empresaTransporte,
@@ -534,6 +540,13 @@ namespace ALISTAMIENTO_IE
                             CANT_SALDO = m.CANT_SALDO,
                             NOTAS_DEL_DOCTO = m.NOTAS_DEL_DOCTO
                         };
+
+                        if (movimiento.BOD_SALIDA is not ("BODEGA INTEGRAL EMPAQUES" or "BODEGA TERCEROS IE" or "017"))
+                        {
+                            MessageBox.Show("Por favor revise la bodega de salida del Documento " + movimiento.NUM_DOCUMENTO);
+                            return;
+                        }
+
 
                         if (int.Parse(empresa) == 1)
                         {
