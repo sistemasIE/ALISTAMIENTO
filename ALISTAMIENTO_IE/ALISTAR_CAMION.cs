@@ -569,11 +569,11 @@ namespace ALISTAMIENTO_IE
 
                     var documentoDespachado = await _cargueMasivoService.ObtenerDocumentoDespachado(documento.Documento.ToString());
 
-                    //if (documentoDespachado != null)
-                    //{
-                    //    MessageBox.Show("El documento " + documentoDespachado.SECUENCIAL + " ya ha se ha programado anteriormente");
-                    //    return;
-                    //}
+                    if (documentoDespachado != null)
+                    {
+                        MessageBox.Show("El documento " + documentoDespachado.SECUENCIAL + " ya ha se ha programado anteriormente");
+                        return;
+                    }
 
 
                     foreach (var m in movsDoc)
@@ -634,6 +634,45 @@ namespace ALISTAMIENTO_IE
                                         // Si el usuario cancela, mantener el item original
                                         movimiento.ITEM_RESUMEN = movimiento.ITEM_RESUMEN;
                                     }
+
+                                    // 🔔 Enviar correo al GRUPO5 notificando que no tenía equivalente
+                                    string asunto = $"ITEM SIN EQUIVALENTE: {itemOriginal}";
+                                    string html = $@"
+        <p><strong>Notificación automática del sistema de despacho</strong></p>
+        <p>El item <strong>{itemOriginal + "-->" + await _cargueMasivoService.ObtenerDescripcionItemAsync(itemOriginal)}</strong> no tenía equivalente en IE.</p>
+        {(string.IsNullOrWhiteSpace(nuevoItem)
+                                            ? "<p>El usuario no ingresó ningún equivalente.</p>"
+                                            : $"<p>El usuario ingresó manualmente el equivalente: <strong>{movimiento.ITEM_RESUMEN}</strong>.</p>")}
+        <hr>
+        <p><strong>Documento:</strong> {movimiento.NUM_DOCUMENTO}</p>
+        <p><strong>Camión:</strong> {camion.PLACAS}</p>
+        <p><strong>Conductor:</strong> {conductor.NOMBRES}</p>
+        <p>Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}</p>";
+
+                                    // Obtener correos del grupo5
+                                    var destinatarios = _cargueMasivoService.ejecuta_script(
+                                        "select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='GRUPO5'");
+
+                                    using (var client = new System.Net.Mail.SmtpClient("192.168.16.215"))
+                                    {
+                                        client.UseDefaultCredentials = false;
+                                        client.Port = 2727;
+                                        client.Credentials = new System.Net.NetworkCredential("cabana\\notificaciones", "Notifica@inte");
+                                        client.EnableSsl = false;
+
+                                        foreach (var correo in destinatarios)
+                                        {
+                                            using (var msg = new System.Net.Mail.MailMessage("notificaciones@integraldeempaques.com", correo))
+                                            {
+                                                msg.Subject = asunto;
+                                                msg.IsBodyHtml = true;
+                                                msg.BodyEncoding = System.Text.Encoding.UTF8;
+                                                msg.Body = html;
+
+                                                await client.SendMailAsync(msg);
+                                            }
+                                        }
+                                    }
                                 }
                                 else
                                 {
@@ -643,7 +682,8 @@ namespace ALISTAMIENTO_IE
                                     movimiento.ITEM_RESUMEN = itemEquivalente.TrimEnd()
                                         + "->" + await _cargueMasivoService.ObtenerDescripcionItemAsync(itemEquivalente);
                                 }
-                            }
+                                
+                                }
 
                             // Si el item ya estaba en caché, actualizarlo
                             // Si el item ya estaba en caché y fue ingresado manualmente, aplicar el formato
