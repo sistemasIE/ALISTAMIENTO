@@ -741,11 +741,11 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new Font("Myriad Pro", 28.1999989F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label1.Font = new Font("Microsoft Sans Serif", 28.1999989F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label1.ForeColor = Color.LimeGreen;
             label1.Location = new Point(132, 37);
             label1.Name = "label1";
-            label1.Size = new Size(303, 46);
+            label1.Size = new Size(332, 44);
             label1.TabIndex = 5;
             label1.Text = "Cargar Camiones";
             // 
@@ -762,7 +762,7 @@
             dtgAgrupada.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dtgAgrupada.Location = new Point(692, 44);
             dtgAgrupada.Name = "dtgAgrupada";
-            dtgAgrupada.Size = new Size(493, 163);
+            dtgAgrupada.Size = new Size(452, 163);
             dtgAgrupada.TabIndex = 1;
             // 
             // btnCargarArchivo
