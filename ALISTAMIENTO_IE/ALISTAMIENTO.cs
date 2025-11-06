@@ -15,11 +15,13 @@ namespace ALISTAMIENTO_IE
         private readonly int _idCamion;
         private readonly string _estadoAlistamientoInicial;
         private readonly AlistamientoService _alistamientoService;
+        private readonly AuthorizationService _authorizationService;
         private readonly AlistamientoEtiquetaService _alistamientoEtiquetaService;
+        private readonly DetalleCamionXDiaService _detalleCamionXDiaService;
         private readonly KardexService _kardexService;
         private EtiquetaService _etiquetaService;
         private EtiquetaLinerService _etiquetaLinerService;
-        private EtiquetaRolloService _etiquetaRolloService; // ✅ NUEVO
+        private EtiquetaRolloService _etiquetaRolloService;
 
 
         private IEnumerable<EtiquetaLeidaDTO> _etiquetasLeidas;
@@ -48,7 +50,8 @@ namespace ALISTAMIENTO_IE
         {
             InitializeComponent();
 
-            this.Icon = ALISTAMIENTO_IE.Properties.Resources.Icono;
+            _authorizationService = AuthorizationService.CreateFromConfig("stringConexionLocal");
+
 
             _idCamion = idCamion;
             _estadoAlistamientoInicial = estado;
@@ -57,16 +60,22 @@ namespace ALISTAMIENTO_IE
             _camionService = new CamionService();
             _alistamientoService = new AlistamientoService();
             _alistamientoEtiquetaService = new AlistamientoEtiquetaService();
+            _detalleCamionXDiaService = new DetalleCamionXDiaService();
             _etiquetaService = new EtiquetaService();
             _etiquetaLinerService = new EtiquetaLinerService();
-            _etiquetaRolloService = new EtiquetaRolloService(); // ✅ NUEVO
+            _etiquetaRolloService = new EtiquetaRolloService();
             _kardexService = new KardexService();
-            this.FormClosing += ALISTAMIENTO_FormClosing;
-            this.Load += ALISTAMIENTO_Load;
-            btnBuscar.Click += btnBuscar_Click;
+
 
             CAMION_ACTUAL = _camionService.GetCamionByCamionXDiaId(idCamion);
+            // Función para procesar el cambio de Item cuando se está haciendo el Alistamiento
+            this.dgvMain.CellDoubleClick += dgvMainDoubleClick;
+            this.Load += ALISTAMIENTO_Load;
+            btnBuscar.Click += btnBuscar_Click;
+            this.FormClosing += ALISTAMIENTO_FormClosing;
+
             lblPlaca.Text = CAMION_ACTUAL != null ? $"PLACAS: " + CAMION_ACTUAL.PLACAS.ToString() : "Desconocida";
+            this.Icon = ALISTAMIENTO_IE.Properties.Resources.Icono;
         }
 
         private bool VerificarAlistamientoCompleto()
@@ -159,6 +168,11 @@ namespace ALISTAMIENTO_IE
                     _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "EN_PROCESO", "Continuando alistamiento incompleto", null);
                     _estadoAlistamiento = "EN_PROCESO";
 
+                    await CargarEtiquetasLeidasEnCache();
+
+                    // Recalcular cantidades alistadas basándose en las etiquetas ya leídas
+                    await RecalcularCantidadesAlistadas();
+
                 }
                 else if (_estadoAlistamientoInicial == "SIN_ALISTAR")
                 {
@@ -183,10 +197,14 @@ namespace ALISTAMIENTO_IE
                     // Deshabilitar controles para visualización únicamente
                     txtEtiqueta.Enabled = false;
                     btnTerminar.Enabled = false;
+                    await CargarEtiquetasLeidasEnCache();
+
+
+                    // Recalcular cantidades alistadas basándose en las etiquetas ya leídas
+                    await RecalcularCantidadesAlistadas();
 
                 }
 
-                await CargarEtiquetasLeidasEnCache();
                 // Inicializar timer
                 _timer = new Timer { Interval = 10000 }; // 10 segundos
                 _timer.Tick += Timer_Tick;
@@ -196,8 +214,6 @@ namespace ALISTAMIENTO_IE
                 // Construir resumen inicial
                 await cargarDgvMain();
 
-                // Recalcular cantidades alistadas basándose en las etiquetas ya leídas
-                await RecalcularCantidadesAlistadas();
 
                 // Obtener los ítems pendientes del camión
                 IEnumerable<CamionItemsDto> items = await _alistamientoService.ObtenerItemsPorAlistarCamion(_idCamion);
@@ -226,6 +242,7 @@ namespace ALISTAMIENTO_IE
         /// </summary>
         private async Task CargarEtiquetasLeidasEnCache()
         {
+
             try
             {
                 _etiquetasLeidas = await _alistamientoEtiquetaService.ObtenerEtiquetasLeidas(_alistamiento.IdAlistamiento);
@@ -439,14 +456,14 @@ namespace ALISTAMIENTO_IE
             this.dgvMain.Columns["MetrosRestantes"].DisplayIndex = 11;
 
             // Para las columnas "Restantes"
-            this.dgvMain.Columns["PacasRestantes"].DefaultCellStyle.BackColor = Color.Green;
-            this.dgvMain.Columns["PacasRestantes"].DefaultCellStyle.ForeColor = Color.White;
+            this.dgvMain.Columns["PacasRestantes"].DefaultCellStyle.BackColor = System.Drawing.Color.Green;
+            this.dgvMain.Columns["PacasRestantes"].DefaultCellStyle.ForeColor = System.Drawing.Color.White;
 
-            this.dgvMain.Columns["KilosRestantes"].DefaultCellStyle.BackColor = Color.Green;
-            this.dgvMain.Columns["KilosRestantes"].DefaultCellStyle.ForeColor = Color.White;
+            this.dgvMain.Columns["KilosRestantes"].DefaultCellStyle.BackColor = System.Drawing.Color.Green;
+            this.dgvMain.Columns["KilosRestantes"].DefaultCellStyle.ForeColor = System.Drawing.Color.White;
 
-            this.dgvMain.Columns["MetrosRestantes"].DefaultCellStyle.BackColor = Color.Green;
-            this.dgvMain.Columns["MetrosRestantes"].DefaultCellStyle.ForeColor = Color.White;
+            this.dgvMain.Columns["MetrosRestantes"].DefaultCellStyle.BackColor = System.Drawing.Color.Green;
+            this.dgvMain.Columns["MetrosRestantes"].DefaultCellStyle.ForeColor = System.Drawing.Color.White;
 
 
         }
@@ -753,6 +770,77 @@ namespace ALISTAMIENTO_IE
                 System.Diagnostics.Debug.WriteLine($"Error al reproducir sonido de éxito: {ex.Message}");
             }
         }
+
+
+        private async void dgvMainDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // Evita errores por cabecera o índices fuera de rango
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                return;
+
+            string columnaObjetivo = "Item"; // columna a controlar
+
+            if (dgvMain.Columns[e.ColumnIndex].Name == columnaObjetivo)
+            {
+                // 📌 Obtienes el valor viejo ANTES de modificar
+                int itemViejo = 0;
+                object valorCelda = dgvMain.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+
+                if (valorCelda != null && int.TryParse(valorCelda.ToString(), out int temp))
+                    itemViejo = temp;
+
+                // 1️⃣ Confirmación inicial
+                DialogResult confirmacion = MessageBox.Show(
+                    $"¿Deseas modificar el valor del ITEM {itemViejo}?",
+                    "Cambiar ITEM",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (confirmacion != DialogResult.Yes)
+                    return;
+
+                // 2️⃣ Solicitar nuevo valor numérico
+                string input = Microsoft.VisualBasic.Interaction.InputBox(
+                    "Introduce el nuevo valor del ITEM:",
+                    "Editar valor",
+                    valorCelda?.ToString() ?? "0"
+                );
+
+                if (!int.TryParse(input, out int nuevoValor))
+                {
+                    MessageBox.Show("Valor inválido. Debe ser numérico entero.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // 3️⃣ Solicitar autorización con contraseña
+                string password = Microsoft.VisualBasic.Interaction.InputBox(
+                    "Introduce la contraseña de autorización:",
+                    "Autorización requerida"
+                );
+
+                password = BCrypt.Net.BCrypt.HashPassword(password);
+
+                int area = 21; // id del área de Alistamiento
+                int idRol = 1; // Id del Rol de Administrador
+
+
+                if (await _authorizationService.ValidatePasswordAsync(area, idRol, password))
+                {
+                    MessageBox.Show("Contraseña incorrecta. No se realizó ningún cambio.", "Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // 4️⃣ Aplicar el cambio si todo está correcto
+                dgvMain.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = nuevoValor;
+
+                // Llamas al servicio pasando el viejo y el nuevo
+                _detalleCamionXDiaService.ActualizarItemDadoCodCamionEItem(_idCamion, itemViejo, nuevoValor);
+
+                MessageBox.Show($"Item {itemViejo} actualizado correctamente a {nuevoValor}.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
 
         private void btnPausa_Click(object sender, EventArgs e)
         {
