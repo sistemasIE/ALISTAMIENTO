@@ -186,8 +186,7 @@ namespace ALISTAMIENTO_IE.Services
                          ON c.COD_CAMION = cxd.COD_REGISTRO_CAMION 
                      LEFT JOIN ALISTAMIENTO a
                          ON a.idCamionDia = cxd.COD_CAMION
-                     WHERE cxd.FECHA > DATEADD(DAY, -2, GETDATE())
-                            AND cxd.ESTADO = 'C'
+                     WHERE cxd.ESTADO = 'C'
                          AND (a.ESTADO IS NULL OR a.ESTADO LIKE '%INCOMPLETO%' OR a.ESTADO = 'EN_PROCESO' OR a.ESTADO = 'ALISTADO' OR a.ESTADO = 'ANULADO')
                     GROUP BY
                         cxd.COD_CAMION, c.PLACAS, cxd.FECHA, cxd.ESTADO, a.estado 

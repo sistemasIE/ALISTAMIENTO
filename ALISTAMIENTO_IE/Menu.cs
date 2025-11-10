@@ -8,7 +8,7 @@ using System.Text;
 
 namespace ALISTAMIENTO_IE
 {
-    public partial class ALISTAR_CAMION : Form
+    public partial class Menu : Form
     {
         private readonly AlistamientoService alistamientoService;
         private readonly IPdfService _pdfService;
@@ -32,7 +32,7 @@ namespace ALISTAMIENTO_IE
         private bool _hasUploaded = false;
 
 
-        public ALISTAR_CAMION()
+        public Menu()
         {
             InitializeComponent();
 
@@ -140,7 +140,7 @@ namespace ALISTAMIENTO_IE
                 var totales = await _alistamientoEtiquetaService.ObtenerTotalesReporte(dtpFechaReporte.Value, turnoLike);
                 if (totales != null)
                 {
-                    lblUnidadesPacas.Text = totales.TotalPacas.ToString();
+                    lblUnidadesPacas.Text = totales.TotalUnidades.ToString();
                     lblCamionesNumero.Text = totales.TotalCamiones.ToString();
                 }
                 else
@@ -476,7 +476,7 @@ namespace ALISTAMIENTO_IE
 
                 if (ofd.ShowDialog() != DialogResult.OK)
                 {
-                    btnCargarArchivo.Enabled = true; 
+                    btnCargarArchivo.Enabled = true;
                     return;
                 }
 
@@ -494,7 +494,7 @@ namespace ALISTAMIENTO_IE
                 if (ds.Tables.Count == 0)
                 {
                     MessageBox.Show("El archivo no contiene hojas.");
-                    btnCargarArchivo.Enabled = true; 
+                    btnCargarArchivo.Enabled = true;
                     return;
                 }
 
@@ -548,7 +548,7 @@ namespace ALISTAMIENTO_IE
                     var camion = await _cargueMasivoService.ObtenerCamionPorCodigoAsync(codCamionLong);
                     var movsDoc = await _cargueMasivoService.ObtenerMovimientosPorConsecutivoAsync(idDocumento, tipoDocumento, int.Parse(empresa));
 
-                    
+
 
 
                     if (documento == null)
@@ -557,7 +557,7 @@ namespace ALISTAMIENTO_IE
                         return;
                     }
 
-                    if(fechaDespacho == "")
+                    if (fechaDespacho == "")
                     {
                         MessageBox.Show("Por favor ingrese la fecha de despacho del Documento " + tipoDocumento + "/" + idDocumento);
                         return;
@@ -683,8 +683,8 @@ namespace ALISTAMIENTO_IE
                                     movimiento.ITEM_RESUMEN = itemEquivalente.TrimEnd()
                                         + "->" + await _cargueMasivoService.ObtenerDescripcionItemAsync(itemEquivalente);
                                 }
-                                
-                                }
+
+                            }
 
                             // Si el item ya estaba en caché, actualizarlo
                             // Si el item ya estaba en caché y fue ingresado manualmente, aplicar el formato

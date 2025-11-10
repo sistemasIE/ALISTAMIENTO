@@ -415,57 +415,7 @@ namespace ALISTAMIENTO_IE
 
         private async Task cargarDgvMain()
         {
-            // Traes la planificación
-            IEnumerable<PlanificacionCamionDTO> planificado =
-                await _alistamientoEtiquetaService.ObtenerPlanificacionCamionAsync(this._idCamion);
-
-            // Mapeas a InformacionCamionDTO
-            var informacion = planificado.Select(p => new InformacionCamionDTO
-            {
-                Item = p.Item,
-                Descripcion = p.Descripcion,
-                PacasEsperadas = p.PacasEsperadas,
-                KilosEsperados = p.KilosEsperados,
-                MetrosEsperados = p.MetrosEsperados,
-
-                // Inicialmente en 0 (se recalculan después)
-                PacasAlistadas = 0,
-                KilosAlistados = 0,
-                MetrosAlistados = 0,
-                PacasRestantes = p.PacasEsperadas,
-                KilosRestantes = p.KilosEsperados,
-                MetrosRestantes = p.MetrosEsperados,
-                CantidadPlanificada = p.CantidadPlanificada
-            }).ToList();
-
-            // Asignas al DataGridView
-            this.dgvMain.AutoGenerateColumns = true;
-            this.dgvMain.DataSource = informacion;
-
-            this.dgvMain.Columns["Item"].DisplayIndex = 0;
-            this.dgvMain.Columns["Descripcion"].DisplayIndex = 1;
-            this.dgvMain.Columns["CantidadPlanificada"].DisplayIndex = 2;
-            this.dgvMain.Columns["PacasEsperadas"].DisplayIndex = 3;
-            this.dgvMain.Columns["PacasAlistadas"].DisplayIndex = 4;
-            this.dgvMain.Columns["PacasRestantes"].DisplayIndex = 5;
-            this.dgvMain.Columns["KilosEsperados"].DisplayIndex = 6;
-            this.dgvMain.Columns["KilosAlistados"].DisplayIndex = 7;
-            this.dgvMain.Columns["KilosRestantes"].DisplayIndex = 8;
-            this.dgvMain.Columns["MetrosEsperados"].DisplayIndex = 9;
-            this.dgvMain.Columns["MetrosAlistados"].DisplayIndex = 10;
-            this.dgvMain.Columns["MetrosRestantes"].DisplayIndex = 11;
-
-            // Para las columnas "Restantes"
-            this.dgvMain.Columns["PacasRestantes"].DefaultCellStyle.BackColor = System.Drawing.Color.Green;
-            this.dgvMain.Columns["PacasRestantes"].DefaultCellStyle.ForeColor = System.Drawing.Color.White;
-
-            this.dgvMain.Columns["KilosRestantes"].DefaultCellStyle.BackColor = System.Drawing.Color.Green;
-            this.dgvMain.Columns["KilosRestantes"].DefaultCellStyle.ForeColor = System.Drawing.Color.White;
-
-            this.dgvMain.Columns["MetrosRestantes"].DefaultCellStyle.BackColor = System.Drawing.Color.Green;
-            this.dgvMain.Columns["MetrosRestantes"].DefaultCellStyle.ForeColor = System.Drawing.Color.White;
-
-
+            _alistamientoService.CargarCamionDia(_idCamion, dgvMain);
         }
 
         public async Task actualizarDgvMain(string etiqueta)
