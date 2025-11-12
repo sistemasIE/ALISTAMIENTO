@@ -475,7 +475,7 @@ namespace ALISTAMIENTO_IE
 
                 if (ofd.ShowDialog() != DialogResult.OK)
                 {
-                    btnCargarArchivo.Enabled = true; 
+                    btnCargarArchivo.Enabled = true;
                     return;
                 }
 
@@ -493,7 +493,7 @@ namespace ALISTAMIENTO_IE
                 if (ds.Tables.Count == 0)
                 {
                     MessageBox.Show("El archivo no contiene hojas.");
-                    btnCargarArchivo.Enabled = true; 
+                    btnCargarArchivo.Enabled = true;
                     return;
                 }
 
@@ -536,10 +536,30 @@ namespace ALISTAMIENTO_IE
                     string codConductorTxt = fila["COD_CONDUCTOR"]?.ToString()?.Trim() ?? "";
                     string codCamionTxt = fila["COD_CAMION"]?.ToString()?.Trim() ?? "";
 
-                    if (!int.TryParse(idDocumentoTxt, out var idDocumento)) { /*...*/ continue; }
-                    if (!int.TryParse(ciaTransporteTxt, out var rowIdTransporte)) { /*...*/ continue; }
-                    if (!long.TryParse(codConductorTxt, out var codConductorLong)) { /*...*/ continue; }
-                    if (!long.TryParse(codCamionTxt, out var codCamionLong)) { /*...*/ continue; }
+                    // --- Validaciones iniciales ---
+                    if (!int.TryParse(idDocumentoTxt, out var idDocumento))
+                    {
+                        lstErrores.Items.Add($"Error: ID DOCUMENTO inválido ({idDocumentoTxt}) en tipo {tipoDocumento}, empresa {empresa}");
+                        continue;
+                    }
+
+                    if (!int.TryParse(ciaTransporteTxt, out var rowIdTransporte))
+                    {
+                        lstErrores.Items.Add($"Error: ID CIA TRANSPORTE inválido ({ciaTransporteTxt}) en documento {tipoDocumento}/{idDocumento}");
+                        continue;
+                    }
+
+                    if (!long.TryParse(codConductorTxt, out var codConductorLong))
+                    {
+                        lstErrores.Items.Add($"Error: COD_CONDUCTOR inválido ({codConductorTxt}) en documento {tipoDocumento}/{idDocumento}");
+                        continue;
+                    }
+
+                    if (!long.TryParse(codCamionTxt, out var codCamionLong))
+                    {
+                        lstErrores.Items.Add($"Error: COD_CAMION inválido ({codCamionTxt}) en documento {tipoDocumento}/{idDocumento}");
+                        continue;
+                    }
 
                     var documento = await _cargueMasivoService.ObtenerDocumentoContableAsync(empresa, tipoDocumento, idDocumento);
                     var tercero = await _cargueMasivoService.ObtenerTerceroPorRowIdAsync(rowIdTransporte);
@@ -547,22 +567,39 @@ namespace ALISTAMIENTO_IE
                     var camion = await _cargueMasivoService.ObtenerCamionPorCodigoAsync(codCamionLong);
                     var movsDoc = await _cargueMasivoService.ObtenerMovimientosPorConsecutivoAsync(idDocumento, tipoDocumento, int.Parse(empresa));
 
-                    
+
 
 
                     if (documento == null)
                     {
-                        MessageBox.Show("Documento no existe o Empresa Incorrecta: " + tipoDocumento + "/" + idDocumento);
-                        return;
+                        //MessageBox.Show("Documento no existe o Empresa Incorrecta: " + tipoDocumento + "/" + idDocumento);
+                        lstErrores.Items.Add("Documento no existe o Empresa Incorrecta: " + tipoDocumento + "/" + idDocumento);
+                        continue;
                     }
 
-                    if(fechaDespacho == "")
+                    if (fechaDespacho == "")
                     {
-                        MessageBox.Show("Por favor ingrese la fecha de despacho del Documento " + tipoDocumento + "/" + idDocumento);
-                        return;
+                        //MessageBox.Show("Por favor ingrese la fecha de despacho del Documento " + tipoDocumento + "/" + idDocumento);
+                        lstErrores.Items.Add("Por favor ingrese la fecha de despacho del Documento " + tipoDocumento + "/" + idDocumento);
+                        continue;
                     }
 
-                    if (tercero == null || conductor == null || camion == null) { /*...*/ continue; }
+                    if (tercero == null)
+                    {
+
+                        lstErrores.Items.Add("Compañía de transporte no existe o RowID incorrecto: " + tipoDocumento + " / " + idDocumento + "-->" + rowIdTransporte);
+                        continue;
+                    }
+                    if (conductor == null)
+                    {
+                        lstErrores.Items.Add("Conductor no existe o código incorrecto: " + tipoDocumento + " / " + idDocumento + "-->" + codConductorLong);
+                        continue;
+                    }
+                    if (camion == null)
+                    {
+                        lstErrores.Items.Add("Camión no existe o código incorrecto: " + tipoDocumento + " / " + idDocumento + "-->" + codCamionLong);
+                        continue;
+                    }
 
                     string empresaTransporte = tercero.f200_id.Trim();
 
@@ -571,8 +608,9 @@ namespace ALISTAMIENTO_IE
 
                     if (documentoDespachado != null)
                     {
-                        MessageBox.Show("El documento " + documentoDespachado.SECUENCIAL + " ya ha se ha programado anteriormente");
-                        return;
+                        //MessageBox.Show("El documento " + documentoDespachado.SECUENCIAL + " ya ha se ha programado anteriormente");
+                        lstErrores.Items.Add("El documento " + documentoDespachado.SECUENCIAL + " ya ha se ha programado anteriormente");
+                        continue;
                     }
 
 
@@ -595,8 +633,9 @@ namespace ALISTAMIENTO_IE
                         };
                         if (movimiento.BOD_SALIDA is not ("BODEGA INTEGRAL EMPAQUES" or "BODEGA TERCEROS IE" or "017"))
                         {
-                            MessageBox.Show("Por favor revise la bodega de salida del Documento " + movimiento.NUM_DOCUMENTO);
-                            return;
+                            //MessageBox.Show("Por favor revise la bodega de salida del Documento " + movimiento.NUM_DOCUMENTO);
+                            lstErrores.Items.Add("Por favor revise la bodega de salida del Documento " + movimiento.NUM_DOCUMENTO);
+                            continue;
                         }
                         if (int.Parse(empresa) == 1)
                         {
@@ -682,8 +721,8 @@ namespace ALISTAMIENTO_IE
                                     movimiento.ITEM_RESUMEN = itemEquivalente.TrimEnd()
                                         + "->" + await _cargueMasivoService.ObtenerDescripcionItemAsync(itemEquivalente);
                                 }
-                                
-                                }
+
+                            }
 
                             // Si el item ya estaba en caché, actualizarlo
                             // Si el item ya estaba en caché y fue ingresado manualmente, aplicar el formato
@@ -966,5 +1005,41 @@ namespace ALISTAMIENTO_IE
                           $"Kilos Esperados: {totales.TotalKilosEsperados:N2}");
         }
 
+        private void ALISTAR_CAMION_Load(object sender, EventArgs e)
+        {
+            // Permite dibujar ítems con varias líneas
+            lstErrores.DrawMode = DrawMode.OwnerDrawVariable;
+
+            // Calcula automáticamente la altura según el texto
+            lstErrores.MeasureItem += (s, ev) =>
+            {
+                if (ev.Index >= 0)
+                {
+                    string text = lstErrores.Items[ev.Index].ToString();
+                    SizeF size = ev.Graphics.MeasureString(text, lstErrores.Font, lstErrores.Width);
+                    ev.ItemHeight = (int)size.Height + 6; // un pequeño margen
+                }
+            };
+
+            // Dibuja el texto dentro del ListBox con salto de línea
+            lstErrores.DrawItem += (s, ev) =>
+            {
+                ev.DrawBackground();
+
+                if (ev.Index >= 0)
+                {
+                    string text = lstErrores.Items[ev.Index].ToString();
+                    ev.Graphics.DrawString(
+                        text,
+                        lstErrores.Font,
+                        Brushes.Black,
+                        ev.Bounds,
+                        new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Near }
+                    );
+                }
+
+                ev.DrawFocusRectangle();
+            };
+        }
     }
 }
