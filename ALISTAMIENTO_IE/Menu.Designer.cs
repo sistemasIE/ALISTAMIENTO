@@ -1,6 +1,6 @@
 ﻿namespace ALISTAMIENTO_IE
 {
-    partial class ALISTAR_CAMION
+    partial class Menu
     {
         /// <summary>
         /// Required designer variable.
@@ -704,9 +704,9 @@
             tabCargueMasivo.Controls.Add(dtgAgrupada);
             tabCargueMasivo.Controls.Add(btnCargarArchivo);
             tabCargueMasivo.Controls.Add(tableLayoutPanel2);
-            tabCargueMasivo.Location = new Point(4, 30);
+            tabCargueMasivo.Location = new Point(4, 24);
             tabCargueMasivo.Name = "tabCargueMasivo";
-            tabCargueMasivo.Size = new Size(1202, 482);
+            tabCargueMasivo.Size = new Size(1202, 488);
             tabCargueMasivo.TabIndex = 2;
             tabCargueMasivo.Text = "Cargue Masivo";
             tabCargueMasivo.UseVisualStyleBackColor = true;

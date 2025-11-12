@@ -8,7 +8,7 @@ using System.Text;
 
 namespace ALISTAMIENTO_IE
 {
-    public partial class ALISTAR_CAMION : Form
+    public partial class Menu : Form
     {
         private readonly AlistamientoService alistamientoService;
         private readonly IPdfService _pdfService;
@@ -29,9 +29,10 @@ namespace ALISTAMIENTO_IE
 
         private int codCamionSeleccionado;
         private String placaCamionSeleccionado;
+        private bool _hasUploaded = false;
 
 
-        public ALISTAR_CAMION()
+        public Menu()
         {
             InitializeComponent();
 
@@ -139,7 +140,7 @@ namespace ALISTAMIENTO_IE
                 var totales = await _alistamientoEtiquetaService.ObtenerTotalesReporte(dtpFechaReporte.Value, turnoLike);
                 if (totales != null)
                 {
-                    lblUnidadesPacas.Text = totales.TotalPacas.ToString();
+                    lblUnidadesPacas.Text = totales.TotalUnidades.ToString();
                     lblCamionesNumero.Text = totales.TotalCamiones.ToString();
                 }
                 else
@@ -831,6 +832,35 @@ namespace ALISTAMIENTO_IE
 
             return sb.ToString();
         }
+
+        // Agregar este helper en la clase ALISTAR_CAMION:
+        private void ClearUploadStateAfterSave()
+        {
+            try
+            {
+                // Mantener una copia visual (snapshot) del DataSource para que el usuario pueda ver los datos,
+                // pero desvincularlos de las listas internas que se usan para guardar.
+                if (dtgCargueMasivo.DataSource is IEnumerable<MovimientoDocumentoDto> listaVisual)
+                {
+                    dtgCargueMasivo.DataSource = listaVisual.Select(m => m).ToList(); // snapshot inmutable para la sesión
+                }
+
+                if (dtgAgrupada.DataSource is IEnumerable<GrupoMovimientosDto> grupoVisual)
+                {
+                    dtgAgrupada.DataSource = grupoVisual.Select(g => g).ToList();
+                }
+            }
+            catch
+            {
+                // Si algo falla, no impedir la finalización. Dejamos el grid tal cual.
+            }
+
+            // Limpiar los parámetros/lists usados para el upload (ya no permitimos re-subir con los mismos objetos)
+            listaNormal?.Clear();
+            listaAgrupada?.Clear();
+        }
+
+
         private async void button1_Click(object sender, EventArgs e)
         {
             if (listaAgrupada is null || listaAgrupada.Count == 0)
@@ -937,6 +967,7 @@ namespace ALISTAMIENTO_IE
             finally
             {
                 btnCrearCamiones.Enabled = true;
+                ClearUploadStateAfterSave();
             }
         }
 

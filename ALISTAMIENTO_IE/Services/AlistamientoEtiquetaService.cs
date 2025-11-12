@@ -8,7 +8,7 @@ namespace ALISTAMIENTO_IE.Services
     // DTO para manejar los totales, según la definición en el formulario.
     public class ReporteTotalesDto
     {
-        public int TotalPacas { get; set; }
+        public int TotalUnidades { get; set; }
         public int TotalCamiones { get; set; }
     }
     internal class AlistamientoEtiquetaService
@@ -210,7 +210,7 @@ SELECT
 
                 var sql = @"
                     SELECT 
-                        SUM(ISNULL(e.CANTIDAD, el.Cantidad)) AS TotalPacas,
+                        SUM(ISNULL(e.CANTIDAD, el.Cantidad)) AS TotalUnidades,
                         COUNT(DISTINCT a.idCamionDia) AS TotalCamiones
                     FROM 
                         ALISTAMIENTO a

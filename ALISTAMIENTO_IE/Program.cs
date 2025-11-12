@@ -15,7 +15,7 @@ namespace ALISTAMIENTO_IE
             {
                 if (loginForm.ShowDialog() == DialogResult.OK && loginForm.UsuarioAutenticado != null)
                 {
-                    Application.Run(new ALISTAR_CAMION());
+                    Application.Run(new Menu());
                 }
             }
         }
