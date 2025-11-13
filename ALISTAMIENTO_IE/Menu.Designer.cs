@@ -820,7 +820,7 @@
             dtgCargueMasivo.Size = new Size(1120, 166);
             dtgCargueMasivo.TabIndex = 1;
             // 
-            // ALISTAR_CAMION
+            // Menu
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
@@ -829,7 +829,7 @@
             Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Margin = new Padding(2);
             MinimumSize = new Size(643, 408);
-            Name = "ALISTAR_CAMION";
+            Name = "Menu";
             Text = "Alistar Camión";
             FormClosing += ALISTAR_CAMION_FormClosing;
             tabMain.ResumeLayout(false);

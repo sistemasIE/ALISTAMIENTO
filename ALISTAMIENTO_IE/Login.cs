@@ -115,7 +115,8 @@ namespace LECTURA_DE_BANDA
             var connectionString = ConfigurationManager.ConnectionStrings["stringConexionLocal"].ConnectionString;
             using (var connection = new SqlConnection(connectionString))
             {
-                string sql = @"SELECT TOP 1 * FROM Usuarios WHERE LoginNombre = @login AND Contraseña = @password AND Posicion = 'Lectura banda'";
+                string sql = @"SELECT TOP 1 * FROM Usuarios WHERE LoginNombre = @login AND Contraseña = @password AND ID_Area IN(SELECT id_area 
+                    from area where AREA like '%LOG%' or AREA LIKE '%alistamiento%')";
                 var res = connection.QueryFirstOrDefault<Usuario>(sql, new { login, password });
                 UserLoginCache.IdUser = res.UsuarioId;
                 UserLoginCache.FirstName = res.PrimerNombre;
