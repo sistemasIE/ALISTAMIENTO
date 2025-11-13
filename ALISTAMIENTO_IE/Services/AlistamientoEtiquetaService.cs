@@ -27,20 +27,8 @@ namespace ALISTAMIENTO_IE.Services
         /// <returns>Una tupla con la fecha de inicio y la fecha de fin del turno.</returns>
         private (DateTime fechaInicio, DateTime fechaFin) ObtenerRangoFechas(DateTime fechaConsulta)
         {
-            DateTime fechaInicio;
-            DateTime fechaFin;
-
-            if (fechaConsulta.Hour < 7)
-            {
-                fechaFin = fechaConsulta.Date.AddHours(7);
-                fechaInicio = fechaFin.AddDays(-1);
-            }
-            else
-            {
-                fechaInicio = fechaConsulta.Date.AddHours(7);
-                fechaFin = fechaInicio.AddDays(1);
-            }
-
+            var fechaInicio = fechaConsulta.Date.AddHours(7);
+            var fechaFin = fechaInicio.AddDays(1);
             return (fechaInicio, fechaFin);
         }
 
@@ -87,7 +75,7 @@ SELECT
             ON ae.etiqueta = er.COD_ETIQUETA_ROLLO
         LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items i
             ON COALESCE(e.COD_ITEM, el.ITEM, er.ITEM) = i.f120_id
-        WHERE a.IdCamionDia = @idCodCamionDia
+        WHERE a.IdCamionDia = @idCodCamionDia and i.f120_id_cia = 2
         GROUP BY 
             COALESCE(e.COD_ITEM, el.ITEM, er.ITEM),
             i.f120_id_unidad_empaque,
@@ -221,7 +209,7 @@ SELECT
                     LEFT JOIN 
                         ETIQUETA_LINER el ON el.COD_ETIQUETA_LINER = ae.etiqueta
                     LEFT JOIN
-                        [SIE].dbo.CAMION_X_DIA cxd ON a.idCamionDia = cxd.COD_REGISTRO_CAMION
+                        [SIE].dbo.CAMION_X_DIA cxd ON a.idCamionDia = cxd.COD_CAMION
                     JOIN
                         USUARIOS u ON u.UsuarioID = a.idUsuario
                     WHERE 

@@ -20,6 +20,8 @@ namespace LECTURA_DE_BANDA
             TXT_CONTRASEÑA.Enter += TXT_CONTRASEÑA_Enter;
             TXT_CONTRASEÑA.Leave += TXT_CONTRASEÑA_Leave;
             TXT_CONTRASEÑA.KeyDown += TXT_CONTRASEÑA_KeyDown;
+
+
         }
 
         private void TXT_USUARIO_Enter(object sender, EventArgs e)
@@ -103,8 +105,8 @@ namespace LECTURA_DE_BANDA
             UserLoginCache.LastName = usuario.Apellido;
             UserLoginCache.idArea = usuario.IdArea;
 
-
-
+            // Cargar permisos del usuario para toda la sesión
+            Common.cache.UserLoginCache.CargarPermisosEnCache(UserLoginCache.IdUser);
 
             this.DialogResult = DialogResult.OK;
             this.Close();
@@ -115,11 +117,14 @@ namespace LECTURA_DE_BANDA
             var connectionString = ConfigurationManager.ConnectionStrings["stringConexionLocal"].ConnectionString;
             using (var connection = new SqlConnection(connectionString))
             {
-                string sql = @"SELECT TOP 1 * FROM Usuarios WHERE LoginNombre = @login AND Contraseña = @password AND Posicion = 'Lectura banda'";
+                string sql = @"SELECT TOP 1 * FROM Usuarios WHERE LoginNombre = @login AND Contraseña = @password AND ID_Area IN(SELECT id_area 
+                    from area where AREA like '%LOG%' or AREA LIKE '%alistamiento%')";
                 var res = connection.QueryFirstOrDefault<Usuario>(sql, new { login, password });
+                if (res == null) return null;
+
                 UserLoginCache.IdUser = res.UsuarioId;
                 UserLoginCache.FirstName = res.PrimerNombre;
-                UserLoginCache.Postion = res.Posicion;
+                UserLoginCache.Postion = res.Posicion; // corregido
                 return res;
 
             }
