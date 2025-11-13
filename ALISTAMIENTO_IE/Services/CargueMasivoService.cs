@@ -489,6 +489,43 @@ namespace ALISTAMIENTO_IE.Services
             // Si no hay registros, devuelve un arreglo vacío
             return Array.Empty<string>();
         }
+        public async Task<bool> AnularCamionConDocumentosAsync(long codCamion)
+        {
+            using (var connection = new SqlConnection(_connectionStringSIIE))
+            {
+                await connection.OpenAsync();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // 1. Actualiza el estado del camión a 'X'
+                        string sqlUpdate = @"
+                    UPDATE CAMION_X_DIA 
+                    SET ESTADO = 'X' 
+                    WHERE COD_CAMION = @CodCamion";
+
+                        await connection.ExecuteAsync(sqlUpdate, new { CodCamion = codCamion }, transaction);
+
+                        // 2. Elimina documentos despachados asociados
+                        string sqlDelete = @"
+                    DELETE FROM DOCUMENTOS_DESPACHADOS 
+                    WHERE COD_CAMION = @CodCamion";
+
+                        await connection.ExecuteAsync(sqlDelete, new { CodCamion = codCamion }, transaction);
+
+                        // 3. Confirma la transacción
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch
+                    {
+                        // Si algo falla, revierte los cambios
+                        transaction.Rollback();
+                        return false;
+                    }
+                }
+            }
+        }
     }
 
 
