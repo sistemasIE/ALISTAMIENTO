@@ -1,4 +1,7 @@
-﻿using System.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using static System.Configuration.ConfigurationManager;
 namespace Common.cache
 {
@@ -9,9 +12,9 @@ namespace Common.cache
         public static string conexUnoe = ConnectionStrings["stringConexionUnoe"].ConnectionString;
 
         public static int IdUser { get; set; }
-        public static string LoginName { get; set; }
         public static string FirstName { get; set; }
         public static string LastName { get; set; }
+        public static string LoginName { get; set; }
         public static string Postion { get; set; }
         public static string Email { get; set; }
         public static int idArea { get; set; }
@@ -34,35 +37,51 @@ namespace Common.cache
 
         public static int item_impresion { get; set; }
 
+        // Cache de permisos del usuario autenticado
+        public static HashSet<string> Permisos { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-
-        public static string RetornaNombrePorId(int idUsuario)
+        public static void CargarPermisosEnCache(int usuarioId)
         {
+            Permisos.Clear();
             using (var con = new SqlConnection(conexlocal))
             {
                 con.Open();
 
-                using (var comando = new SqlCommand("select PrimerNombre + ' ' + Apellido from Usuarios where UsuarioID = " + idUsuario + "", con))
+                string sql = @"
+            SELECT p.Tipo_permiso
+            FROM PERMISOS_USUARIO pu
+            JOIN USUARIOS u ON u.UsuarioId = pu.Id_Usuario
+            JOIN PERMISOS p ON p.Id_Permiso = pu.Id_Permiso
+            WHERE u.UsuarioId = @UsuarioId";
+
+                using (var cmd = new SqlCommand(sql, con))
                 {
-                    using (var reader = comando.ExecuteReader())
+                    cmd.Parameters.AddWithValue("@UsuarioId", usuarioId);
+
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        reader.Read();
-                        if (reader.HasRows)
+                        while (reader.Read())
                         {
-                            return reader.GetString(0);
-                        }
-                        else
-                        {
-                            return "No nombre";
+                            if (!reader.IsDBNull(0))
+                            {
+                                string permiso = reader.GetString(0).Trim();
+                                if (!string.IsNullOrWhiteSpace(permiso))
+                                    Permisos.Add(permiso);
+                            }
                         }
                     }
                 }
             }
         }
 
+        public static bool TienePermisoLike(string fragmento)
+        {
+            if (string.IsNullOrWhiteSpace(fragmento)) return false;
 
-
-
+            // Busca coincidencias parciales en cualquier permiso
+            return Permisos.Any(p =>
+                p?.IndexOf(fragmento, StringComparison.OrdinalIgnoreCase) >= 0);
+        }
 
     }
 

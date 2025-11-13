@@ -2,8 +2,10 @@
 using ALISTAMIENTO_IE.Interfaces;
 using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
+using Common.cache;
 using ExcelDataReader;
 using System.Data;
+using System.Reflection;
 using System.Text;
 
 namespace ALISTAMIENTO_IE
@@ -37,7 +39,6 @@ namespace ALISTAMIENTO_IE
             InitializeComponent();
 
             this.Icon = ALISTAMIENTO_IE.Properties.Resources.Icono;
-
 
             _detalleCamionXDiaService = new DetalleCamionXDiaService();
             alistamientoService = new AlistamientoService();
@@ -75,6 +76,11 @@ namespace ALISTAMIENTO_IE
             tabMain.SelectedIndexChanged += TabMain_SelectedIndexChanged;
             dtpFechaReporte.ValueChanged += DtpFechaReporte_ValueChanged;
             tbcTurnos.SelectedIndexChanged += TbcTurnos_SelectedIndexChanged;
+
+            // Validaciones:
+
+            LimitarVistaPorUsuario();
+
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
@@ -1071,6 +1077,26 @@ namespace ALISTAMIENTO_IE
 
                 ev.DrawFocusRectangle();
             };
+        }
+
+        public void LimitarVistaPorUsuario()
+        {
+            string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
+
+            if (!UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]"))
+            {
+                tabMain.TabPages.Remove(tabReportes);
+                tabMain.TabPages.Remove(tabCargueMasivo);
+
+                if (!UserLoginCache.TienePermisoLike($"Operador - [{nombreApp}]"))
+                {
+                    btnAlistar.Visible = false;
+                    btnImprimir.Visible = false;
+                }
+            }
+
+
+
         }
     }
 }
