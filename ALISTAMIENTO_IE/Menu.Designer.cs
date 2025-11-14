@@ -849,10 +849,7 @@
             dtgCargueMasivo.Name = "dtgCargueMasivo";
             dtgCargueMasivo.Size = new Size(1120, 166);
             dtgCargueMasivo.TabIndex = 1;
-            // 
-<<<<<<< HEAD
-            // tabAdmonCamiones
-            // 
+
             tabAdmonCamiones.Controls.Add(btnCerrarCamion);
             tabAdmonCamiones.Controls.Add(dataGridView1);
             tabAdmonCamiones.Controls.Add(lstCamiones);
@@ -891,11 +888,7 @@
             lstCamiones.Size = new Size(291, 424);
             lstCamiones.TabIndex = 11;
             lstCamiones.SelectedIndexChanged += lstCamiones_SelectedIndexChanged;
-            // 
-=======
->>>>>>> master
-            // Menu
-            // 
+
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(1210, 516);

@@ -1093,6 +1093,7 @@ namespace ALISTAMIENTO_IE
             {
                 tabMain.TabPages.Remove(tabReportes);
                 tabMain.TabPages.Remove(tabCargueMasivo);
+                tabMain.TabPages.Remove(tabAdmonCamiones);
 
                 if (!UserLoginCache.TienePermisoLike($"Operador - [{nombreApp}]"))
                 {
@@ -1158,6 +1159,14 @@ namespace ALISTAMIENTO_IE
 
             long codCamion = codCamiones[lstCamiones.SelectedIndex];
             string texto = lstCamiones.GetItemText(lstCamiones.SelectedItem);
+
+            var alistamiento = await _alistamientoEtiquetaService.GetItemsAlistadosAsync(Convert.ToInt32(codCamion));
+
+            if( alistamiento.Count > 0)
+            {
+                MessageBox.Show("No se puede anular el camión porque tiene alistamientos asociados.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             var confirm = MessageBox.Show(
                 $"¿Seguro que deseas anular el camión:\n{texto}?\n\nEsto también eliminará los documentos asociados.",
