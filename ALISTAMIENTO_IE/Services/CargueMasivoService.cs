@@ -202,10 +202,10 @@ namespace ALISTAMIENTO_IE.Services
                 const string sqlRmv = @"
             select f350_fecha AS FECHA,'' as [NOMBRE CONDUCTOR],
              case f350_id_cia when '1' then 'RD/' when '2' then 'IE/' end+f350_id_tipo_docto+'-'+CONVERT(nvarchar, f350_consec_docto) AS [NUM DOCUMENTO],
-             f200_nit, f200_razon_social as[Razon Social cliente despacho],'' as [U.M.emp.],f470_cant_base AS [CANT_SALDO],'' as [Peso en KLS],'' as [Cantidad en emp.],
-             f150_descripcion as [BOD_SALIDA],f120_id as [ITEM],'' as [ITEM EQUIVALENTE IE],convert(nvarchar, f120_id)+'->'+convert(nvarchar, f120_descripcion) AS ITEM_RESUMEN,
-             '' as [ANCHO], '' as [LARGO],'' AS [GRAMAJE],f350_notas AS [NOTAS_DEL_DOCTO],f215_descripcion ,f350_id_cia,
-             UPPER(t013_mm_ciudades.f013_descripcion) as [BOD_ENTRADA]
+             f200_nit, f200_razon_social as[Razon Social cliente despacho],'' as [U.M.emp.],f470_cant_base AS [Cantidad],'' as [Peso en KLS],'' as [Cantidad en emp.],
+             f150_descripcion as [Bodega],f120_id as [ITEM],'' as [ITEM EQUIVALENTE IE],convert(nvarchar, f120_id)+'->'+convert(nvarchar, f120_descripcion) AS [ITEM RESUMEN],
+             '' as [ANCHO], '' as [LARGO],'' AS [GRAMAJE],f350_notas AS [NOTAS DEL DOCTO],f215_descripcion ,f350_id_cia,
+             t013_mm_ciudades.f013_descripcion as [BOD_ENTRADA]
              from t350_co_docto_contable, t470_cm_movto_invent,t200_mm_terceros,t120_mc_items,t121_mc_items_extensiones,t150_mc_bodegas,t215_mm_puntos_envio_cliente,
              t015_mm_contactos,t013_mm_ciudades
              where t350_co_docto_contable.f350_rowid= t470_cm_movto_invent.f470_rowid_docto  
@@ -215,13 +215,13 @@ namespace ALISTAMIENTO_IE.Services
              and t470_cm_movto_invent.f470_rowid_bodega=t150_mc_bodegas.f150_rowid
              and f470_rowid_punto_envio_rem=f215_rowid
              and f470_rowid_bodega=f150_rowid and f215_rowid_tercero=t200_mm_terceros.f200_rowid
-             and t200_mm_terceros.f200_rowid_contacto  = t015_mm_contactos.f015_rowid 
+             and t215_mm_puntos_envio_cliente.f215_rowid_contacto  = t015_mm_contactos.f015_rowid 
              and t015_mm_contactos.f015_id_ciudad = t013_mm_ciudades.f013_id 
              and t015_mm_contactos.f015_id_depto  = t013_mm_ciudades.f013_id_depto 
              and  t015_mm_contactos.f015_id_pais = t013_mm_ciudades.f013_id_pais 
               and f350_id_tipo_docto =UPPER(@idTipoDocto)
               and f350_consec_docto = @consecDocto
-              and f350_id_cia = @idCia";
+              and f350_id_cia =@idCia";
 
                 return await connection.QueryAsync<MovimientoDoctoDto>(sqlRmv, new { consecDocto, idTipoDocto, idCia });
             }

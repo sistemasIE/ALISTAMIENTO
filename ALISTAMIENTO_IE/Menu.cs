@@ -478,7 +478,7 @@ namespace ALISTAMIENTO_IE
         private async void btnCargarArchivo_Click(object sender, EventArgs e)
         {
             btnCargarArchivo.Enabled = false;
-
+            lstErrores.Items.Clear();
             try
             {
                 using var ofd = new OpenFileDialog
