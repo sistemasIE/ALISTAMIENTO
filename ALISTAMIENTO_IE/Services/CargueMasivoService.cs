@@ -226,7 +226,7 @@ namespace ALISTAMIENTO_IE.Services
 
                 return await connection.QueryAsync<MovimientoDoctoDto>(sqlRmv, new { consecDocto, idTipoDocto, idCia });
             }
-            else  if (string.Equals(idTipoDocto, "RMV", StringComparison.OrdinalIgnoreCase))
+            else  if (string.Equals(idTipoDocto, "TTS", StringComparison.OrdinalIgnoreCase))
             {
                 // === Query TTS (u otros) ===
                 const string sqlTts = @"
