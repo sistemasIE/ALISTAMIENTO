@@ -3,10 +3,12 @@ using ALISTAMIENTO_IE.Interfaces;
 using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
 using Common.cache;
+//using DocumentFormat.OpenXml.Spreadsheet;
 using ExcelDataReader;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ALISTAMIENTO_IE
 {
@@ -14,11 +16,13 @@ namespace ALISTAMIENTO_IE
     {
         private readonly AlistamientoService _alistamientoService;
         private readonly IPdfService _pdfService;
+        private readonly CamionXDiaService _camionXDiaService;
         private readonly DetalleCamionXDiaService _detalleCamionXDiaService;
         private readonly AlistamientoEtiquetaService _alistamientoEtiquetaService; // reporte
         private readonly KardexService _kardexService; // reporte
         private readonly IDataGridViewExporter _dataGridViewExporter; // reporte
         private readonly CargueMasivoService _cargueMasivoService;
+        private readonly EmailService _emailService;
         private List<CamionDetallesDTO> _camiones;
         private readonly TimerTurnos _turnoTimerManager; // Manejador de Timer y Turnos
         private readonly System.Windows.Forms.Timer _timer;
@@ -28,6 +32,8 @@ namespace ALISTAMIENTO_IE
         private List<MovimientoDocumentoDto> listaNormal = new();
         private List<GrupoMovimientosDto> listaAgrupada = new();
         private Dictionary<string, string> _cacheItemsEquivalentes = new Dictionary<string, string>();
+        private List<long> codCamiones = new List<long>();
+
 
         private int codCamionSeleccionado;
         private String placaCamionSeleccionado;
@@ -43,12 +49,13 @@ namespace ALISTAMIENTO_IE
             _detalleCamionXDiaService = new DetalleCamionXDiaService();
             _alistamientoService = new AlistamientoService();
             _alistamientoEtiquetaService = new AlistamientoEtiquetaService();
+            _camionXDiaService = new CamionXDiaService();
             _turnoTimerManager = new TimerTurnos(this); // inicializar el timer
             _cargueMasivoService = new CargueMasivoService();
             _dataGridViewExporter = new DataGridViewExporter();
             _kardexService = new KardexService();
             _pdfService = new QuestPDFService(_dataGridViewExporter);
-
+            _emailService = new EmailService();
             CargarUI();
 
             lvwListasCamiones.DoubleClick += lvwListasCamiones_DoubleClick;
@@ -471,7 +478,7 @@ namespace ALISTAMIENTO_IE
         private async void btnCargarArchivo_Click(object sender, EventArgs e)
         {
             btnCargarArchivo.Enabled = false;
-
+            lstErrores.Items.Clear();
             try
             {
                 using var ofd = new OpenFileDialog
@@ -1041,34 +1048,33 @@ namespace ALISTAMIENTO_IE
                           $"Pacas Esperadas: {totales.TotalPacasEsperadas:N2}\n" +
                           $"Kilos Esperados: {totales.TotalKilosEsperados:N2}");
         }
-
-        private void ALISTAR_CAMION_Load(object sender, EventArgs e)
+        public void AjustarListas(ListBox Lista)
         {
             // Permite dibujar ítems con varias líneas
-            lstErrores.DrawMode = DrawMode.OwnerDrawVariable;
+            Lista.DrawMode = DrawMode.OwnerDrawVariable;
 
             // Calcula automáticamente la altura según el texto
-            lstErrores.MeasureItem += (s, ev) =>
+            Lista.MeasureItem += (s, ev) =>
             {
                 if (ev.Index >= 0)
                 {
-                    string text = lstErrores.Items[ev.Index].ToString();
-                    SizeF size = ev.Graphics.MeasureString(text, lstErrores.Font, lstErrores.Width);
+                    string text = Lista.Items[ev.Index].ToString();
+                    SizeF size = ev.Graphics.MeasureString(text, Lista.Font, Lista.Width);
                     ev.ItemHeight = (int)size.Height + 6; // un pequeño margen
                 }
             };
 
             // Dibuja el texto dentro del ListBox con salto de línea
-            lstErrores.DrawItem += (s, ev) =>
+            Lista.DrawItem += (s, ev) =>
             {
                 ev.DrawBackground();
 
                 if (ev.Index >= 0)
                 {
-                    string text = lstErrores.Items[ev.Index].ToString();
+                    string text = Lista.Items[ev.Index].ToString();
                     ev.Graphics.DrawString(
                         text,
-                        lstErrores.Font,
+                        Lista.Font,
                         Brushes.Black,
                         ev.Bounds,
                         new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Near }
@@ -1087,6 +1093,7 @@ namespace ALISTAMIENTO_IE
             {
                 tabMain.TabPages.Remove(tabReportes);
                 tabMain.TabPages.Remove(tabCargueMasivo);
+                tabMain.TabPages.Remove(tabAdmonCamiones);
 
                 if (!UserLoginCache.TienePermisoLike($"Operador - [{nombreApp}]"))
                 {
@@ -1098,5 +1105,118 @@ namespace ALISTAMIENTO_IE
 
 
         }
+
+        private async void ALISTAR_CAMION_Load(object sender, EventArgs e)
+        {
+            AjustarListas(lstErrores);
+            AjustarListas(lstCamiones);
+            // --- Al llenar el ListBox ---
+            var result = await _camionXDiaService.GetByStatusAsync();
+            lstCamiones.Items.Clear();
+            codCamiones.Clear();
+
+            foreach (var c in result.OrderByDescending(x => (DateTime)x.FECHA))
+            {
+                string fecha = ((DateTime)c.FECHA).ToString("dd/MM/yyyy");
+                lstCamiones.Items.Add($"{c.PLACAS} ---> {fecha}");
+                codCamiones.Add((long)c.COD_CAMION);
+            }
+
+        }
+
+        private void lstCamiones_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lstCamiones.SelectedIndex >= 0)
+            {
+                long codCamion = codCamiones[lstCamiones.SelectedIndex];
+                string texto = lstCamiones.SelectedItem.ToString();
+
+                var detalle = _detalleCamionXDiaService.ObtenerPorCodCamion((int)codCamion);
+                dataGridView1.DataSource = detalle;
+            }
+        }
+        public async void RefrescarListaCamiones()
+        {
+            var result = await _camionXDiaService.GetByStatusAsync();
+            lstCamiones.Items.Clear();
+            codCamiones.Clear();
+            foreach (var c in result.OrderByDescending(x => (DateTime)x.FECHA))
+            {
+                string fecha = ((DateTime)c.FECHA).ToString("dd/MM/yyyy");
+                lstCamiones.Items.Add($"{c.PLACAS} ---> {fecha}");
+                codCamiones.Add((long)c.COD_CAMION);
+            }
+
+            dataGridView1.DataSource = null;
+        }
+        private async void btnCerrarCamion_Click(object sender, EventArgs e)
+        {
+            if (lstCamiones.SelectedIndex < 0)
+            {
+                MessageBox.Show("Selecciona un camión antes de anularlo.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            long codCamion = codCamiones[lstCamiones.SelectedIndex];
+            string texto = lstCamiones.GetItemText(lstCamiones.SelectedItem);
+
+            var alistamiento = await _alistamientoEtiquetaService.GetItemsAlistadosAsync(Convert.ToInt32(codCamion));
+
+            if( alistamiento.Count > 0)
+            {
+                MessageBox.Show("No se puede anular el camión porque tiene alistamientos asociados.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var confirm = MessageBox.Show(
+                $"¿Seguro que deseas anular el camión:\n{texto}?\n\nEsto también eliminará los documentos asociados.",
+                "Confirmar anulación",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (confirm != DialogResult.Yes)
+                return;
+
+            // Solicita causa del cierre
+            string causa = Microsoft.VisualBasic.Interaction.InputBox(
+                "Ingrese la causa del cierre o anulación del camión:",
+                "Causa del cierre",
+                ""
+            );
+
+            if (string.IsNullOrWhiteSpace(causa))
+            {
+                MessageBox.Show("Debe ingresar una causa para continuar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Ejecuta la anulación
+            bool ok = await _cargueMasivoService.AnularCamionConDocumentosAsync(codCamion);
+
+            if (ok)
+            {
+                MessageBox.Show("Camión anulado y documentos eliminados correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                RefrescarListaCamiones();
+
+                // Enviar correo de notificación
+
+
+                string[] destinatarios = new string[]
+                {
+            "jefedesistemas@integraldeempaques.com",
+            "desarrollador@integraldeempaques.com"
+                };
+
+                destinatarios = _cargueMasivoService.ejecuta_script("select correos from [dbo].[GRUPOS_DISTRIBUCION_CORREO] where id_grupo='GRUPO4'");
+
+
+                await _emailService.NotificarAnulacionCamionAsync(codCamion, texto, causa, destinatarios);
+            }
+            else
+            {
+                MessageBox.Show("Error al anular el camión.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
     }
 }

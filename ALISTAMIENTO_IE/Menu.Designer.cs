@@ -85,6 +85,10 @@
             btnCrearCamiones = new Button();
             progressBar1 = new ProgressBar();
             dtgCargueMasivo = new DataGridView();
+            tabAdmonCamiones = new TabPage();
+            btnCerrarCamion = new Button();
+            dataGridView1 = new DataGridView();
+            lstCamiones = new ListBox();
             tabMain.SuspendLayout();
             tabAlistar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splMain).BeginInit();
@@ -113,6 +117,8 @@
             ((System.ComponentModel.ISupportInitialize)dtgAgrupada).BeginInit();
             tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dtgCargueMasivo).BeginInit();
+            tabAdmonCamiones.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
             // tabMain
@@ -120,6 +126,7 @@
             tabMain.Controls.Add(tabAlistar);
             tabMain.Controls.Add(tabReportes);
             tabMain.Controls.Add(tabCargueMasivo);
+            tabMain.Controls.Add(tabAdmonCamiones);
             tabMain.Dock = DockStyle.Fill;
             tabMain.Location = new Point(0, 0);
             tabMain.Margin = new Padding(2);
@@ -842,9 +849,46 @@
             dtgCargueMasivo.Name = "dtgCargueMasivo";
             dtgCargueMasivo.Size = new Size(1120, 166);
             dtgCargueMasivo.TabIndex = 1;
+
+            tabAdmonCamiones.Controls.Add(btnCerrarCamion);
+            tabAdmonCamiones.Controls.Add(dataGridView1);
+            tabAdmonCamiones.Controls.Add(lstCamiones);
+            tabAdmonCamiones.Location = new Point(4, 30);
+            tabAdmonCamiones.Name = "tabAdmonCamiones";
+            tabAdmonCamiones.Size = new Size(1202, 482);
+            tabAdmonCamiones.TabIndex = 3;
+            tabAdmonCamiones.Text = "AdministracionCamiones";
+            tabAdmonCamiones.UseVisualStyleBackColor = true;
             // 
-            // Menu
+            // btnCerrarCamion
             // 
+            btnCerrarCamion.FlatStyle = FlatStyle.Flat;
+            btnCerrarCamion.Location = new Point(1011, 31);
+            btnCerrarCamion.Name = "btnCerrarCamion";
+            btnCerrarCamion.Size = new Size(183, 80);
+            btnCerrarCamion.TabIndex = 13;
+            btnCerrarCamion.Text = "ANULAR PROGRAMACION CAMION";
+            btnCerrarCamion.UseVisualStyleBackColor = true;
+            btnCerrarCamion.Click += btnCerrarCamion_Click;
+            // 
+            // dataGridView1
+            // 
+            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView1.Location = new Point(318, 31);
+            dataGridView1.Name = "dataGridView1";
+            dataGridView1.Size = new Size(674, 421);
+            dataGridView1.TabIndex = 12;
+            // 
+            // lstCamiones
+            // 
+            lstCamiones.FormattingEnabled = true;
+            lstCamiones.ItemHeight = 21;
+            lstCamiones.Location = new Point(8, 28);
+            lstCamiones.Name = "lstCamiones";
+            lstCamiones.Size = new Size(291, 424);
+            lstCamiones.TabIndex = 11;
+            lstCamiones.SelectedIndexChanged += lstCamiones_SelectedIndexChanged;
+
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(1210, 516);
@@ -891,6 +935,8 @@
             ((System.ComponentModel.ISupportInitialize)dtgAgrupada).EndInit();
             tableLayoutPanel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dtgCargueMasivo).EndInit();
+            tabAdmonCamiones.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
         }
 
@@ -955,5 +1001,9 @@
         private Label label2;
         private Label label4;
         private ListBox lstErrores;
+        private TabPage tabAdmonCamiones;
+        private ListBox lstCamiones;
+        private DataGridView dataGridView1;
+        private Button btnCerrarCamion;
     }
 }
