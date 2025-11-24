@@ -302,7 +302,7 @@ namespace ALISTAMIENTO_IE.Services
             List<AlistamientoItemDTO> alistados;
             try
             {
-                alistados = await _alistamientoEtiquetaService.GetItemsAlistadosAsync(idCamion);
+                alistados = await _alistamientoEtiquetaService.ObtenerItemAlistados(idCamion);
             }
             catch
             {

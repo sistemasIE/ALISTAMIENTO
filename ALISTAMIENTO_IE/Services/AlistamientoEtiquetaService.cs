@@ -1,4 +1,5 @@
 ﻿using ALISTAMIENTO_IE.DTOs;
+using ALISTAMIENTO_IE.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Configuration;
@@ -6,12 +7,8 @@ using System.Configuration;
 namespace ALISTAMIENTO_IE.Services
 {
     // DTO para manejar los totales, según la definición en el formulario.
-    public class ReporteTotalesDto
-    {
-        public int TotalUnidades { get; set; }
-        public int TotalCamiones { get; set; }
-    }
-    internal class AlistamientoEtiquetaService
+
+    internal class AlistamientoEtiquetaService : IAlistamientoEtiquetaService
     {
         private readonly string _connectionString;
 
@@ -32,10 +29,7 @@ namespace ALISTAMIENTO_IE.Services
             return (fechaInicio, fechaFin);
         }
 
-
-
-
-        public async Task<List<AlistamientoItemDTO>> GetItemsAlistadosAsync(int idCamionDia)
+        public async Task<List<AlistamientoItemDTO>> ObtenerItemAlistados(int idCamionDia)
         {
             var query = @"
         
@@ -75,7 +69,7 @@ SELECT
             ON ae.etiqueta = er.COD_ETIQUETA_ROLLO
         LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items i
             ON COALESCE(e.COD_ITEM, el.ITEM, er.ITEM) = i.f120_id
-        WHERE a.IdCamionDia = @idCodCamionDia and i.f120_id_cia = 2
+        WHERE a.IdCamionDia = @idCodCamionDia and i.f120_id_cia = 2 AND ae.estado = 'ACTIVA'
         GROUP BY 
             COALESCE(e.COD_ITEM, el.ITEM, er.ITEM),
             i.f120_id_unidad_empaque,
@@ -97,9 +91,6 @@ SELECT
                 return result.ToList();
             }
         }
-
-
-
 
 
         public async Task<IEnumerable<ReporteAlistamientoPorTurnoDto>> ObtenerReportePacasPorHora(DateTime fechaConsulta)
@@ -130,6 +121,7 @@ SELECT
                         ae.fecha >= @fechaInicio
                         AND ae.fecha < @fechaFin
                         AND a.estado LIKE '%alistado%'
+                        AND ae.estado = 'ACTIVA'
                     GROUP BY 
                         u.loginNombre;";
 
@@ -170,7 +162,9 @@ SELECT
                     WHERE 
                         ae.fecha >= @fechaInicio
                         AND ae.fecha < @fechaFin
-                        AND a.estado LIKE '%alistado%'";
+                        AND a.estado LIKE '%alistado%'
+                        AND ae.estado = 'ACTIVA'
+                        ";
 
                 string? likeParam = null;
                 if (!string.IsNullOrWhiteSpace(turnoLike))
@@ -215,7 +209,9 @@ SELECT
                     WHERE 
                         ae.fecha >= @fechaInicio
                         AND ae.fecha < @fechaFin
-                        AND a.estado LIKE '%alistado%'";
+                        AND a.estado LIKE '%alistado%
+                        AND ae.estado = 'ACTIVA'
+                    '";
 
                 if (!string.IsNullOrWhiteSpace(turnoLike))
                 {
@@ -306,6 +302,7 @@ SELECT
             {
                 string sql = @"
                 SELECT 
+                ae.idAlistamientoEtiqueta AS IDALISTAMIENTOETIQUETA,
                 ae.etiqueta AS ETIQUETA,
                 COALESCE(e.COD_ITEM, el.ITEM, elr.ITEM) AS ITEM,
                 d1.F120_DESCRIPCION AS DESCRIPCION,
@@ -333,7 +330,7 @@ SELECT
             LEFT JOIN [192.168.50.86].REPLICA.dbo.t120_mc_items d1 
                 ON COALESCE(e.COD_ITEM, el.ITEM, elr.ITEM) = d1.F120_ID 
                 AND d1.f120_id_cia = 2
-            WHERE ae.idAlistamiento = @idAlistamiento
+            WHERE ae.idAlistamiento = @idAlistamiento AND ae.estado = 'ACTIVA'
             ORDER BY ae.fecha DESC;
             ";
 
@@ -342,6 +339,55 @@ SELECT
 
 
         }
+
+        // Este método obtiene TODO (tanto etiquetas ACTIVAS como INACTIVAS (Eliminadas))
+        public async Task<IEnumerable<AlistamientoEtiqueta>> ObtenerAlistamientoEtiquetaPorEtiquetasYAlistamiento(int idAlistamiento, string[] codigoeEtiquetas)
+        {
+            const string sql = @"
+                SELECT 
+                    idAlistamientoEtiqueta, idAlistamiento, etiqueta, fecha, estado, 
+                    areaInicial, areaFinal, idBodegaInicial, idBodegaFinal, idUsuario
+                FROM ALISTAMIENTO_ETIQUETA
+                WHERE idAlistamiento = @IdAlistamiento 
+                  AND etiqueta IN @CodigosEtiquetas; 
+            ";
+
+            await using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var result = await connection.QueryAsync<AlistamientoEtiqueta>(sql, new
+            {
+                IdAlistamiento = idAlistamiento,
+                CodigosEtiquetas = codigoeEtiquetas
+            });
+
+            return result;
+        }
+
+        public async Task<int> EliminarEtiquetasDeAlistamiento(int idAlistamiento, string[] codigoeEtiquetas)
+        {
+            const string sql = @"
+        UPDATE ALISTAMIENTO_ETIQUETA
+        SET estado = 'ELIMINADA'
+        WHERE idAlistamiento = @IdAlistamiento
+          AND etiqueta IN @EtiquetasArray; 
+    ";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                // Ejecutamos la consulta y Dapper devuelve el número de filas afectadas.
+                var affectedRows = await connection.ExecuteAsync(sql, new
+                {
+                    IdAlistamiento = idAlistamiento,
+                    EtiquetasArray = codigoeEtiquetas // Usamos el nombre del array en la consulta
+                });
+
+                return affectedRows; // ¡Esto es lo que debes devolver!
+            }
+        }
+
 
     }
 

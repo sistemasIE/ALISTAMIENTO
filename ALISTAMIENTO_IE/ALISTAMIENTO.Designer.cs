@@ -6,9 +6,6 @@
         ///  Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
-        // Controles agregados para la interfaz solicitada
-        private System.Windows.Forms.Label lblPlaca;
         private System.Windows.Forms.Label lblLlevas;
         private System.Windows.Forms.Label lblTimer;
         private System.Windows.Forms.Label lblEtiqueta;
@@ -40,7 +37,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            lblPlaca = new Label();
             lblLlevas = new Label();
             lblTimer = new Label();
             lblEtiqueta = new Label();
@@ -59,6 +55,8 @@
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel2 = new TableLayoutPanel();
             tableLayoutPanel3 = new TableLayoutPanel();
+            btnEliminarEtiquetasLeidas = new Button();
+            lblPlaca = new Label();
             btnPausa = new Button();
             btnBuscar = new Button();
             btnTerminar = new Button();
@@ -71,30 +69,16 @@
             tableLayoutPanel3.SuspendLayout();
             SuspendLayout();
             // 
-            // lblPlaca
-            // 
-            lblPlaca.AutoSize = true;
-            lblPlaca.BackColor = Color.Transparent;
-            lblPlaca.Dock = DockStyle.Left;
-            lblPlaca.Font = new Font("Segoe UI", 24F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblPlaca.Location = new Point(7, 0);
-            lblPlaca.Margin = new Padding(7, 0, 7, 0);
-            lblPlaca.Name = "lblPlaca";
-            lblPlaca.Size = new Size(162, 71);
-            lblPlaca.TabIndex = 0;
-            lblPlaca.Text = "PLACA: X";
-            lblPlaca.TextAlign = ContentAlignment.MiddleCenter;
-            // 
             // lblLlevas
             // 
             lblLlevas.AutoSize = true;
             lblLlevas.BackColor = Color.Transparent;
             lblLlevas.Dock = DockStyle.Fill;
             lblLlevas.Font = new Font("Segoe UI", 16.2F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
-            lblLlevas.Location = new Point(368, 0);
+            lblLlevas.Location = new Point(375, 0);
             lblLlevas.Margin = new Padding(7, 0, 7, 0);
             lblLlevas.Name = "lblLlevas";
-            lblLlevas.Size = new Size(132, 71);
+            lblLlevas.Size = new Size(125, 71);
             lblLlevas.TabIndex = 1;
             lblLlevas.Text = "LLEVAS:";
             lblLlevas.TextAlign = ContentAlignment.MiddleCenter;
@@ -245,6 +229,7 @@
             dgvLeidos.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             dgvLeidos.Size = new Size(937, 192);
             dgvLeidos.TabIndex = 13;
+            dgvLeidos.SelectionChanged += dgvLeidos_SelectionChanged;
             // 
             // dgvMain
             // 
@@ -342,19 +327,21 @@
             // tableLayoutPanel3
             // 
             tableLayoutPanel3.BackColor = Color.Transparent;
-            tableLayoutPanel3.ColumnCount = 6;
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 71.2031555F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 28.7968445F));
+            tableLayoutPanel3.ColumnCount = 7;
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 199F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 54.86111F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45.13889F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 187F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 95F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 251F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 259F));
-            tableLayoutPanel3.Controls.Add(btnPausa, 4, 0);
-            tableLayoutPanel3.Controls.Add(btnBuscar, 3, 0);
+            tableLayoutPanel3.Controls.Add(btnEliminarEtiquetasLeidas, 1, 0);
             tableLayoutPanel3.Controls.Add(lblPlaca, 0, 0);
-            tableLayoutPanel3.Controls.Add(lblLlevas, 1, 0);
-            tableLayoutPanel3.Controls.Add(btnTerminar, 5, 0);
-            tableLayoutPanel3.Controls.Add(lblTimer, 2, 0);
+            tableLayoutPanel3.Controls.Add(btnPausa, 5, 0);
+            tableLayoutPanel3.Controls.Add(btnBuscar, 4, 0);
+            tableLayoutPanel3.Controls.Add(lblLlevas, 2, 0);
+            tableLayoutPanel3.Controls.Add(btnTerminar, 6, 0);
+            tableLayoutPanel3.Controls.Add(lblTimer, 3, 0);
             tableLayoutPanel3.Dock = DockStyle.Top;
             tableLayoutPanel3.Location = new Point(0, 0);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
@@ -362,6 +349,34 @@
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel3.Size = new Size(1300, 71);
             tableLayoutPanel3.TabIndex = 22;
+            // 
+            // btnEliminarEtiquetasLeidas
+            // 
+            btnEliminarEtiquetasLeidas.Cursor = Cursors.Hand;
+            btnEliminarEtiquetasLeidas.Dock = DockStyle.Fill;
+            btnEliminarEtiquetasLeidas.Font = new Font("Segoe UI", 15.4F);
+            btnEliminarEtiquetasLeidas.ForeColor = Color.Crimson;
+            btnEliminarEtiquetasLeidas.Location = new Point(206, 5);
+            btnEliminarEtiquetasLeidas.Margin = new Padding(7, 5, 7, 5);
+            btnEliminarEtiquetasLeidas.Name = "btnEliminarEtiquetasLeidas";
+            btnEliminarEtiquetasLeidas.Size = new Size(155, 61);
+            btnEliminarEtiquetasLeidas.TabIndex = 23;
+            btnEliminarEtiquetasLeidas.Text = "🗑️";
+            btnEliminarEtiquetasLeidas.Click += btnEliminarEtiquetasLeidas_Click;
+            // 
+            // lblPlaca
+            // 
+            lblPlaca.AutoSize = true;
+            lblPlaca.BackColor = Color.Transparent;
+            lblPlaca.Dock = DockStyle.Left;
+            lblPlaca.Font = new Font("Segoe UI", 24F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblPlaca.Location = new Point(7, 0);
+            lblPlaca.Margin = new Padding(7, 0, 7, 0);
+            lblPlaca.Name = "lblPlaca";
+            lblPlaca.Size = new Size(162, 71);
+            lblPlaca.TabIndex = 22;
+            lblPlaca.Text = "PLACA: X";
+            lblPlaca.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // btnPausa
             // 
@@ -454,5 +469,7 @@
         private Button btnPausa;
         private Button btnBuscar;
         private Button btnTerminar;
+        private Button btnEliminarEtiquetasLeidas;
+        private Label lblPlaca;
     }
 }

@@ -1,8 +1,11 @@
 ﻿using ALISTAMIENTO_IE.DTOs;
+using ALISTAMIENTO_IE.Forms;
+using ALISTAMIENTO_IE.Interfaces;
 using ALISTAMIENTO_IE.Model;
 using ALISTAMIENTO_IE.Models;
 using ALISTAMIENTO_IE.Services;
 using Common.cache;
+using Microsoft.VisualBasic;
 using System.ComponentModel; // Added for BindingList
 using System.Data;
 using System.Media;
@@ -14,18 +17,16 @@ namespace ALISTAMIENTO_IE
     {
         private readonly int _idCamion;
         private readonly string _estadoAlistamientoInicial;
-        private readonly AlistamientoService _alistamientoService;
         private readonly AuthorizationService _authorizationService;
-        private readonly AlistamientoEtiquetaService _alistamientoEtiquetaService;
+        private readonly IAlistamientoService _alistamientoService;
+        private readonly IAlistamientoEtiquetaService _alistamientoEtiquetaService;
         private readonly DetalleCamionXDiaService _detalleCamionXDiaService;
         private readonly KardexService _kardexService;
         private EtiquetaService _etiquetaService;
         private EtiquetaLinerService _etiquetaLinerService;
         private EtiquetaRolloService _etiquetaRolloService;
 
-
         private IEnumerable<EtiquetaLeidaDTO> _etiquetasLeidas;
-
         private List<string> ITEMS_PENDIENTES = new List<string>();
         private int _idAlistamiento;
         private Timer _timer;
@@ -34,32 +35,34 @@ namespace ALISTAMIENTO_IE
         private readonly CamionService _camionService;
         private readonly Camion CAMION_ACTUAL;
 
-
-
         private readonly DataGridViewExporter _dataGridViewExporter = new DataGridViewExporter();
-        // Cache en memoria para acelerar cálculos sin tocar DB
+        // Cache en memoria para acelerar cálulos sin tocar DB
         private List<string> etiquetasLeidas = new List<string>();
         private Dictionary<int, int> _conteoPorItem = new Dictionary<int, int>();
         private BindingList<DTOs.EtiquetaLeidaDTO> _leidasBinding = new BindingList<DTOs.EtiquetaLeidaDTO>();
 
         Alistamiento _alistamiento;
+        private readonly EliminacionAlistamientoEtiquetaService _elimService = new EliminacionAlistamientoEtiquetaService();
 
-        public ALISTAMIENTO(int idCamion) : this(idCamion, "EN_PROCESO") { }
 
-        public ALISTAMIENTO(int idCamion, string estado)
+        public ALISTAMIENTO(int idCamion, IAlistamientoService alistamientoService, IAlistamientoEtiquetaService alistamientoEtiquetaService)
+    : this(idCamion, "EN_PROCESO", alistamientoService, alistamientoEtiquetaService)
+        { }
+
+        public ALISTAMIENTO(int idCamion, string estado, IAlistamientoService alistamientoService,
+    IAlistamientoEtiquetaService alistamientoEtiquetaService)
         {
             InitializeComponent();
 
             _authorizationService = AuthorizationService.CreateFromConfig("stringConexionLocal");
-
 
             _idCamion = idCamion;
             _estadoAlistamientoInicial = estado;
             _estadoAlistamiento = estado;
 
             _camionService = new CamionService();
-            _alistamientoService = new AlistamientoService();
-            _alistamientoEtiquetaService = new AlistamientoEtiquetaService();
+            _alistamientoEtiquetaService = alistamientoEtiquetaService;
+            _alistamientoService = alistamientoService;
             _detalleCamionXDiaService = new DetalleCamionXDiaService();
             _etiquetaService = new EtiquetaService();
             _etiquetaLinerService = new EtiquetaLinerService();
@@ -359,8 +362,6 @@ namespace ALISTAMIENTO_IE
                 MessageBox.Show($"Error al recalcular cantidades alistadas: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-
         private void Timer_Tick(object sender, EventArgs e)
         {
             ActualizarTimer();
@@ -395,7 +396,7 @@ namespace ALISTAMIENTO_IE
                     var result = obsForm.ShowDialog(this);
                     if (result == DialogResult.OK && obsForm.AlistamientoAnulado)
                     {
-                        // Se aceptó la observación y se anuló el alistamiento
+                        // Se aceptó la observación y el alistamiento quedó incompleto
                         _estadoAlistamiento = "ALISTADO_INCOMPLETO";
                         e.Cancel = false;
                     }
@@ -411,8 +412,6 @@ namespace ALISTAMIENTO_IE
                 e.Cancel = false;
             }
         }
-
-
         private async Task cargarDgvMain()
         {
             _alistamientoService.CargarCamionDia(_idCamion, dgvMain);
@@ -674,9 +673,6 @@ namespace ALISTAMIENTO_IE
             }
         }
 
-        /// <summary>
-        /// Reproduce un sonido de error fuerte para alertar al operario
-        /// </summary>
         private void ReproducirSonidoError()
         {
             try
@@ -701,9 +697,7 @@ namespace ALISTAMIENTO_IE
             }
         }
 
-        /// <summary>
-        /// Reproduce un sonido de éxito cuando la etiqueta se lee correctamente
-        /// </summary>
+
         private void ReproducirSonidoExito()
         {
             try
@@ -804,6 +798,111 @@ namespace ALISTAMIENTO_IE
 
             this.Close();
 
+        }
+
+        private void dgvLeidos_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dgvLeidos.SelectedCells.Count == 0)
+            {
+                btnEliminarEtiquetasLeidas.Visible = false;
+                return;
+            }
+
+            // Verifica que todas las celdas seleccionadas sean de la columna "ETIQUETA"
+            bool soloColumnaEtiqueta = dgvLeidos.SelectedCells
+                .Cast<DataGridViewCell>()
+                .All(c => c.OwningColumn.Name == "ETIQUETA");
+
+            btnEliminarEtiquetasLeidas.Visible = soloColumnaEtiqueta;
+        }
+
+        private async void btnEliminarEtiquetasLeidas_Click(object sender, EventArgs e)
+        {
+            var etiquetasSeleccionadas = dgvLeidos.SelectedCells
+                .Cast<DataGridViewCell>()
+                .Select(c => c.Value?.ToString())
+                .Where(v => !string.IsNullOrWhiteSpace(v))
+                .Distinct()
+                .ToArray();
+
+            if (etiquetasSeleccionadas.Length == 0)
+            {
+                MessageBox.Show("No hay etiquetas válidas seleccionadas.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (_alistamiento == null)
+            {
+                MessageBox.Show("Alistamiento no inicializado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Confirmación antes de operar
+            var confirm = MessageBox.Show($"¿Desea eliminar {etiquetasSeleccionadas.Length} etiqueta(s) del alistamiento?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (confirm != DialogResult.Yes) return;
+
+            // 1) Pedir observaciones al usuario
+            string observaciones = Interaction.InputBox("Ingrese las observaciones de la eliminación:", "Observaciones", "");
+            if (string.IsNullOrWhiteSpace(observaciones))
+            {
+                var seguir = MessageBox.Show("No ingresó observaciones. ¿Desea continuar sin observaciones?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (seguir != DialogResult.Yes) return;
+                observaciones = null;
+            }
+
+            // 2) Preparar funciones
+            Func<string[], bool> validarNoVacias = etqs => etqs.All(e => e.Length >= 10);
+
+            // Función de eliminación base
+            Func<string[], Task> eliminarEtiquetas = async etqs =>
+            {
+                var eliminadas = await _alistamientoEtiquetaService.EliminarEtiquetasDeAlistamiento(_alistamiento.IdAlistamiento, etqs);
+                if (eliminadas <= 0)
+                    throw new InvalidOperationException("No se eliminaron etiquetas. Verifique estado.");
+            };
+
+            // 3) Ejecutar formulario genérico
+            var form = new FormOperarEtiquetas(
+                "ELIMINAR",
+                etiquetasSeleccionadas,
+                new List<Func<string[], bool>> { validarNoVacias },
+                new List<Func<string[], Task>> { eliminarEtiquetas }
+            );
+
+            var result = form.ShowDialog(this);
+            if (result == DialogResult.OK)
+            {
+                try
+                {
+                    // 4) Registrar auditoría por cada ID de ALISTAMIENTO_ETIQUETA
+                    // Ya tenemos los IDs cargados en _leidasBinding via IDALISTAMIENTOETIQUETA
+                    var idsAEliminar = _leidasBinding
+                        .Where(x => etiquetasSeleccionadas.Contains(x.ETIQUETA))
+                        .Select(x => x.IDALISTAMIENTOETIQUETA)
+                        .Distinct()
+                        .ToArray();
+
+                    foreach (var idAliEtq in idsAEliminar)
+                    {
+                        await _elimService.InsertarEliminacionAsync(idAliEtq, UserLoginCache.IdUser, observaciones);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error registrando observaciones: {ex.Message}", "Auditoría", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                // 5) Re-cargar datos y recalcular totales tras eliminación
+                await CargarEtiquetasLeidasEnCache();
+                await RecalcularCantidadesAlistadas();
+                await cargarDgvMain();
+                await RecalcularCantidadesAlistadas();
+
+                foreach (string etiqueta in etiquetasSeleccionadas)
+                {
+                    lstMensajes.Items.Insert(0, "Etiqueta eliminada: " + etiqueta);
+                }
+            }
         }
     }
 

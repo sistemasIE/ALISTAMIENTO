@@ -286,7 +286,7 @@
             lblItemsTitulo.Location = new Point(0, 88);
             lblItemsTitulo.Margin = new Padding(0, 5, 0, 5);
             lblItemsTitulo.Name = "lblItemsTitulo";
-            lblItemsTitulo.Size = new Size(97, 19);
+            lblItemsTitulo.Size = new Size(97, 15);
             lblItemsTitulo.TabIndex = 3;
             lblItemsTitulo.Text = "Lista de Items:";
             // 
@@ -296,17 +296,17 @@
             dgvItems.AllowUserToDeleteRows = false;
             dgvItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvItems.BackgroundColor = SystemColors.Window;
-            dgvItems.ColumnHeadersHeight = 29;
+            dgvItems.ColumnHeadersHeight = 35;
             tlpRight.SetColumnSpan(dgvItems, 2);
             dgvItems.Dock = DockStyle.Top;
-            dgvItems.Location = new Point(2, 137);
+            dgvItems.Location = new Point(2, 110);
             dgvItems.Margin = new Padding(2);
             dgvItems.Name = "dgvItems";
             dgvItems.ReadOnly = true;
             dgvItems.RowHeadersVisible = false;
             dgvItems.RowHeadersWidth = 51;
             dgvItems.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvItems.Size = new Size(633, 223);
+            dgvItems.Size = new Size(633, 250);
             dgvItems.TabIndex = 4;
             // 
             // lblTituloCamion
@@ -387,11 +387,11 @@
             // tabReportes
             // 
             tabReportes.Controls.Add(tlpReportes);
-            tabReportes.Location = new Point(4, 30);
+            tabReportes.Location = new Point(4, 24);
             tabReportes.Margin = new Padding(2);
             tabReportes.Name = "tabReportes";
             tabReportes.Padding = new Padding(6);
-            tabReportes.Size = new Size(1202, 482);
+            tabReportes.Size = new Size(1202, 488);
             tabReportes.TabIndex = 1;
             tabReportes.Text = "Reportes";
             tabReportes.UseVisualStyleBackColor = true;
@@ -409,7 +409,7 @@
             tlpReportes.Name = "tlpReportes";
             tlpReportes.RowCount = 1;
             tlpReportes.RowStyles.Add(new RowStyle(SizeType.Absolute, 16F));
-            tlpReportes.Size = new Size(1190, 470);
+            tlpReportes.Size = new Size(1190, 476);
             tlpReportes.TabIndex = 0;
             // 
             // tlpFiltros
@@ -430,7 +430,7 @@
             tlpFiltros.RowStyles.Add(new RowStyle());
             tlpFiltros.RowStyles.Add(new RowStyle());
             tlpFiltros.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tlpFiltros.Size = new Size(220, 466);
+            tlpFiltros.Size = new Size(220, 472);
             tlpFiltros.TabIndex = 0;
             // 
             // lblEscogeFecha
@@ -508,7 +508,7 @@
             tlpResumenHost.RowCount = 2;
             tlpResumenHost.RowStyles.Add(new RowStyle());
             tlpResumenHost.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tlpResumenHost.Size = new Size(962, 466);
+            tlpResumenHost.Size = new Size(962, 472);
             tlpResumenHost.TabIndex = 1;
             // 
             // tbcTurnos
@@ -575,7 +575,7 @@
             grpResumen.Margin = new Padding(2);
             grpResumen.Name = "grpResumen";
             grpResumen.Padding = new Padding(6);
-            grpResumen.Size = new Size(958, 378);
+            grpResumen.Size = new Size(958, 384);
             grpResumen.TabIndex = 1;
             grpResumen.TabStop = false;
             // 
@@ -594,7 +594,7 @@
             tlpResumen.RowCount = 2;
             tlpResumen.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
             tlpResumen.RowStyles.Add(new RowStyle(SizeType.Percent, 45F));
-            tlpResumen.Size = new Size(946, 344);
+            tlpResumen.Size = new Size(946, 350);
             tlpResumen.TabIndex = 0;
             // 
             // dgvResumen
@@ -612,7 +612,7 @@
             dgvResumen.RowHeadersVisible = false;
             dgvResumen.RowHeadersWidth = 51;
             dgvResumen.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvResumen.Size = new Size(658, 185);
+            dgvResumen.Size = new Size(658, 188);
             dgvResumen.TabIndex = 0;
             // 
             // pnlKpis
@@ -626,7 +626,7 @@
             pnlKpis.Margin = new Padding(2);
             pnlKpis.Name = "pnlKpis";
             pnlKpis.Padding = new Padding(6);
-            pnlKpis.Size = new Size(280, 185);
+            pnlKpis.Size = new Size(280, 188);
             pnlKpis.TabIndex = 1;
             // 
             // lblCamionesTexto
@@ -682,14 +682,14 @@
             dgvMovimientos.ColumnHeadersHeight = 29;
             tlpResumen.SetColumnSpan(dgvMovimientos, 2);
             dgvMovimientos.Dock = DockStyle.Fill;
-            dgvMovimientos.Location = new Point(2, 191);
+            dgvMovimientos.Location = new Point(2, 194);
             dgvMovimientos.Margin = new Padding(2);
             dgvMovimientos.Name = "dgvMovimientos";
             dgvMovimientos.ReadOnly = true;
             dgvMovimientos.RowHeadersVisible = false;
             dgvMovimientos.RowHeadersWidth = 51;
             dgvMovimientos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvMovimientos.Size = new Size(942, 151);
+            dgvMovimientos.Size = new Size(942, 154);
             dgvMovimientos.TabIndex = 2;
             // 
             // tabCargueMasivo

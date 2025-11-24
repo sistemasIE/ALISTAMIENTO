@@ -12,7 +12,7 @@ namespace ALISTAMIENTO_IE
 {
     public partial class Menu : Form
     {
-        private readonly AlistamientoService alistamientoService;
+        private readonly AlistamientoService _alistamientoService;
         private readonly IPdfService _pdfService;
         private readonly DetalleCamionXDiaService _detalleCamionXDiaService;
         private readonly AlistamientoEtiquetaService _alistamientoEtiquetaService; // reporte
@@ -41,7 +41,7 @@ namespace ALISTAMIENTO_IE
             this.Icon = ALISTAMIENTO_IE.Properties.Resources.Icono;
 
             _detalleCamionXDiaService = new DetalleCamionXDiaService();
-            alistamientoService = new AlistamientoService();
+            _alistamientoService = new AlistamientoService();
             _alistamientoEtiquetaService = new AlistamientoEtiquetaService();
             _turnoTimerManager = new TimerTurnos(this); // inicializar el timer
             _cargueMasivoService = new CargueMasivoService();
@@ -181,7 +181,7 @@ namespace ALISTAMIENTO_IE
         private void CargarCamiones()
         {
 
-            List<CamionEnAlistamientoDTO> _camiones = alistamientoService.ObtenerCamionesEnAlistamiento().ToList();
+            List<CamionEnAlistamientoDTO> _camiones = _alistamientoService.ObtenerCamionesEnAlistamiento().ToList();
             lvwListasCamiones.Items.Clear();
             foreach (CamionEnAlistamientoDTO camion in _camiones)
             {
@@ -257,7 +257,7 @@ namespace ALISTAMIENTO_IE
 
                 if (estadoAlistamiento == "ALISTADO" || estadoAlistamiento == "ALISTADO_INCOMPLETO")
                 {
-                    await alistamientoService.CargarCamionDia(codCamionSeleccionado, this.dgvItems);
+                    await _alistamientoService.CargarCamionDia(codCamionSeleccionado, this.dgvItems);
 
                 }
                 else
@@ -275,7 +275,7 @@ namespace ALISTAMIENTO_IE
 
         private async void MostrarItemsDeCamion(int codCamion)
         {
-            List<CamionItemsDto> items = new List<CamionItemsDto>(await alistamientoService.ObtenerItemsPorAlistarCamion(codCamion));
+            List<CamionItemsDto> items = new List<CamionItemsDto>(await _alistamientoService.ObtenerItemsPorAlistarCamion(codCamion));
             dgvItems.DataSource = items;
         }
 
@@ -344,7 +344,7 @@ namespace ALISTAMIENTO_IE
             {
                 // IMPORTANTE: Pasar el estado original para que ALISTAMIENTO sepa cómo manejarlo
                 // pero el formulario ALISTAMIENTO se encargará de cambiar el estado a EN_PROCESO internamente
-                var alistamientoForm = new ALISTAMIENTO(codCamion.Value, estadoActual);
+                var alistamientoForm = new ALISTAMIENTO(codCamion.Value, estadoActual, _alistamientoService, _alistamientoEtiquetaService);
                 alistamientoForm.ShowDialog(this);
 
                 // Recargar los camiones después de cerrar el formulario para reflejar cambios
@@ -1008,7 +1008,7 @@ namespace ALISTAMIENTO_IE
         private async void button1_Click_1(object sender, EventArgs e)
         {
             // Obtener los ítems del camión
-            IEnumerable<CamionItemsDto> items = await alistamientoService.ObtenerItemsPorAlistarCamion(codCamionSeleccionado);
+            IEnumerable<CamionItemsDto> items = await _alistamientoService.ObtenerItemsPorAlistarCamion(codCamionSeleccionado);
 
             // Extraer códigos de ítems para el kardex
             var validItems = items.Select(x => x.Item).ToList();
@@ -1021,13 +1021,13 @@ namespace ALISTAMIENTO_IE
             }
 
             // Calcular totales usando el servicio
-            ReporteImpresionTotalesDto totales = alistamientoService.CalcularTotalesReporte(items);
+            ReporteImpresionTotalesDto totales = _alistamientoService.CalcularTotalesReporte(items);
 
             // Convertir items a DataTable
             DataTable dt1 = _dataGridViewExporter.ToDataTable(items);
 
             // Agregar fila de totales usando el servicio
-            alistamientoService.AgregarFilaTotalesADataTable(dt1, totales);
+            _alistamientoService.AgregarFilaTotalesADataTable(dt1, totales);
 
             // Obtener datos del kardex
             DataTable dt2 = _kardexService.ObtenerDatosDeItems(validItems);
