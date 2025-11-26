@@ -102,7 +102,7 @@ namespace ALISTAMIENTO_IE.Forms
 
                 await _elimService.RevertirEliminacionAsync(regAuditoria.IdEliminacionAlistamientoEtiqueta, idUsuarioActual);
 
-                MessageBox.Show("Reversión completada. El ítem fue devuelto al Kardex.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Reversión completada. El ítem fue devuelto al Alistamiento.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 await CargarListaAsync();
 
