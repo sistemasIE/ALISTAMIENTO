@@ -72,7 +72,7 @@ namespace ALISTAMIENTO_IE.Services
         public string SECUENCIAL { get; set; } = "";
         public long COD_CAMION { get; set; }
     }
-    internal class CargueMasivoService
+    public class CargueMasivoService
     {
         private readonly string _connectionString;
         private readonly string _connectionStringSIIE;
@@ -156,7 +156,7 @@ namespace ALISTAMIENTO_IE.Services
             await using var connection = new SqlConnection(_connectionStringSIIE);
             return await connection.QueryFirstOrDefaultAsync<ConductorDto>(sql, new { codConductor });
         }
-        public async Task<DocumentoDespachadoDto?> ObtenerDocumentoDespachado(string  secuencial)
+        public async Task<DocumentoDespachadoDto?> ObtenerDocumentoDespachado(string secuencial)
         {
             const string sql = @"
                                 select COD_DOCUMENTO_DESPACHADO, SECUENCIAL, COD_CAMION 

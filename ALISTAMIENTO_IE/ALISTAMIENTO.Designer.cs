@@ -8,12 +8,9 @@
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.Label lblLlevas;
         private System.Windows.Forms.Label lblTimer;
-        private System.Windows.Forms.Label lblEtiqueta;
-        private System.Windows.Forms.TextBox txtEtiqueta;
         private System.Windows.Forms.GroupBox grpErrores;
         private System.Windows.Forms.ListBox lstMensajes;
         private System.Windows.Forms.Label lblNE;
-        private System.Windows.Forms.DataGridView dgvLeidos;
         private System.Windows.Forms.Label lblPedido;
 
         /// <summary>
@@ -37,96 +34,42 @@
         /// </summary>
         private void InitializeComponent()
         {
-            lblLlevas = new Label();
-            lblTimer = new Label();
-            lblEtiqueta = new Label();
-            txtEtiqueta = new TextBox();
             grpErrores = new GroupBox();
             tableLayoutPanel4 = new TableLayoutPanel();
             label5 = new Label();
             lblNE = new Label();
             label1 = new Label();
             lstMensajes = new ListBox();
-            dgvLeidos = new DataGridView();
-            dgvMain = new DataGridView();
             label2 = new Label();
             label3 = new Label();
             label4 = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
-            tableLayoutPanel2 = new TableLayoutPanel();
             tableLayoutPanel3 = new TableLayoutPanel();
+            btnRecargarUi = new Button();
+            btnVerEliminadas = new Button();
+            lblTimer = new Label();
+            label6 = new Label();
             btnEliminarEtiquetasLeidas = new Button();
             lblPlaca = new Label();
             btnPausa = new Button();
             btnBuscar = new Button();
             btnTerminar = new Button();
+            dgvLeidos = new DataGridView();
+            dgvMain = new DataGridView();
+            lblEtiqueta = new Label();
+            tableLayoutPanel2 = new TableLayoutPanel();
+            tableLayoutPanel5 = new TableLayoutPanel();
+            txtEtiqueta = new TextBox();
+            btnManual = new Button();
             grpErrores.SuspendLayout();
             tableLayoutPanel4.SuspendLayout();
+            tableLayoutPanel1.SuspendLayout();
+            tableLayoutPanel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvLeidos).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvMain).BeginInit();
-            tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
-            tableLayoutPanel3.SuspendLayout();
+            tableLayoutPanel5.SuspendLayout();
             SuspendLayout();
-            // 
-            // lblLlevas
-            // 
-            lblLlevas.AutoSize = true;
-            lblLlevas.BackColor = Color.Transparent;
-            lblLlevas.Dock = DockStyle.Fill;
-            lblLlevas.Font = new Font("Segoe UI", 16.2F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
-            lblLlevas.Location = new Point(375, 0);
-            lblLlevas.Margin = new Padding(7, 0, 7, 0);
-            lblLlevas.Name = "lblLlevas";
-            lblLlevas.Size = new Size(125, 71);
-            lblLlevas.TabIndex = 1;
-            lblLlevas.Text = "LLEVAS:";
-            lblLlevas.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // lblTimer
-            // 
-            lblTimer.AutoSize = true;
-            lblTimer.BackColor = Color.Transparent;
-            lblTimer.Dock = DockStyle.Fill;
-            lblTimer.Font = new Font("Segoe UI", 18F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
-            lblTimer.ForeColor = Color.MidnightBlue;
-            lblTimer.Location = new Point(514, 0);
-            lblTimer.Margin = new Padding(7, 0, 7, 0);
-            lblTimer.Name = "lblTimer";
-            lblTimer.Size = new Size(173, 71);
-            lblTimer.TabIndex = 2;
-            lblTimer.Text = "00:00:00";
-            lblTimer.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // lblEtiqueta
-            // 
-            lblEtiqueta.AutoSize = true;
-            lblEtiqueta.BackColor = Color.Transparent;
-            lblEtiqueta.Dock = DockStyle.Fill;
-            lblEtiqueta.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblEtiqueta.ForeColor = Color.DarkGreen;
-            lblEtiqueta.Location = new Point(7, 0);
-            lblEtiqueta.Margin = new Padding(7, 0, 7, 0);
-            lblEtiqueta.Name = "lblEtiqueta";
-            lblEtiqueta.Size = new Size(937, 55);
-            lblEtiqueta.TabIndex = 5;
-            lblEtiqueta.Text = "ETIQUETA";
-            lblEtiqueta.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // txtEtiqueta
-            // 
-            txtEtiqueta.BackColor = SystemColors.InactiveBorder;
-            txtEtiqueta.BorderStyle = BorderStyle.FixedSingle;
-            txtEtiqueta.Dock = DockStyle.Fill;
-            txtEtiqueta.Enabled = false;
-            txtEtiqueta.Font = new Font("Segoe UI", 14F);
-            txtEtiqueta.Location = new Point(7, 60);
-            txtEtiqueta.Margin = new Padding(7, 5, 7, 5);
-            txtEtiqueta.Name = "txtEtiqueta";
-            txtEtiqueta.Size = new Size(937, 32);
-            txtEtiqueta.TabIndex = 6;
-            txtEtiqueta.TextAlign = HorizontalAlignment.Center;
-            txtEtiqueta.TextChanged += txtEtiqueta_TextChanged;
             // 
             // grpErrores
             // 
@@ -211,45 +154,6 @@
             lstMensajes.Size = new Size(315, 424);
             lstMensajes.TabIndex = 0;
             // 
-            // dgvLeidos
-            // 
-            dgvLeidos.AllowUserToAddRows = false;
-            dgvLeidos.AllowUserToDeleteRows = false;
-            dgvLeidos.AllowUserToOrderColumns = true;
-            dgvLeidos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            dgvLeidos.BackgroundColor = Color.Silver;
-            dgvLeidos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvLeidos.Cursor = Cursors.No;
-            dgvLeidos.Dock = DockStyle.Fill;
-            dgvLeidos.Font = new Font("Segoe UI", 12F);
-            dgvLeidos.Location = new Point(7, 393);
-            dgvLeidos.Margin = new Padding(7, 5, 7, 5);
-            dgvLeidos.Name = "dgvLeidos";
-            dgvLeidos.ReadOnly = true;
-            dgvLeidos.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            dgvLeidos.Size = new Size(937, 192);
-            dgvLeidos.TabIndex = 13;
-            dgvLeidos.SelectionChanged += dgvLeidos_SelectionChanged;
-            // 
-            // dgvMain
-            // 
-            dgvMain.AllowUserToAddRows = false;
-            dgvMain.AllowUserToDeleteRows = false;
-            dgvMain.AllowUserToOrderColumns = true;
-            dgvMain.BackgroundColor = Color.Silver;
-            dgvMain.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvMain.Cursor = Cursors.No;
-            dgvMain.Dock = DockStyle.Fill;
-            dgvMain.Font = new Font("Segoe UI", 12F);
-            dgvMain.GridColor = SystemColors.ScrollBar;
-            dgvMain.Location = new Point(7, 137);
-            dgvMain.Margin = new Padding(7, 5, 7, 5);
-            dgvMain.Name = "dgvMain";
-            dgvMain.ReadOnly = true;
-            dgvMain.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            dgvMain.Size = new Size(937, 246);
-            dgvMain.TabIndex = 14;
-            // 
             // label2
             // 
             label2.AutoSize = true;
@@ -302,46 +206,28 @@
             tableLayoutPanel1.Size = new Size(349, 590);
             tableLayoutPanel1.TabIndex = 20;
             // 
-            // tableLayoutPanel2
-            // 
-            tableLayoutPanel2.BackColor = Color.Transparent;
-            tableLayoutPanel2.ColumnCount = 1;
-            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel2.Controls.Add(lblEtiqueta, 0, 0);
-            tableLayoutPanel2.Controls.Add(txtEtiqueta, 0, 1);
-            tableLayoutPanel2.Controls.Add(dgvMain, 0, 2);
-            tableLayoutPanel2.Controls.Add(dgvLeidos, 0, 3);
-            tableLayoutPanel2.Dock = DockStyle.Fill;
-            tableLayoutPanel2.GrowStyle = TableLayoutPanelGrowStyle.AddColumns;
-            tableLayoutPanel2.Location = new Point(349, 71);
-            tableLayoutPanel2.Name = "tableLayoutPanel2";
-            tableLayoutPanel2.RowCount = 4;
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 41.48936F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 58.51064F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 256F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 201F));
-            tableLayoutPanel2.Size = new Size(951, 590);
-            tableLayoutPanel2.TabIndex = 21;
-            // 
             // tableLayoutPanel3
             // 
             tableLayoutPanel3.BackColor = Color.Transparent;
-            tableLayoutPanel3.ColumnCount = 7;
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 199F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 54.86111F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45.13889F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 187F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 95F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 251F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 259F));
+            tableLayoutPanel3.ColumnCount = 9;
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 220F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 75F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 41.37931F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 58.62069F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 79F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 84F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 76F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 257F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 178F));
+            tableLayoutPanel3.Controls.Add(btnRecargarUi, 4, 0);
+            tableLayoutPanel3.Controls.Add(btnVerEliminadas, 5, 0);
+            tableLayoutPanel3.Controls.Add(lblTimer, 3, 0);
+            tableLayoutPanel3.Controls.Add(label6, 2, 0);
             tableLayoutPanel3.Controls.Add(btnEliminarEtiquetasLeidas, 1, 0);
             tableLayoutPanel3.Controls.Add(lblPlaca, 0, 0);
-            tableLayoutPanel3.Controls.Add(btnPausa, 5, 0);
-            tableLayoutPanel3.Controls.Add(btnBuscar, 4, 0);
-            tableLayoutPanel3.Controls.Add(lblLlevas, 2, 0);
-            tableLayoutPanel3.Controls.Add(btnTerminar, 6, 0);
-            tableLayoutPanel3.Controls.Add(lblTimer, 3, 0);
+            tableLayoutPanel3.Controls.Add(btnPausa, 7, 0);
+            tableLayoutPanel3.Controls.Add(btnBuscar, 6, 0);
+            tableLayoutPanel3.Controls.Add(btnTerminar, 8, 0);
             tableLayoutPanel3.Dock = DockStyle.Top;
             tableLayoutPanel3.Location = new Point(0, 0);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
@@ -350,17 +236,74 @@
             tableLayoutPanel3.Size = new Size(1300, 71);
             tableLayoutPanel3.TabIndex = 22;
             // 
+            // btnRecargarUi
+            // 
+            btnRecargarUi.Cursor = Cursors.Hand;
+            btnRecargarUi.Dock = DockStyle.Fill;
+            btnRecargarUi.Font = new Font("Segoe UI", 22.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnRecargarUi.ForeColor = Color.Blue;
+            btnRecargarUi.Location = new Point(632, 5);
+            btnRecargarUi.Margin = new Padding(7, 5, 7, 5);
+            btnRecargarUi.Name = "btnRecargarUi";
+            btnRecargarUi.Size = new Size(65, 61);
+            btnRecargarUi.TabIndex = 28;
+            btnRecargarUi.Text = " ⟳ ";
+            btnRecargarUi.Click += button1_Click;
+            // 
+            // btnVerEliminadas
+            // 
+            btnVerEliminadas.Cursor = Cursors.Hand;
+            btnVerEliminadas.Dock = DockStyle.Fill;
+            btnVerEliminadas.Font = new Font("Segoe UI", 19.8000011F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnVerEliminadas.ForeColor = Color.Crimson;
+            btnVerEliminadas.Location = new Point(711, 5);
+            btnVerEliminadas.Margin = new Padding(7, 5, 7, 5);
+            btnVerEliminadas.Name = "btnVerEliminadas";
+            btnVerEliminadas.Size = new Size(70, 61);
+            btnVerEliminadas.TabIndex = 27;
+            btnVerEliminadas.Text = "👁";
+            btnVerEliminadas.Click += btnVerEliminadas_Click;
+            // 
+            // lblTimer
+            // 
+            lblTimer.AutoSize = true;
+            lblTimer.BackColor = Color.Transparent;
+            lblTimer.Dock = DockStyle.Fill;
+            lblTimer.Font = new Font("Segoe UI", 18F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
+            lblTimer.ForeColor = Color.MidnightBlue;
+            lblTimer.Location = new Point(438, 0);
+            lblTimer.Margin = new Padding(7, 0, 7, 0);
+            lblTimer.Name = "lblTimer";
+            lblTimer.Size = new Size(180, 71);
+            lblTimer.TabIndex = 26;
+            lblTimer.Text = "00:00:00";
+            lblTimer.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.BackColor = Color.Transparent;
+            label6.Dock = DockStyle.Fill;
+            label6.Font = new Font("Segoe UI", 16.2F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
+            label6.Location = new Point(302, 0);
+            label6.Margin = new Padding(7, 0, 7, 0);
+            label6.Name = "label6";
+            label6.Size = new Size(122, 71);
+            label6.TabIndex = 25;
+            label6.Text = "LLEVAS:";
+            label6.TextAlign = ContentAlignment.MiddleCenter;
+            // 
             // btnEliminarEtiquetasLeidas
             // 
             btnEliminarEtiquetasLeidas.Cursor = Cursors.Hand;
             btnEliminarEtiquetasLeidas.Dock = DockStyle.Fill;
             btnEliminarEtiquetasLeidas.Font = new Font("Segoe UI", 15.4F);
             btnEliminarEtiquetasLeidas.ForeColor = Color.Crimson;
-            btnEliminarEtiquetasLeidas.Location = new Point(206, 5);
+            btnEliminarEtiquetasLeidas.Location = new Point(227, 5);
             btnEliminarEtiquetasLeidas.Margin = new Padding(7, 5, 7, 5);
             btnEliminarEtiquetasLeidas.Name = "btnEliminarEtiquetasLeidas";
-            btnEliminarEtiquetasLeidas.Size = new Size(155, 61);
-            btnEliminarEtiquetasLeidas.TabIndex = 23;
+            btnEliminarEtiquetasLeidas.Size = new Size(61, 61);
+            btnEliminarEtiquetasLeidas.TabIndex = 24;
             btnEliminarEtiquetasLeidas.Text = "🗑️";
             btnEliminarEtiquetasLeidas.Click += btnEliminarEtiquetasLeidas_Click;
             // 
@@ -385,10 +328,10 @@
             btnPausa.Dock = DockStyle.Fill;
             btnPausa.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             btnPausa.ForeColor = Color.White;
-            btnPausa.Location = new Point(796, 5);
+            btnPausa.Location = new Point(871, 5);
             btnPausa.Margin = new Padding(7, 5, 7, 5);
             btnPausa.Name = "btnPausa";
-            btnPausa.Size = new Size(237, 61);
+            btnPausa.Size = new Size(243, 61);
             btnPausa.TabIndex = 21;
             btnPausa.Text = "PAUSAR";
             btnPausa.UseVisualStyleBackColor = false;
@@ -396,14 +339,14 @@
             // 
             // btnBuscar
             // 
-            btnBuscar.Cursor = Cursors.WaitCursor;
+            btnBuscar.Cursor = Cursors.Hand;
             btnBuscar.Dock = DockStyle.Fill;
             btnBuscar.Font = new Font("Segoe UI", 15.4F);
             btnBuscar.ForeColor = Color.DarkGreen;
-            btnBuscar.Location = new Point(701, 5);
+            btnBuscar.Location = new Point(795, 5);
             btnBuscar.Margin = new Padding(7, 5, 7, 5);
             btnBuscar.Name = "btnBuscar";
-            btnBuscar.Size = new Size(81, 61);
+            btnBuscar.Size = new Size(62, 61);
             btnBuscar.TabIndex = 20;
             btnBuscar.Text = "🔍";
             // 
@@ -414,14 +357,129 @@
             btnTerminar.Dock = DockStyle.Fill;
             btnTerminar.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             btnTerminar.ForeColor = Color.White;
-            btnTerminar.Location = new Point(1047, 5);
+            btnTerminar.Location = new Point(1128, 5);
             btnTerminar.Margin = new Padding(7, 5, 7, 5);
             btnTerminar.Name = "btnTerminar";
-            btnTerminar.Size = new Size(246, 61);
+            btnTerminar.Size = new Size(165, 61);
             btnTerminar.TabIndex = 19;
             btnTerminar.Text = "TERMINAR";
             btnTerminar.UseVisualStyleBackColor = false;
             btnTerminar.Click += BtnTerminar_Click;
+            // 
+            // dgvLeidos
+            // 
+            dgvLeidos.AllowUserToAddRows = false;
+            dgvLeidos.AllowUserToDeleteRows = false;
+            dgvLeidos.AllowUserToOrderColumns = true;
+            dgvLeidos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            dgvLeidos.BackgroundColor = Color.Silver;
+            dgvLeidos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvLeidos.Cursor = Cursors.No;
+            dgvLeidos.Dock = DockStyle.Fill;
+            dgvLeidos.Font = new Font("Segoe UI", 12F);
+            dgvLeidos.Location = new Point(7, 393);
+            dgvLeidos.Margin = new Padding(7, 5, 7, 5);
+            dgvLeidos.Name = "dgvLeidos";
+            dgvLeidos.ReadOnly = true;
+            dgvLeidos.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            dgvLeidos.Size = new Size(937, 192);
+            dgvLeidos.TabIndex = 13;
+            dgvLeidos.SelectionChanged += dgvLeidos_SelectionChanged;
+            // 
+            // dgvMain
+            // 
+            dgvMain.AllowUserToAddRows = false;
+            dgvMain.AllowUserToDeleteRows = false;
+            dgvMain.AllowUserToOrderColumns = true;
+            dgvMain.BackgroundColor = Color.Silver;
+            dgvMain.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvMain.Cursor = Cursors.No;
+            dgvMain.Dock = DockStyle.Fill;
+            dgvMain.Font = new Font("Segoe UI", 12F);
+            dgvMain.GridColor = SystemColors.ScrollBar;
+            dgvMain.Location = new Point(7, 137);
+            dgvMain.Margin = new Padding(7, 5, 7, 5);
+            dgvMain.Name = "dgvMain";
+            dgvMain.ReadOnly = true;
+            dgvMain.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            dgvMain.Size = new Size(937, 246);
+            dgvMain.TabIndex = 14;
+            // 
+            // lblEtiqueta
+            // 
+            lblEtiqueta.AutoSize = true;
+            lblEtiqueta.BackColor = Color.Transparent;
+            lblEtiqueta.Dock = DockStyle.Fill;
+            lblEtiqueta.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblEtiqueta.ForeColor = Color.DarkGreen;
+            lblEtiqueta.Location = new Point(7, 0);
+            lblEtiqueta.Margin = new Padding(7, 0, 7, 0);
+            lblEtiqueta.Name = "lblEtiqueta";
+            lblEtiqueta.Size = new Size(937, 55);
+            lblEtiqueta.TabIndex = 5;
+            lblEtiqueta.Text = "ETIQUETA";
+            lblEtiqueta.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // tableLayoutPanel2
+            // 
+            tableLayoutPanel2.BackColor = Color.Transparent;
+            tableLayoutPanel2.ColumnCount = 1;
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel2.Controls.Add(lblEtiqueta, 0, 0);
+            tableLayoutPanel2.Controls.Add(dgvMain, 0, 2);
+            tableLayoutPanel2.Controls.Add(dgvLeidos, 0, 3);
+            tableLayoutPanel2.Controls.Add(tableLayoutPanel5, 0, 1);
+            tableLayoutPanel2.Dock = DockStyle.Fill;
+            tableLayoutPanel2.GrowStyle = TableLayoutPanelGrowStyle.AddColumns;
+            tableLayoutPanel2.Location = new Point(349, 71);
+            tableLayoutPanel2.Name = "tableLayoutPanel2";
+            tableLayoutPanel2.RowCount = 4;
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 41.48936F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 58.51064F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 256F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 201F));
+            tableLayoutPanel2.Size = new Size(951, 590);
+            tableLayoutPanel2.TabIndex = 21;
+            // 
+            // tableLayoutPanel5
+            // 
+            tableLayoutPanel5.ColumnCount = 2;
+            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 87.19577F));
+            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 12.8042326F));
+            tableLayoutPanel5.Controls.Add(txtEtiqueta, 0, 0);
+            tableLayoutPanel5.Controls.Add(btnManual, 1, 0);
+            tableLayoutPanel5.Dock = DockStyle.Fill;
+            tableLayoutPanel5.Location = new Point(3, 58);
+            tableLayoutPanel5.Name = "tableLayoutPanel5";
+            tableLayoutPanel5.RowCount = 1;
+            tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel5.Size = new Size(945, 71);
+            tableLayoutPanel5.TabIndex = 15;
+            // 
+            // txtEtiqueta
+            // 
+            txtEtiqueta.BackColor = SystemColors.InactiveBorder;
+            txtEtiqueta.BorderStyle = BorderStyle.FixedSingle;
+            txtEtiqueta.Dock = DockStyle.Fill;
+            txtEtiqueta.Enabled = false;
+            txtEtiqueta.Font = new Font("Segoe UI", 14F);
+            txtEtiqueta.Location = new Point(7, 5);
+            txtEtiqueta.Margin = new Padding(7, 5, 7, 5);
+            txtEtiqueta.Name = "txtEtiqueta";
+            txtEtiqueta.Size = new Size(810, 32);
+            txtEtiqueta.TabIndex = 7;
+            txtEtiqueta.TextAlign = HorizontalAlignment.Center;
+            // 
+            // btnManual
+            // 
+            btnManual.Dock = DockStyle.Fill;
+            btnManual.Location = new Point(827, 3);
+            btnManual.Name = "btnManual";
+            btnManual.Size = new Size(115, 65);
+            btnManual.TabIndex = 8;
+            btnManual.Text = "Manual";
+            btnManual.UseVisualStyleBackColor = true;
             // 
             // ALISTAMIENTO
             // 
@@ -443,27 +501,26 @@
             grpErrores.ResumeLayout(false);
             tableLayoutPanel4.ResumeLayout(false);
             tableLayoutPanel4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvLeidos).EndInit();
-            ((System.ComponentModel.ISupportInitialize)dgvMain).EndInit();
             tableLayoutPanel1.ResumeLayout(false);
-            tableLayoutPanel2.ResumeLayout(false);
-            tableLayoutPanel2.PerformLayout();
             tableLayoutPanel3.ResumeLayout(false);
             tableLayoutPanel3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvLeidos).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvMain).EndInit();
+            tableLayoutPanel2.ResumeLayout(false);
+            tableLayoutPanel2.PerformLayout();
+            tableLayoutPanel5.ResumeLayout(false);
+            tableLayoutPanel5.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
-
-        private DataGridView dgvMain;
         private Label label2;
         private Label label3;
         private Label label4;
         private Label label5;
         private Label label1;
         private TableLayoutPanel tableLayoutPanel1;
-        private TableLayoutPanel tableLayoutPanel2;
         private TableLayoutPanel tableLayoutPanel3;
         private TableLayoutPanel tableLayoutPanel4;
         private Button btnPausa;
@@ -471,5 +528,15 @@
         private Button btnTerminar;
         private Button btnEliminarEtiquetasLeidas;
         private Label lblPlaca;
+        private Button btnVerEliminadas;
+        private Label label6;
+        private DataGridView dgvLeidos;
+        private DataGridView dgvMain;
+        private Label lblEtiqueta;
+        private TableLayoutPanel tableLayoutPanel2;
+        private TableLayoutPanel tableLayoutPanel5;
+        private TextBox txtEtiqueta;
+        private Button btnManual;
+        private Button btnRecargarUi;
     }
 }

@@ -8,7 +8,7 @@ namespace ALISTAMIENTO_IE.Services
 {
     // DTO para manejar los totales, según la definición en el formulario.
 
-    internal class AlistamientoEtiquetaService : IAlistamientoEtiquetaService
+    public class AlistamientoEtiquetaService : IAlistamientoEtiquetaService
     {
         private readonly string _connectionString;
 

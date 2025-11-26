@@ -1,3 +1,4 @@
+using ALISTAMIENTO_IE.DTOs;
 using ALISTAMIENTO_IE.Models;
 
 namespace ALISTAMIENTO_IE.Interfaces
@@ -30,5 +31,14 @@ namespace ALISTAMIENTO_IE.Interfaces
         /// Obtiene todas las eliminaciones realizadas sobre un alistamiento dado.
         /// </summary>
         Task<IEnumerable<EliminacionAlistamientoEtiqueta>> ObtenerEliminacionesPorAlistamientoAsync(int idAlistamiento);
+
+
+        Task<IEnumerable<EliminacionAlistamientoEtiquetaDTO>> ObtenerEliminacionesPorAlistamientoConEtiquetaAsync(int idAlistamiento);
+
+        Task RevertirEliminacionAsync(int idEliminacionRegistro, int idUsuarioReversion);
+
     }
 }
+
+
+

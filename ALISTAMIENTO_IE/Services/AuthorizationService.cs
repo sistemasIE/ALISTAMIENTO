@@ -1,13 +1,14 @@
 ﻿namespace ALISTAMIENTO_IE.Services
 {
+    using ALISTAMIENTO_IE.Interfaces;
     using BCrypt.Net;
     using Dapper;
+    using Microsoft.Data.SqlClient;
+    using System.Configuration;
     using System.Data;
     using System.Threading.Tasks;
-    using System.Configuration;
-    using Microsoft.Data.SqlClient;
 
-    public class AuthorizationService
+    public class AuthorizationService : IAuthorizationService
     {
         private readonly IDbConnection _connection;
 

@@ -6,7 +6,6 @@ using System.Data;
 
 namespace ALISTAMIENTO_IE.Services
 {
-
     public class KardexService : IKardexService
     {
         private readonly string _connectionString;

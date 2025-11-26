@@ -1,29 +1,20 @@
-﻿using ALISTAMIENTO_IE.Model;
+﻿using ALISTAMIENTO_IE.DTOs;
+using ALISTAMIENTO_IE.Interfaces;
 using ALISTAMIENTO_IE.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Configuration;
 
 namespace ALISTAMIENTO_IE.Services;
-
-public class EtiquetaBusquedaResult
+public class EtiquetaService : IEtiquetaService
 {
-    public bool EsValida { get; set; }
-    public bool Existe { get; set; }
-    public bool ExisteEnKardex { get; set; }
-    public string TipoEtiqueta { get; set; } // "ETIQUETA", "ETIQUETA_LINER" o "ETIQUETA_ROLLO"
-    public Etiqueta Etiqueta { get; set; }
-    public EtiquetaLiner EtiquetaLiner { get; set; }
-    public EtiquetaRollo EtiquetaRollo { get; set; }
-    public string Mensaje { get; set; }
-}
+    private readonly string _connectionString;
 
-public class EtiquetaService
-{
-    private readonly string _connectionString = ConfigurationManager.ConnectionStrings["stringConexionLocal"].ConnectionString;
-    private readonly string _connectionStringUnoE = ConfigurationManager.ConnectionStrings["stringConexionUnoe"].ConnectionString;
+    public EtiquetaService()
+    {
 
-    public EtiquetaService() { }
+        _connectionString = ConfigurationManager.ConnectionStrings["stringConexionLocal"].ConnectionString;
+    }
 
     public async Task<Etiqueta?> ObtenerEtiquetaPorCodigoAsync(string codigoEtiqueta)
     {

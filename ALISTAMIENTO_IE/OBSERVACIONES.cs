@@ -1,22 +1,20 @@
-﻿using ALISTAMIENTO_IE.Services;
-
-namespace ALISTAMIENTO_IE
+﻿namespace ALISTAMIENTO_IE
 {
     public partial class OBSERVACIONES : Form
     {
         private readonly int _idAlistamiento;
         private readonly string _accion;
-        private readonly AlistamientoService _alistamientoService;
+        private readonly IAlistamientoService _alistamientoService;
         public bool AlistamientoAnulado { get; private set; } = false;
         public bool AlistamientoIncompleto { get; private set; } = false;
 
-        public OBSERVACIONES(int idAlistamiento, string accion)
+        public OBSERVACIONES(int idAlistamiento, string accion, string texto, IAlistamientoService alistamientoService)
         {
             InitializeComponent();
             _idAlistamiento = idAlistamiento;
             _accion = accion;
-            _alistamientoService = new AlistamientoService();
-            lblDinamico.Text = accion;
+            _alistamientoService = alistamientoService;
+            lblDinamico.Text = texto;
             btnAceptar.Click += btnAceptar_Click;
             btnCancelar.Click += btnCancelar_Click;
         }

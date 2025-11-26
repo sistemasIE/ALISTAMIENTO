@@ -1,4 +1,5 @@
 ﻿using ALISTAMIENTO_IE.DTOs;
+using ALISTAMIENTO_IE.Interfaces;
 using ALISTAMIENTO_IE.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -9,20 +10,26 @@ namespace ALISTAMIENTO_IE.Services
 {
     public class AlistamientoService : IAlistamientoService
     {
-        private readonly string _connectionStringSIE = ConfigurationManager.ConnectionStrings["stringConexionSIE"].ConnectionString;
         private readonly string _connectionStringMAIN = ConfigurationManager.ConnectionStrings["stringConexionLocal"].ConnectionString;
-        private readonly CamionXDiaService _camionXDiaService;
-        private readonly DetalleCamionXDiaService _detalleCamionXDiaService;
-        private readonly AlistamientoEtiquetaService _alistamientoEtiquetaService;
-        private readonly ItemService _itemService;
+        private readonly ICamionXDiaService _camionXDiaService;
+        private readonly IDetalleCamionXDiaService _detalleCamionXDiaService;
+        private readonly IAlistamientoEtiquetaService _alistamientoEtiquetaService;
+        private readonly IItemService _itemService;
 
-        public AlistamientoService()
+        public AlistamientoService(
+           ICamionXDiaService camionXDiaService,
+           IDetalleCamionXDiaService detalleCamionXDiaService,
+           IAlistamientoEtiquetaService alistamientoEtiquetaService,
+           IItemService itemService
+       )
         {
-            _camionXDiaService = new CamionXDiaService();
-            _detalleCamionXDiaService = new DetalleCamionXDiaService();
-            _alistamientoEtiquetaService = new AlistamientoEtiquetaService();
-            _itemService = new ItemService();
+            _camionXDiaService = camionXDiaService;
+            _detalleCamionXDiaService = detalleCamionXDiaService;
+            _alistamientoEtiquetaService = alistamientoEtiquetaService;
+            _itemService = itemService;
+
         }
+
 
         public async Task<IEnumerable<CamionItemsDto>> ObtenerItemsPorAlistarCamion(int camionId)
         {

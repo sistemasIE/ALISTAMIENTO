@@ -1,3 +1,4 @@
+using ALISTAMIENTO_IE.DTOs;
 using ALISTAMIENTO_IE.Interfaces;
 using ALISTAMIENTO_IE.Models;
 using Dapper;
@@ -6,7 +7,7 @@ using System.Configuration;
 
 namespace ALISTAMIENTO_IE.Services
 {
-    internal class EliminacionAlistamientoEtiquetaService : IEliminacionAlistamientoEtiquetaService
+    public class EliminacionAlistamientoEtiquetaService : IEliminacionAlistamientoEtiquetaService
     {
         private readonly string _connectionString;
 
@@ -14,6 +15,7 @@ namespace ALISTAMIENTO_IE.Services
         {
             _connectionString = ConfigurationManager.ConnectionStrings["stringConexionLocal"].ConnectionString;
         }
+
 
         public async Task<int> InsertarEliminacionesAsync(IEnumerable<EliminacionAlistamientoEtiqueta> registros)
         {
@@ -100,5 +102,76 @@ namespace ALISTAMIENTO_IE.Services
             await connection.OpenAsync();
             return await connection.QueryAsync<EliminacionAlistamientoEtiqueta>(sql, new { IdAlistamiento = idAlistamiento });
         }
+
+        public async Task<IEnumerable<EliminacionAlistamientoEtiquetaDTO>> ObtenerEliminacionesPorAlistamientoConEtiquetaAsync(int idAlistamiento)
+        {
+            const string sql = @"
+        SELECT 
+            eae.idEliminacionAlistamientoEtiqueta, 
+            eae.idAlistamientoEtiqueta, 
+            ae.etiqueta AS EtiquetaTexto, 
+            eae.fechaEliminacion, 
+            eae.idUsuarioElimina,
+            -- <<< AQUÍ ESTÁ EL JOIN Y LA CONCATENACIÓN >>>
+            (u.PrimerNombre + ' ' + u.Apellido) AS NombreUsuarioElimina, 
+            eae.observaciones
+        FROM ELIMINADAS_ALISTAMIENTO_ETIQUETA eae
+        JOIN ALISTAMIENTO_ETIQUETA ae ON eae.idAlistamientoEtiqueta = ae.idAlistamientoEtiqueta
+        JOIN USUARIOS u ON eae.idUsuarioElimina = u.UsuarioID -- <<< JOIN CON USUARIOS
+        WHERE ae.idAlistamiento = @IdAlistamiento;";
+
+            await using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            return await connection.QueryAsync<EliminacionAlistamientoEtiquetaDTO>(sql, new { IdAlistamiento = idAlistamiento });
+        }
+
+
+        public async Task RevertirEliminacionAsync(int idEliminacionRegistro, int idUsuarioReversion)
+        {
+            // 1. Obtener información del registro a revertir
+            const string sqlGetInfo = @"
+                SELECT eae.idAlistamientoEtiqueta, ae.etiqueta, ae.idBodegaInicial 
+                FROM ELIMINADAS_ALISTAMIENTO_ETIQUETA eae
+                JOIN ALISTAMIENTO_ETIQUETA ae ON eae.idAlistamientoEtiqueta = ae.idAlistamientoEtiqueta
+                WHERE eae.idEliminacionAlistamientoEtiqueta = @IdEliminacion";
+
+            await using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                var info = await connection.QueryFirstOrDefaultAsync<dynamic>(
+                    sqlGetInfo,
+                    new { IdEliminacion = idEliminacionRegistro },
+                    transaction);
+
+                if (info == null)
+                    throw new InvalidOperationException("Registro de eliminación no encontrado.");
+
+                // 2. Eliminar registro de Auditoría (ELIMINADAS_ALISTAMIENTO_ETIQUETA)
+                const string sqlDeleteAudit = @"
+                    DELETE FROM ELIMINADAS_ALISTAMIENTO_ETIQUETA 
+                    WHERE idEliminacionAlistamientoEtiqueta = @IdEliminacion";
+                await connection.ExecuteAsync(sqlDeleteAudit, new { IdEliminacion = idEliminacionRegistro }, transaction);
+
+                // 3. Revertir estado en ALISTAMIENTO_ETIQUETA (marcar como ACTIVA de nuevo)
+                const string sqlRevertAlistamiento = @"
+                    UPDATE ALISTAMIENTO_ETIQUETA 
+                    SET Estado = 'ACTIVA', Fecha = GETDATE() -- Actualiza la fecha para auditoría
+                    WHERE idAlistamientoEtiqueta = @IdEtiqueta";
+                await connection.ExecuteAsync(sqlRevertAlistamiento, new { IdEtiqueta = info.idAlistamientoEtiqueta }, transaction);
+
+                transaction.Commit();
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+
     }
 }

@@ -2,7 +2,7 @@
 
 namespace ALISTAMIENTO_IE.Utils
 {
-    internal class PrinterService : IPrinterService
+    public class PrinterService : IPrinterService
     {
         public void PrintDocument(string documentPath)
         {

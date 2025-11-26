@@ -1,5 +1,4 @@
 ﻿using ALISTAMIENTO_IE.Interfaces;
-using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
 using System.Data;
 
@@ -9,27 +8,26 @@ namespace LECTURA_DE_BANDA
 {
     public partial class CONSULTA_ITEMS_ETIQUETAS : Form
     {
-        private readonly AlistamientoService _alistamientoService;
-        private readonly DataGridView? dgvAImprimir;
         private readonly DataTable info;
         private readonly IDataGridViewExporter _dataGridViewExporter;
         private readonly IPrinterService _printerService;
-        private readonly ItemService _itemService;
-        private readonly KardexService _kardexService;
+        private readonly IItemService _itemService;
+        private readonly IKardexService _kardexService;
         private readonly string? _placaCamion;
-        public CONSULTA_ITEMS_ETIQUETAS()
+        public CONSULTA_ITEMS_ETIQUETAS(IKardexService kardexService, IItemService itemService)
         {
             InitializeComponent();
 
             this.Icon = ALISTAMIENTO_IE.Properties.Resources.Icono;
             this._printerService = new PrinterService();
             this._dataGridViewExporter = new DataGridViewExporter();
-            this._kardexService = new KardexService();
-            this._itemService = new ItemService();
+            this._kardexService = kardexService;
+            this._itemService = itemService;
         }
 
 
-        public CONSULTA_ITEMS_ETIQUETAS(IEnumerable<string> items, string placaCamion, DataTable info) : this()
+        public CONSULTA_ITEMS_ETIQUETAS(IEnumerable<string> items, string placaCamion, DataTable info,
+            IKardexService kardexService, IItemService itemService) : this(kardexService, itemService)
         {
             _placaCamion = placaCamion;
 

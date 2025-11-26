@@ -1,10 +1,10 @@
 ﻿using ALISTAMIENTO_IE.DTOs;
 using ALISTAMIENTO_IE.Forms;
 using ALISTAMIENTO_IE.Interfaces;
-using ALISTAMIENTO_IE.Model;
 using ALISTAMIENTO_IE.Models;
-using ALISTAMIENTO_IE.Services;
 using Common.cache;
+using LECTURA_DE_BANDA;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualBasic;
 using System.ComponentModel; // Added for BindingList
 using System.Data;
@@ -15,63 +15,119 @@ namespace ALISTAMIENTO_IE
 {
     public partial class ALISTAMIENTO : Form
     {
+        // --- PROPIEDADES INYECTADAS (readonly) ---
+        private readonly IEtiquetaLinerService _etiquetaLinerService;
+        private readonly IEtiquetaRolloService _etiquetaRolloService;
+        private readonly IEtiquetaService _etiquetaService;
+        private readonly IAlistamientoEtiquetaService _alistamientoEtiquetaService;
+        private readonly IAlistamientoService _alistamientoService;
+        private readonly IAuthorizationService _authorizationService;
+        private readonly ICamionService _camionService;
+        private readonly IDetalleCamionXDiaService _detalleCamionXDiaService;
+        private readonly IEliminacionAlistamientoEtiquetaService _elimService;
+        private readonly IKardexService _kardexService;
+        private readonly IServiceScopeFactory _scopeFactory; // Reemplaza IServiceProvider
+
+        // --- PROPIEDADES DE ESTADO Y CONTEXTO ---
         private readonly int _idCamion;
         private readonly string _estadoAlistamientoInicial;
-        private readonly AuthorizationService _authorizationService;
-        private readonly IAlistamientoService _alistamientoService;
-        private readonly IAlistamientoEtiquetaService _alistamientoEtiquetaService;
-        private readonly DetalleCamionXDiaService _detalleCamionXDiaService;
-        private readonly KardexService _kardexService;
-        private EtiquetaService _etiquetaService;
-        private EtiquetaLinerService _etiquetaLinerService;
-        private EtiquetaRolloService _etiquetaRolloService;
 
-        private IEnumerable<EtiquetaLeidaDTO> _etiquetasLeidas;
-        private List<string> ITEMS_PENDIENTES = new List<string>();
-        private int _idAlistamiento;
-        private Timer _timer;
-        private DateTime _fechaInicio;
-        private string _estadoAlistamiento = "EN_PROCESO";
-        private readonly CamionService _camionService;
-        private readonly Camion CAMION_ACTUAL;
+        // Propiedades que aceptan nulos o requieren inicialización en el ctor
+        private Timer? _timer;
+        private Camion? CAMION_ACTUAL; // Puede ser null si el servicio no encuentra el camión
+        private IEnumerable<EtiquetaLeidaDTO>? _etiquetasLeidas;
+        public Alistamiento? _alistamiento; // Objeto de modelo, si puede ser null
 
+        // Propiedades con inicialización directa
         private readonly DataGridViewExporter _dataGridViewExporter = new DataGridViewExporter();
-        // Cache en memoria para acelerar cálulos sin tocar DB
-        private List<string> etiquetasLeidas = new List<string>();
-        private Dictionary<int, int> _conteoPorItem = new Dictionary<int, int>();
-        private BindingList<DTOs.EtiquetaLeidaDTO> _leidasBinding = new BindingList<DTOs.EtiquetaLeidaDTO>();
+        private BindingList<DTOs.EtiquetaLeidaDTO> _leidasBinding = new();
+        private readonly Dictionary<int, int> _conteoPorItem = new();
+        private List<string> etiquetasLeidas = new();
+        private List<string> ITEMS_PENDIENTES = new();
 
-        Alistamiento _alistamiento;
-        private readonly EliminacionAlistamientoEtiquetaService _elimService = new EliminacionAlistamientoEtiquetaService();
+        // Valores por defecto
+        private string _estadoAlistamiento = "EN_PROCESO";
+        private int _idAlistamiento;
+        private DateTime _fechaInicio;
 
+        private bool cerradoDesdeBoton = false;
 
-        public ALISTAMIENTO(int idCamion, IAlistamientoService alistamientoService, IAlistamientoEtiquetaService alistamientoEtiquetaService)
-    : this(idCamion, "EN_PROCESO", alistamientoService, alistamientoEtiquetaService)
-        { }
+        // ------------------------------------------------------------------
+        // CONSTRUCTORES
+        // ------------------------------------------------------------------
 
-        public ALISTAMIENTO(int idCamion, string estado, IAlistamientoService alistamientoService,
-    IAlistamientoEtiquetaService alistamientoEtiquetaService)
+        // Constructor de sobrecarga: Delega al principal con estado "EN_PROCESO"
+        public ALISTAMIENTO(
+            int idCamion,
+            IAlistamientoService alistamientoService,
+            IAlistamientoEtiquetaService alistamientoEtiquetaService,
+            IServiceScopeFactory scopeFactory,
+            IAuthorizationService authorizationService,
+            ICamionService camionService,
+            IDetalleCamionXDiaService detalleCamionXDiaService,
+            IEtiquetaService etiquetaService,
+            IEtiquetaLinerService etiquetaLinerService,
+            IEtiquetaRolloService etiquetaRolloService,
+            IEliminacionAlistamientoEtiquetaService elimService,
+            IKardexService kardexService
+        )
+        : this(idCamion, "EN_PROCESO",
+              alistamientoService, alistamientoEtiquetaService, scopeFactory,
+              authorizationService, camionService, detalleCamionXDiaService,
+              etiquetaService, etiquetaLinerService, etiquetaRolloService,
+              elimService, kardexService)
+        {
+            // Creado automáticamente por DI.
+        }
+
+        // Constructor principal: Recibe todos los servicios y los asigna.
+        public ALISTAMIENTO(
+            int idCamion,
+            string estado,
+            // Servicios de Alistamiento
+            IAlistamientoService alistamientoService,
+            IAlistamientoEtiquetaService alistamientoEtiquetaService,
+            // Fábrica para Forms
+            IServiceScopeFactory scopeFactory,
+            // Otros servicios
+            IAuthorizationService authorizationService,
+            ICamionService camionService,
+            IDetalleCamionXDiaService detalleCamionXDiaService,
+            IEtiquetaService etiquetaService,
+            IEtiquetaLinerService etiquetaLinerService,
+            IEtiquetaRolloService etiquetaRolloService,
+            IEliminacionAlistamientoEtiquetaService elimService,
+            IKardexService kardexService
+        )
         {
             InitializeComponent();
 
-            _authorizationService = AuthorizationService.CreateFromConfig("stringConexionLocal");
-
+            // 1. Asignación de dependencias y parámetros de contexto
             _idCamion = idCamion;
             _estadoAlistamientoInicial = estado;
             _estadoAlistamiento = estado;
 
-            _camionService = new CamionService();
+            _scopeFactory = scopeFactory;
+
+            // Asignación de Servicios
             _alistamientoEtiquetaService = alistamientoEtiquetaService;
             _alistamientoService = alistamientoService;
-            _detalleCamionXDiaService = new DetalleCamionXDiaService();
-            _etiquetaService = new EtiquetaService();
-            _etiquetaLinerService = new EtiquetaLinerService();
-            _etiquetaRolloService = new EtiquetaRolloService();
-            _kardexService = new KardexService();
+            _authorizationService = authorizationService;
+            _camionService = camionService;
+            _detalleCamionXDiaService = detalleCamionXDiaService;
+            _etiquetaService = etiquetaService;
+            _etiquetaLinerService = etiquetaLinerService;
+            _etiquetaRolloService = etiquetaRolloService;
+            _elimService = elimService;
+            _kardexService = kardexService;
 
+            // 2. Inicialización de clases de UI o de Contexto
+            _timer = new Timer(); // Inicialización de Timer
 
+            // 3. Uso del servicio inyectado para obtener datos iniciales
             CAMION_ACTUAL = _camionService.GetCamionByCamionXDiaId(idCamion);
-            // Función para procesar el cambio de Item cuando se está haciendo el Alistamiento
+
+            // 4. Configuración de UI
             this.dgvMain.CellDoubleClick += dgvMainDoubleClick;
             this.Load += ALISTAMIENTO_Load;
             btnBuscar.Click += btnBuscar_Click;
@@ -106,9 +162,8 @@ namespace ALISTAMIENTO_IE
 
         private void BtnTerminar_Click(object sender, EventArgs e)
         {
-
             var res = MessageBox.Show("¡¿Desea TERMINAR el alistamiento?!", "Confirmar",
-                                        MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                                      MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (res == DialogResult.Yes)
                 if (VerificarAlistamientoCompleto())
                 {
@@ -116,6 +171,7 @@ namespace ALISTAMIENTO_IE
                     _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "ALISTADO", "Alistamiento completado exitosamente", DateTime.Now);
                     _estadoAlistamiento = "ALISTADO";
                     MessageBox.Show("Alistamiento completado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    cerradoDesdeBoton = true;
                     this.Close();
                 }
                 else
@@ -129,21 +185,33 @@ namespace ALISTAMIENTO_IE
 
                     if (result == DialogResult.Yes)
                     {
-                        using (var obsForm = new OBSERVACIONES(_idAlistamiento, "Indique el motivo del alistamiento incompleto"))
+                        // *** 1. Crear un nuevo ámbito para el Formulario ***
+                        using (var scope = _scopeFactory.CreateScope())
                         {
-                            var obsResult = obsForm.ShowDialog(this);
-                            if (obsResult == DialogResult.OK && obsForm.AlistamientoIncompleto)
+                            // *** 2. Usar ActivatorUtilities para instanciar el Form. ***
+                            // ActivatorUtilities se encarga de inyectar IAlistamientoService.
+                            using (var obsForm = ActivatorUtilities.CreateInstance<OBSERVACIONES>(
+                                scope.ServiceProvider,
+                                _idAlistamiento,
+                                "Alistamiento INCOMPLETO", // Se cierra con alistamiento incompleto
+                                "Indique el motivo del alistamiento incompleto" // Parámetros de contexto
+                            ))
                             {
-                                // El estado ya fue actualizado en el form de observaciones
-                                _estadoAlistamiento = "ALISTADO";
-                                MessageBox.Show("Alistamiento cerrado como incompleto.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                this.Close();
-                            }
-                        }
+                                var obsResult = obsForm.ShowDialog(this);
+                                if (obsResult == DialogResult.OK && obsForm.AlistamientoIncompleto)
+                                {
+                                    // El estado ya fue actualizado en el form de observaciones
+                                    _estadoAlistamiento = "ALISTADO";
+                                    MessageBox.Show("Alistamiento cerrado como incompleto.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    cerradoDesdeBoton = true;
+                                    this.Close();
+
+                                }
+                            } // obsForm se desecha
+                        } // scope se desecha, liberando todos los servicios scoped que usó el form
                     }
                 }
         }
-
         private async void ALISTAMIENTO_Load(object sender, EventArgs e)
         {
             try
@@ -376,25 +444,39 @@ namespace ALISTAMIENTO_IE
         private async void btnBuscar_Click(object sender, EventArgs e)
         {
             var placa = CAMION_ACTUAL?.PLACAS ?? string.Empty;
-
-            // Create a properly initialized DataGridView with the current main data
-            var dgvNew = new DataGridView();
             var itemsData = await _alistamientoService.ObtenerItemsPorAlistarCamion(_idCamion);
-            dgvNew.DataSource = itemsData;
 
-            var consultaForm = new LECTURA_DE_BANDA.CONSULTA_ITEMS_ETIQUETAS(ITEMS_PENDIENTES, placa, _dataGridViewExporter.ToDataTable<CamionItemsDto>(itemsData));
-            consultaForm.ShowDialog(this);
+            // Convertir datos a DataTable ANTES de pasarlos
+            var infoDataTable = _dataGridViewExporter.ToDataTable<CamionItemsDto>(itemsData);
+
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var consultaForm = ActivatorUtilities.CreateInstance<CONSULTA_ITEMS_ETIQUETAS>(
+                    scope.ServiceProvider,
+                    ITEMS_PENDIENTES,
+                    placa,
+                    infoDataTable
+                );
+
+                consultaForm.ShowDialog(this);
+
+            }
         }
 
         private void ALISTAMIENTO_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // Si fue cerrado desde alguno de los botones
+            if (cerradoDesdeBoton) return;
+
+            VerificarAlistamientoCompleto();
+
             // Si el estado no contiene 'ALISTADO', mostrar el cuadro de observaciones
             if (!_estadoAlistamiento.Contains("ALISTADO"))
             {
-                using (var obsForm = new OBSERVACIONES(_idAlistamiento, "Indique el motivo de cierre del alistamiento"))
+                using (var obsForm = new OBSERVACIONES(_idAlistamiento, "incompleto", "Indique el motivo del cierre.", _alistamientoService))
                 {
                     var result = obsForm.ShowDialog(this);
-                    if (result == DialogResult.OK && obsForm.AlistamientoAnulado)
+                    if (result == DialogResult.OK)
                     {
                         // Se aceptó la observación y el alistamiento quedó incompleto
                         _estadoAlistamiento = "ALISTADO_INCOMPLETO";
@@ -843,6 +925,7 @@ namespace ALISTAMIENTO_IE
 
             // 1) Pedir observaciones al usuario
             string observaciones = Interaction.InputBox("Ingrese las observaciones de la eliminación:", "Observaciones", "");
+
             if (string.IsNullOrWhiteSpace(observaciones))
             {
                 var seguir = MessageBox.Show("No ingresó observaciones. ¿Desea continuar sin observaciones?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
@@ -892,17 +975,48 @@ namespace ALISTAMIENTO_IE
                     MessageBox.Show($"Error registrando observaciones: {ex.Message}", "Auditoría", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
-                // 5) Re-cargar datos y recalcular totales tras eliminación
-                await CargarEtiquetasLeidasEnCache();
-                await RecalcularCantidadesAlistadas();
-                await cargarDgvMain();
-                await RecalcularCantidadesAlistadas();
+                // Recargar la Interfaz
+                RecargarUI();
+
 
                 foreach (string etiqueta in etiquetasSeleccionadas)
                 {
                     lstMensajes.Items.Insert(0, "Etiqueta eliminada: " + etiqueta);
                 }
             }
+        }
+
+        private void btnVerEliminadas_Click(object sender, EventArgs e)
+        {
+            // Usamos _scopeFactory, que ya fue inyectado en el constructor de ALISTAMIENTO.
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                // 1. Pedimos al ServiceProvider del scope que cree la instancia.
+                // ActivatorUtilities inyectará IEliminacionAlistamientoEtiquetaService automáticamente.
+                var form = ActivatorUtilities.CreateInstance<EtqsEliminadasEnAlistamiento>(
+                    scope.ServiceProvider,
+                    _idAlistamiento // Argumento que no es una dependencia y DEBE pasarse.
+                );
+
+                // 2. Mostrar
+                form.StartPosition = FormStartPosition.CenterParent;
+                form.ShowDialog(this);
+            }
+        }
+
+        private async void RecargarUI()
+        {
+
+            await CargarEtiquetasLeidasEnCache();
+            await RecalcularCantidadesAlistadas();
+            await cargarDgvMain();
+            await RecalcularCantidadesAlistadas();
+        }
+
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            RecargarUI();
         }
     }
 

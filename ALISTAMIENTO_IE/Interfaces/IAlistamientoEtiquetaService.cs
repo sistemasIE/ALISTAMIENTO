@@ -26,6 +26,5 @@ namespace ALISTAMIENTO_IE.Interfaces
 
         Task<int> EliminarEtiquetasDeAlistamiento(int idAlistamiento, string[] codigoeEtiquetas);
 
-
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace ALISTAMIENTO_IE.Model;
+﻿namespace ALISTAMIENTO_IE.Models;
 
 public class Etiqueta
 {

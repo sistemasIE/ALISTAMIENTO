@@ -45,6 +45,7 @@
             lblPlaca.AutoSize = true;
             lblPlaca.Dock = DockStyle.Fill;
             lblPlaca.Font = new Font("Segoe UI Variable Display", 28.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblPlaca.ForeColor = Color.Blue;
             lblPlaca.Location = new Point(12, 10);
             lblPlaca.Margin = new Padding(0, 0, 0, 8);
             lblPlaca.Name = "lblPlaca";
@@ -56,18 +57,20 @@
             // txtBoxEtiquetas
             // 
             txtBoxEtiquetas.Dock = DockStyle.Fill;
-            txtBoxEtiquetas.Font = new Font("Consolas", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            txtBoxEtiquetas.Font = new Font("Consolas", 16.2F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
             txtBoxEtiquetas.Location = new Point(12, 69);
             txtBoxEtiquetas.Margin = new Padding(0, 0, 0, 12);
             txtBoxEtiquetas.Multiline = true;
             txtBoxEtiquetas.Name = "txtBoxEtiquetas";
             txtBoxEtiquetas.ScrollBars = ScrollBars.Vertical;
-            txtBoxEtiquetas.Size = new Size(431, 289);
+            txtBoxEtiquetas.Size = new Size(431, 322);
             txtBoxEtiquetas.TabIndex = 1;
+            txtBoxEtiquetas.Text = "1234567A890";
             // 
             // btnEjecutar
             // 
             btnEjecutar.BackColor = Color.ForestGreen;
+            btnEjecutar.Cursor = Cursors.Hand;
             btnEjecutar.Dock = DockStyle.Fill;
             btnEjecutar.FlatStyle = FlatStyle.Flat;
             btnEjecutar.Font = new Font("Segoe UI Variable Display", 13.8F, FontStyle.Bold);
@@ -85,6 +88,7 @@
             // button1
             // 
             button1.BackColor = Color.Firebrick;
+            button1.Cursor = Cursors.Hand;
             button1.Dock = DockStyle.Fill;
             button1.FlatStyle = FlatStyle.Flat;
             button1.Font = new Font("Segoe UI Variable Display", 13.8F, FontStyle.Bold);
@@ -121,12 +125,12 @@
             // flpButtons
             // 
             flpButtons.Controls.Add(tableLayoutPanel1);
-            flpButtons.Dock = DockStyle.Fill;
+            flpButtons.Dock = DockStyle.Bottom;
             flpButtons.FlowDirection = FlowDirection.RightToLeft;
-            flpButtons.Location = new Point(12, 370);
+            flpButtons.Location = new Point(12, 403);
             flpButtons.Margin = new Padding(0);
             flpButtons.Name = "flpButtons";
-            flpButtons.Size = new Size(431, 100);
+            flpButtons.Size = new Size(431, 67);
             flpButtons.TabIndex = 2;
             flpButtons.WrapContents = false;
             // 
