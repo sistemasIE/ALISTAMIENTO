@@ -24,7 +24,6 @@
             dgvInfoEliminacion = new DataGridView();
             txtObservaciones = new TextBox();
             lblObservaciones = new Label();
-            button1 = new Button();
             btnRevertir = new Button();
             tlpRoot.SuspendLayout();
             pnlRight.SuspendLayout();
@@ -80,18 +79,15 @@
             pnlRight.Controls.Add(dgvInfoEliminacion, 0, 2);
             pnlRight.Controls.Add(txtObservaciones, 0, 1);
             pnlRight.Controls.Add(lblObservaciones, 0, 0);
-            pnlRight.Controls.Add(button1, 0, 4);
             pnlRight.Controls.Add(btnRevertir, 0, 3);
             pnlRight.Dock = DockStyle.Fill;
             pnlRight.Location = new Point(270, 11);
             pnlRight.Name = "pnlRight";
-            pnlRight.RowCount = 6;
+            pnlRight.RowCount = 4;
             pnlRight.RowStyles.Add(new RowStyle());
-            pnlRight.RowStyles.Add(new RowStyle(SizeType.Absolute, 266F));
+            pnlRight.RowStyles.Add(new RowStyle(SizeType.Absolute, 237F));
             pnlRight.RowStyles.Add(new RowStyle(SizeType.Percent, 75.60241F));
-            pnlRight.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
-            pnlRight.RowStyles.Add(new RowStyle(SizeType.Percent, 24.39759F));
-            pnlRight.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            pnlRight.RowStyles.Add(new RowStyle(SizeType.Absolute, 69F));
             pnlRight.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             pnlRight.Size = new Size(267, 493);
             pnlRight.TabIndex = 1;
@@ -103,7 +99,7 @@
             dgvInfoEliminacion.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvInfoEliminacion.BackgroundColor = SystemColors.ActiveCaptionText;
             dgvInfoEliminacion.Dock = DockStyle.Fill;
-            dgvInfoEliminacion.Location = new Point(3, 303);
+            dgvInfoEliminacion.Location = new Point(3, 274);
             dgvInfoEliminacion.Name = "dgvInfoEliminacion";
             dgvInfoEliminacion.ReadOnly = true;
             dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
@@ -116,7 +112,7 @@
             dgvInfoEliminacion.RowHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvInfoEliminacion.RowHeadersVisible = false;
             dgvInfoEliminacion.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvInfoEliminacion.Size = new Size(261, 79);
+            dgvInfoEliminacion.Size = new Size(261, 147);
             dgvInfoEliminacion.TabIndex = 4;
             // 
             // txtObservaciones
@@ -129,7 +125,7 @@
             txtObservaciones.Name = "txtObservaciones";
             txtObservaciones.ReadOnly = true;
             txtObservaciones.ScrollBars = ScrollBars.Vertical;
-            txtObservaciones.Size = new Size(261, 260);
+            txtObservaciones.Size = new Size(261, 231);
             txtObservaciones.TabIndex = 3;
             // 
             // lblObservaciones
@@ -145,15 +141,6 @@
             lblObservaciones.Text = "OBSERVACIONES:";
             lblObservaciones.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // button1
-            // 
-            button1.Location = new Point(3, 448);
-            button1.Name = "button1";
-            button1.Size = new Size(8, 1);
-            button1.TabIndex = 5;
-            button1.Text = "button1";
-            button1.UseVisualStyleBackColor = true;
-            // 
             // btnRevertir
             // 
             btnRevertir.BackColor = Color.Brown;
@@ -161,12 +148,13 @@
             btnRevertir.Dock = DockStyle.Fill;
             btnRevertir.Font = new Font("Segoe UI", 16.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnRevertir.ForeColor = SystemColors.Control;
-            btnRevertir.Location = new Point(3, 388);
+            btnRevertir.Location = new Point(3, 427);
             btnRevertir.Name = "btnRevertir";
-            btnRevertir.Size = new Size(261, 54);
+            btnRevertir.Size = new Size(261, 63);
             btnRevertir.TabIndex = 6;
             btnRevertir.Text = "Revertir";
             btnRevertir.UseVisualStyleBackColor = false;
+            btnRevertir.Click += lstEtiquetasEliminadas_DoubleClick;
             // 
             // EtqsEliminadasEnAlistamiento
             // 
@@ -192,7 +180,6 @@
         private DataGridView dgvInfoEliminacion;
         private TextBox txtObservaciones;
         private Label lblObservaciones;
-        private Button button1;
         private Button btnRevertir;
     }
 }

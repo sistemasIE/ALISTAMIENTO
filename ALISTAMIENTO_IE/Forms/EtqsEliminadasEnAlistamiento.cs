@@ -1,11 +1,11 @@
 ﻿using ALISTAMIENTO_IE.DTOs;
 using ALISTAMIENTO_IE.Interfaces;
+using Common.cache;
 
 namespace ALISTAMIENTO_IE.Forms
 {
     public partial class EtqsEliminadasEnAlistamiento : Form
     {
-        // 1. Uso de la Interfaz (Desacoplamiento)
         private readonly IEliminacionAlistamientoEtiquetaService _elimService;
         private readonly int _idAlistamiento;
 
@@ -26,10 +26,8 @@ namespace ALISTAMIENTO_IE.Forms
             await CargarListaAsync();
         }
 
-        // 4. CargarListaAsync optimizado (usa el DTO)
         private async Task CargarListaAsync()
         {
-            // Ya no necesitas ObtenerEtiquetaPorIdAsync, el servicio lo resolvió con el JOIN
             var eliminadas = await _elimService.ObtenerEliminacionesPorAlistamientoConEtiquetaAsync(_idAlistamiento);
 
             lstEtiquetasEliminadas.Items.Clear();
@@ -47,7 +45,6 @@ namespace ALISTAMIENTO_IE.Forms
             }
         }
 
-        // 5. Lógica de habilitación del botón (UX)
         private void lstEtiquetasEliminadas_SelectedIndexChanged(object? sender, EventArgs e)
         {
             // Habilitar solo si se selecciona exactamente un ítem.
@@ -61,7 +58,7 @@ namespace ALISTAMIENTO_IE.Forms
             }
         }
 
-        // 6. Lógica de doble click (ahora usa el DTO)
+        // Lógica de doble click (ahora usa el DTO)
         private void lstEtiquetasEliminadas_DoubleClick(object sender, EventArgs e)
         {
             if (lstEtiquetasEliminadas.SelectedItems.Count == 0) return;
@@ -77,13 +74,12 @@ namespace ALISTAMIENTO_IE.Forms
             {
         new { Campo = "Etiqueta", Valor = reg.EtiquetaTexto },
         new { Campo = "FechaEliminacion", Valor = reg.FechaEliminacion.ToString("yyyy-MM-dd HH:mm") },
-        // <<< CAMBIO AQUÍ >>> Ahora mostramos el nombre
         new { Campo = "Usuario Elimina", Valor = reg.NombreUsuarioElimina },
     };
             dgvInfoEliminacion.DataSource = data;
         }
 
-        // 7. Evento de Reversión (Orquestación)
+        //Evento de Reversión (Orquestación)
         private async void btnRevertir_Click(object? sender, EventArgs e)
         {
             if (lstEtiquetasEliminadas.SelectedItems.Count == 0) return;
@@ -93,12 +89,9 @@ namespace ALISTAMIENTO_IE.Forms
 
             if (regAuditoria == null) return;
 
-            // ... (Lógica de confirmación)
-
             try
             {
-                // **IMPORTANTE:** Obtén el ID de usuario real de tu sistema de autenticación
-                int idUsuarioActual = 123;
+                int idUsuarioActual = UserLoginCache.IdUser;
 
                 await _elimService.RevertirEliminacionAsync(regAuditoria.IdEliminacionAlistamientoEtiqueta, idUsuarioActual);
 
