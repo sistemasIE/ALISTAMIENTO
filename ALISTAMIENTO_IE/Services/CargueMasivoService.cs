@@ -261,6 +261,49 @@ namespace ALISTAMIENTO_IE.Services
 
                 return await connection.QueryAsync<MovimientoDoctoDto>(sqlTts, new { consecDocto, idTipoDocto, idCia });
             }
+            else if (string.Equals(idTipoDocto, "PVP", StringComparison.OrdinalIgnoreCase))
+            {
+                const string sqlPvp = @"
+                SELECT 
+                    t430.f430_ts,
+                    '' AS NOMBRE_CONDUCTOR,
+                    CASE t430.f430_id_cia WHEN 1 THEN 'RD/' WHEN 2 THEN 'IE/' END
+                        + t430.f430_id_tipo_docto + '-' + CONVERT(nvarchar(20), t430.f430_consec_docto) AS NUM_DOCUMENTO,
+                    t200.f200_razon_social AS [Razon Social cliente despacho],
+                    '' AS [U.M.emp.],
+                    t431.f431_cant1_pedida AS Cantidad,
+                    '' AS [Peso en KLS],
+                    '' AS [Cantidad en emp.],
+                    t150.f150_descripcion AS Bodega,
+                    t120.f120_id AS ITEM,
+                    t120.f120_descripcion AS [ITEM_RESUMEN],
+                    '' AS ANCHO,
+                    '' AS LARGO,
+                    '' AS GRAMAJE,
+                    t430.f430_notas AS [NOTAS_DEL_DOCTO],
+                    '' AS [Ciudad del punto de envio],
+                    t430.f430_id_cia
+                FROM t430_cm_pv_docto AS t430
+                JOIN t200_mm_terceros          AS t200 ON t200.f200_rowid = t430.f430_rowid_tercero_rem
+                JOIN t431_cm_pv_movto          AS t431 ON t431.f431_rowid_pv_docto = t430.f430_rowid
+                JOIN t121_mc_items_extensiones AS t121 ON t121.f121_rowid = t431.f431_rowid_item_ext
+                JOIN t120_mc_items             AS t120 ON t120.f120_rowid = t121.f121_rowid_item
+                JOIN t150_mc_bodegas           AS t150 ON t150.f150_rowid = t431.f431_rowid_bodega
+                WHERE 
+                    t430.f430_id_tipo_docto = 'PVP'
+                    AND t430.f430_ind_estado BETWEEN 1 AND 3
+                    AND t430.f430_id_cia = @idCia
+                    AND t430.f430_consec_docto = @consecDocto
+                ORDER BY 
+                    t430.f430_consec_docto DESC;
+                ";
+
+                return await connection.QueryAsync<MovimientoDoctoDto>(
+                    sqlPvp,
+                    new { idCia, consecDocto }
+                );
+            }
+
             else
             {
                 // === Query RMV ===
