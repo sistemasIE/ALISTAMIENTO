@@ -1036,14 +1036,7 @@ namespace ALISTAMIENTO_IE
         }
 
 
-
-
-
-
-
-
-
-        private async void button1_Click_1(object sender, EventArgs e)
+        private async void btnImprimir_Click(object sender, EventArgs e)
         {
             // Obtener los ítems del camión
             IEnumerable<CamionItemsDto> items = await _alistamientoService.ObtenerItemsPorAlistarCamion(codCamionSeleccionado);
@@ -1247,6 +1240,40 @@ namespace ALISTAMIENTO_IE
             {
                 MessageBox.Show("Error al anular el camión.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+
+        private async void btnVerMas_Click(object? sender, EventArgs e)
+        {
+            int? codCamion = GetSelectedCamionId();
+            if (codCamion == null || codCamion <= 0)
+            {
+                MessageBox.Show("Seleccione un camión para ver más.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Placas del camión seleccionado
+            var placas = placaCamionSeleccionado;
+            if (string.IsNullOrWhiteSpace(placas) && lvwListasCamiones.SelectedItems.Count > 0)
+            {
+                placas = lvwListasCamiones.SelectedItems[0].SubItems[0].Text;
+            }
+
+            // Obtener alistamiento actual por camión
+            var alistamiento = await _alistamientoService.ObtenerAlistamientoPorCamionDia(codCamion.Value);
+            if (alistamiento == null || alistamiento.IdAlistamiento <= 0)
+            {
+                MessageBox.Show("No hay alistamiento para este camión.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            using var scope = _scopeFactory.CreateScope();
+            var form = ActivatorUtilities.CreateInstance<ALISTAMIENTO_IE.Forms.FormDetalleAlistamiento>(
+                scope.ServiceProvider,
+                alistamiento.IdAlistamiento,
+                placas
+            );
+            form.ShowDialog(this);
         }
 
     }

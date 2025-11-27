@@ -8,7 +8,7 @@ public interface IAlistamientoService
     // --- CONSULTAS PRINCIPALES ---
 
 
-    Task<Object> ObtenerAlistamiento(int idAlistamiento);
+    Task<Alistamiento> ObtenerAlistamiento(int idAlistamiento);
     Task<Alistamiento> ObtenerAlistamientoPorCamionDia(int idCamionDia);
 
     Task<IEnumerable<CamionItemsDto>> ObtenerItemsPorAlistarCamion(int camionId);

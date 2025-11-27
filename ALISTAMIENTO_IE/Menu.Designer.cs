@@ -42,7 +42,13 @@
             lblFechaTitulo = new Label();
             lblFechaValor = new Label();
             lblItemsTitulo = new Label();
+            dgvItems = new DataGridView();
             lblTituloCamion = new Label();
+            tlpBotones = new TableLayoutPanel();
+            btnImprimir = new Button();
+            btnVerMas = new Button();
+            btnRecargar = new Button();
+            btnAlistar = new Button();
             tabReportes = new TabPage();
             tlpReportes = new TableLayoutPanel();
             tlpFiltros = new TableLayoutPanel();
@@ -84,11 +90,6 @@
             btnCerrarCamion = new Button();
             dataGridView1 = new DataGridView();
             lstCamiones = new ListBox();
-            tlpBotones = new TableLayoutPanel();
-            btnImprimir = new Button();
-            btnRecargar = new Button();
-            btnAlistar = new Button();
-            dgvItems = new DataGridView();
             tabMain.SuspendLayout();
             tabAlistar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splMain).BeginInit();
@@ -98,6 +99,8 @@
             tlpLeft.SuspendLayout();
             grpDetalleCamion.SuspendLayout();
             tlpRight.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvItems).BeginInit();
+            tlpBotones.SuspendLayout();
             tabReportes.SuspendLayout();
             tlpReportes.SuspendLayout();
             tlpFiltros.SuspendLayout();
@@ -117,8 +120,6 @@
             ((System.ComponentModel.ISupportInitialize)dtgCargueMasivo).BeginInit();
             tabAdmonCamiones.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
-            tlpBotones.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvItems).BeginInit();
             SuspendLayout();
             // 
             // tabMain
@@ -300,6 +301,25 @@
             lblItemsTitulo.TabIndex = 3;
             lblItemsTitulo.Text = "Lista de Items:";
             // 
+            // dgvItems
+            // 
+            dgvItems.AllowUserToAddRows = false;
+            dgvItems.AllowUserToDeleteRows = false;
+            dgvItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvItems.BackgroundColor = SystemColors.Window;
+            dgvItems.ColumnHeadersHeight = 35;
+            tlpRight.SetColumnSpan(dgvItems, 2);
+            dgvItems.Dock = DockStyle.Fill;
+            dgvItems.Location = new Point(2, 119);
+            dgvItems.Margin = new Padding(2);
+            dgvItems.Name = "dgvItems";
+            dgvItems.ReadOnly = true;
+            dgvItems.RowHeadersVisible = false;
+            dgvItems.RowHeadersWidth = 51;
+            dgvItems.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvItems.Size = new Size(633, 231);
+            dgvItems.TabIndex = 4;
+            // 
             // lblTituloCamion
             // 
             lblTituloCamion.AutoSize = true;
@@ -311,6 +331,99 @@
             lblTituloCamion.Size = new Size(119, 30);
             lblTituloCamion.TabIndex = 0;
             lblTituloCamion.Text = "CAMIÓN -";
+            // 
+            // tlpBotones
+            // 
+            tlpBotones.ColumnCount = 4;
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 146F));
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 42.24138F));
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 57.75862F));
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 183F));
+            tlpBotones.Controls.Add(btnImprimir, 3, 0);
+            tlpBotones.Controls.Add(btnVerMas, 2, 0);
+            tlpBotones.Controls.Add(btnRecargar, 1, 0);
+            tlpBotones.Controls.Add(btnAlistar, 0, 0);
+            tlpBotones.Dock = DockStyle.Fill;
+            tlpBotones.GrowStyle = TableLayoutPanelGrowStyle.AddColumns;
+            tlpBotones.Location = new Point(3, 355);
+            tlpBotones.Name = "tlpBotones";
+            tlpBotones.RowCount = 1;
+            tlpBotones.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tlpBotones.Size = new Size(631, 62);
+            tlpBotones.TabIndex = 8;
+            // 
+            // btnImprimir
+            // 
+            btnImprimir.AutoSize = true;
+            btnImprimir.BackColor = Color.MediumBlue;
+            btnImprimir.Cursor = Cursors.Hand;
+            btnImprimir.Dock = DockStyle.Fill;
+            btnImprimir.FlatAppearance.BorderColor = Color.FromArgb(155, 187, 89);
+            btnImprimir.FlatStyle = FlatStyle.Flat;
+            btnImprimir.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
+            btnImprimir.ForeColor = Color.White;
+            btnImprimir.Location = new Point(449, 2);
+            btnImprimir.Margin = new Padding(2);
+            btnImprimir.Name = "btnImprimir";
+            btnImprimir.Padding = new Padding(10, 5, 10, 5);
+            btnImprimir.Size = new Size(180, 58);
+            btnImprimir.TabIndex = 11;
+            btnImprimir.Text = "IMPRIMIR";
+            btnImprimir.UseVisualStyleBackColor = false;
+            btnImprimir.Visible = false;
+            btnImprimir.Click += btnImprimir_Click;
+            // 
+            // btnVerMas
+            // 
+            btnVerMas.AutoSize = true;
+            btnVerMas.BackColor = Color.Gray;
+            btnVerMas.Cursor = Cursors.Hand;
+            btnVerMas.Dock = DockStyle.Fill;
+            btnVerMas.FlatAppearance.BorderColor = Color.FromArgb(155, 187, 89);
+            btnVerMas.FlatStyle = FlatStyle.Flat;
+            btnVerMas.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
+            btnVerMas.ForeColor = Color.White;
+            btnVerMas.Location = new Point(275, 2);
+            btnVerMas.Margin = new Padding(2);
+            btnVerMas.Name = "btnVerMas";
+            btnVerMas.Padding = new Padding(10, 5, 10, 5);
+            btnVerMas.Size = new Size(170, 58);
+            btnVerMas.TabIndex = 10;
+            btnVerMas.Text = "VER MÁS";
+            btnVerMas.UseVisualStyleBackColor = false;
+            btnVerMas.Click += btnVerMas_Click;
+            // 
+            // btnRecargar
+            // 
+            btnRecargar.Cursor = Cursors.Hand;
+            btnRecargar.Dock = DockStyle.Fill;
+            btnRecargar.Location = new Point(149, 3);
+            btnRecargar.Name = "btnRecargar";
+            btnRecargar.Size = new Size(121, 56);
+            btnRecargar.TabIndex = 8;
+            btnRecargar.Text = "RECARGAR";
+            btnRecargar.UseVisualStyleBackColor = true;
+            btnRecargar.Click += btnRecargar_Click;
+            // 
+            // btnAlistar
+            // 
+            btnAlistar.AutoSize = true;
+            btnAlistar.BackColor = Color.FromArgb(198, 239, 206);
+            btnAlistar.Cursor = Cursors.Hand;
+            btnAlistar.Dock = DockStyle.Fill;
+            btnAlistar.FlatAppearance.BorderColor = Color.FromArgb(155, 187, 89);
+            btnAlistar.FlatStyle = FlatStyle.Flat;
+            btnAlistar.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
+            btnAlistar.Location = new Point(2, 2);
+            btnAlistar.Margin = new Padding(2);
+            btnAlistar.Name = "btnAlistar";
+            btnAlistar.Padding = new Padding(10, 5, 10, 5);
+            btnAlistar.Size = new Size(142, 58);
+            btnAlistar.TabIndex = 7;
+            btnAlistar.Text = "ALISTAR";
+            btnAlistar.UseVisualStyleBackColor = false;
+            btnAlistar.Visible = false;
+            btnAlistar.Click += btnAlistar_Click;
             // 
             // tabReportes
             // 
@@ -812,85 +925,6 @@
             lstCamiones.TabIndex = 11;
             lstCamiones.SelectedIndexChanged += lstCamiones_SelectedIndexChanged;
             // 
-            // tlpBotones
-            // 
-            tlpBotones.ColumnCount = 3;
-            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 192F));
-            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tlpBotones.Controls.Add(btnImprimir, 2, 0);
-            tlpBotones.Controls.Add(btnRecargar, 1, 0);
-            tlpBotones.Controls.Add(btnAlistar, 0, 0);
-            tlpBotones.GrowStyle = TableLayoutPanelGrowStyle.AddColumns;
-            tlpBotones.Location = new Point(3, 355);
-            tlpBotones.Name = "tlpBotones";
-            tlpBotones.RowCount = 1;
-            tlpBotones.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tlpBotones.Size = new Size(559, 56);
-            tlpBotones.TabIndex = 8;
-            // 
-            // btnImprimir
-            // 
-            btnImprimir.BackColor = Color.Blue;
-            btnImprimir.Cursor = Cursors.Hand;
-            btnImprimir.Dock = DockStyle.Fill;
-            btnImprimir.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnImprimir.ForeColor = SystemColors.ControlLightLight;
-            btnImprimir.Location = new Point(378, 3);
-            btnImprimir.Name = "btnImprimir";
-            btnImprimir.Size = new Size(178, 50);
-            btnImprimir.TabIndex = 8;
-            btnImprimir.Text = "IMPRIMIR";
-            btnImprimir.UseVisualStyleBackColor = false;
-            // 
-            // btnRecargar
-            // 
-            btnRecargar.Dock = DockStyle.Fill;
-            btnRecargar.Location = new Point(195, 3);
-            btnRecargar.Name = "btnRecargar";
-            btnRecargar.Size = new Size(177, 50);
-            btnRecargar.TabIndex = 8;
-            btnRecargar.Text = "RECARGAR";
-            btnRecargar.UseVisualStyleBackColor = true;
-            // 
-            // btnAlistar
-            // 
-            btnAlistar.AutoSize = true;
-            btnAlistar.BackColor = Color.FromArgb(198, 239, 206);
-            btnAlistar.Cursor = Cursors.Hand;
-            btnAlistar.Dock = DockStyle.Fill;
-            btnAlistar.FlatAppearance.BorderColor = Color.FromArgb(155, 187, 89);
-            btnAlistar.FlatStyle = FlatStyle.Flat;
-            btnAlistar.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
-            btnAlistar.Location = new Point(2, 2);
-            btnAlistar.Margin = new Padding(2);
-            btnAlistar.Name = "btnAlistar";
-            btnAlistar.Padding = new Padding(10, 5, 10, 5);
-            btnAlistar.Size = new Size(188, 52);
-            btnAlistar.TabIndex = 7;
-            btnAlistar.Text = "ALISTAR";
-            btnAlistar.UseVisualStyleBackColor = false;
-            btnAlistar.Visible = false;
-            // 
-            // dgvItems
-            // 
-            dgvItems.AllowUserToAddRows = false;
-            dgvItems.AllowUserToDeleteRows = false;
-            dgvItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvItems.BackgroundColor = SystemColors.Window;
-            dgvItems.ColumnHeadersHeight = 35;
-            tlpRight.SetColumnSpan(dgvItems, 2);
-            dgvItems.Dock = DockStyle.Fill;
-            dgvItems.Location = new Point(2, 119);
-            dgvItems.Margin = new Padding(2);
-            dgvItems.Name = "dgvItems";
-            dgvItems.ReadOnly = true;
-            dgvItems.RowHeadersVisible = false;
-            dgvItems.RowHeadersWidth = 51;
-            dgvItems.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvItems.Size = new Size(633, 231);
-            dgvItems.TabIndex = 4;
-            // 
             // Menu
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
@@ -915,6 +949,9 @@
             grpDetalleCamion.ResumeLayout(false);
             tlpRight.ResumeLayout(false);
             tlpRight.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvItems).EndInit();
+            tlpBotones.ResumeLayout(false);
+            tlpBotones.PerformLayout();
             tabReportes.ResumeLayout(false);
             tlpReportes.ResumeLayout(false);
             tlpFiltros.ResumeLayout(false);
@@ -938,9 +975,6 @@
             ((System.ComponentModel.ISupportInitialize)dtgCargueMasivo).EndInit();
             tabAdmonCamiones.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
-            tlpBotones.ResumeLayout(false);
-            tlpBotones.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvItems).EndInit();
             ResumeLayout(false);
         }
 
@@ -1006,8 +1040,9 @@
         private Button btnCerrarCamion;
         private DataGridView dgvItems;
         private TableLayoutPanel tlpBotones;
-        private Button btnImprimir;
         private Button btnRecargar;
         private Button btnAlistar;
+        private Button btnImprimir;
+        private Button btnVerMas;
     }
 }

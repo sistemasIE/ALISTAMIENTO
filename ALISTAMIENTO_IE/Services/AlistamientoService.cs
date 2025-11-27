@@ -276,11 +276,22 @@ namespace ALISTAMIENTO_IE.Services
             throw new NotImplementedException();
         }
 
-        public Task<object> ObtenerAlistamiento(int idAlistamiento)
+        public async Task<Alistamiento> ObtenerAlistamiento(int idAlistamiento)
         {
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionStringMAIN))
+            {
+                string sql = @"SELECT * FROM ALISTAMIENTO
+                       WHERE idAlistamiento = @idAlistamiento;";
+
+                var parameters = new { idAlistamiento = idAlistamiento };
+
+                var result = await connection.QueryFirstOrDefaultAsync<Alistamiento>(sql, parameters);
+                return result;
+            }
         }
-        public async Task<Alistamiento> ObtenerAlistamientoCompletoPorCamionDia(int idCamionDia)
+
+
+        public async Task<Alistamiento> ObtenerAlistamientoPorCamionDia(int idCamionDia)
         {
             using (var connection = new SqlConnection(_connectionStringMAIN))
             {
@@ -291,11 +302,6 @@ namespace ALISTAMIENTO_IE.Services
                 return alistamiento;
 
             }
-        }
-
-        public Task<Alistamiento> ObtenerAlistamientoPorCamionDia(int idCamionDia)
-        {
-            throw new NotImplementedException();
         }
 
 
