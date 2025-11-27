@@ -209,9 +209,9 @@ SELECT
                     WHERE 
                         ae.fecha >= @fechaInicio
                         AND ae.fecha < @fechaFin
-                        AND a.estado LIKE '%alistado%
+                        AND a.estado LIKE '%alistado%'
                         AND ae.estado = 'ACTIVA'
-                    '";
+                    ";
 
                 if (!string.IsNullOrWhiteSpace(turnoLike))
                 {
