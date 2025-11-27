@@ -1,10 +1,10 @@
+using ALISTAMIENTO_IE.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Configuration;
-
 namespace ALISTAMIENTO_IE.Services
 {
-    public class ItemService
+    public class ItemService : IItemService
     {
         private readonly string _connectionStringUnoe;
 

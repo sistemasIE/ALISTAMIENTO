@@ -17,5 +17,8 @@
         public TipoProductoEnum DESDE { get; set; }
         public float VALOR { get; set; }
 
+        public int IDALISTAMIENTOETIQUETA { get; set; }
+
+
     }
 }

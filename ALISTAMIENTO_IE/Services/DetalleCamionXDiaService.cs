@@ -1,3 +1,4 @@
+using ALISTAMIENTO_IE.Interfaces;
 using ALISTAMIENTO_IE.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -5,9 +6,16 @@ using System.Configuration;
 
 namespace ALISTAMIENTO_IE.Services
 {
-    public class DetalleCamionXDiaService
+    public class DetalleCamionXDiaService : IDetalleCamionXDiaService
     {
-        private readonly string _connectionString = ConfigurationManager.ConnectionStrings["stringConexionSIE"].ConnectionString;
+        private readonly string _connectionString;
+
+        public DetalleCamionXDiaService() // Si NO usas un Contenedor de DI (WinForms puro y ConfigurationManager)
+        {
+            // Usar la asignación estática solo si el ambiente NO tiene DI
+            _connectionString = ConfigurationManager.ConnectionStrings["stringConexionSIE"].ConnectionString;
+        }
+
 
         // SELECT por COD_CAMION (ya existente, actualizado para evitar SELECT *)
         public IEnumerable<DetalleCamionXDia> ObtenerPorCodCamion(int codCamion)
@@ -68,6 +76,6 @@ namespace ALISTAMIENTO_IE.Services
                 });
             }
         }
-        
+
     }
 }

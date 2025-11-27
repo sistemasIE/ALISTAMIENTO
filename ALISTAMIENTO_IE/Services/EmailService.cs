@@ -1,28 +1,20 @@
-﻿using ALISTAMIENTO_IE.DTOs;
-using MailKit.Net.Smtp;
-using MailKit.Security;
-using MimeKit;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using ALISTAMIENTO_IE.Interfaces;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ALISTAMIENTO_IE.Services
 {
-    public class EmailService
+    public class EmailService : IEmailService
     {
-        private readonly System.Net.Mail.SmtpClient _client;
+        private readonly SmtpClient _client;
         private readonly string _remitente;
 
         public EmailService()
         {
             _remitente = "notificaciones@integraldeempaques.com";
 
-            _client = new System.Net.Mail.SmtpClient("192.168.16.215")
+            _client = new SmtpClient("192.168.16.215")
             {
                 Port = 2727,
                 UseDefaultCredentials = false,
@@ -60,7 +52,7 @@ namespace ALISTAMIENTO_IE.Services
             <p><strong>Causa de cierre:</strong> {System.Net.WebUtility.HtmlEncode(causa)}</p>
         ";
 
-                
+
 
                 await EnviarCorreoAsync(asunto, cuerpo, destinatarios);
             }

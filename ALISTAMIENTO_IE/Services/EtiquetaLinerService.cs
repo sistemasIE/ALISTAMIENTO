@@ -1,11 +1,12 @@
-﻿using ALISTAMIENTO_IE.Model;
+﻿using ALISTAMIENTO_IE.Interfaces;
+using ALISTAMIENTO_IE.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Configuration;
 
 namespace ALISTAMIENTO_IE.Services
 {
-    public class EtiquetaLinerService
+    public class EtiquetaLinerService : IEtiquetaLinerService
     {
         private readonly string _connectionString;
 

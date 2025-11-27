@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ALISTAMIENTO_IE.Model
+namespace ALISTAMIENTO_IE.Models
 {
     // El modelo de la clase se ha ajustado para el mapeo con Dapper.
     // Dapper mapea las propiedades de la clase directamente a las columnas de la tabla.

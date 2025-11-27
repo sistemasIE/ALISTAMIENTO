@@ -30,12 +30,11 @@
     {
 
 
-        public DateTime Fecha { get; set; }
-        public string Item { get; set; }
         public string Descripcion { get; set; }
+        public string Item { get; set; }
+        public string Destino { get; set; }
         public string? UNIDAD { get; set; }
         public string? EMB { get; set; }
-        public string Placas { get; set; }
 
         public decimal CantTotalPedido { get; set; }
         public decimal? PacasEsperadas { get; set; }

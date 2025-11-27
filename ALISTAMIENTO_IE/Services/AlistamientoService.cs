@@ -1,4 +1,5 @@
 ﻿using ALISTAMIENTO_IE.DTOs;
+using ALISTAMIENTO_IE.Interfaces;
 using ALISTAMIENTO_IE.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -9,20 +10,26 @@ namespace ALISTAMIENTO_IE.Services
 {
     public class AlistamientoService : IAlistamientoService
     {
-        private readonly string _connectionStringSIE = ConfigurationManager.ConnectionStrings["stringConexionSIE"].ConnectionString;
         private readonly string _connectionStringMAIN = ConfigurationManager.ConnectionStrings["stringConexionLocal"].ConnectionString;
-        private readonly CamionXDiaService _camionXDiaService;
-        private readonly DetalleCamionXDiaService _detalleCamionXDiaService;
-        private readonly AlistamientoEtiquetaService _alistamientoEtiquetaService;
-        private readonly ItemService _itemService;
+        private readonly ICamionXDiaService _camionXDiaService;
+        private readonly IDetalleCamionXDiaService _detalleCamionXDiaService;
+        private readonly IAlistamientoEtiquetaService _alistamientoEtiquetaService;
+        private readonly IItemService _itemService;
 
-        public AlistamientoService()
+        public AlistamientoService(
+           ICamionXDiaService camionXDiaService,
+           IDetalleCamionXDiaService detalleCamionXDiaService,
+           IAlistamientoEtiquetaService alistamientoEtiquetaService,
+           IItemService itemService
+       )
         {
-            _camionXDiaService = new CamionXDiaService();
-            _detalleCamionXDiaService = new DetalleCamionXDiaService();
-            _alistamientoEtiquetaService = new AlistamientoEtiquetaService();
-            _itemService = new ItemService();
+            _camionXDiaService = camionXDiaService;
+            _detalleCamionXDiaService = detalleCamionXDiaService;
+            _alistamientoEtiquetaService = alistamientoEtiquetaService;
+            _itemService = itemService;
+
         }
+
 
         public async Task<IEnumerable<CamionItemsDto>> ObtenerItemsPorAlistarCamion(int camionId)
         {
@@ -31,10 +38,9 @@ namespace ALISTAMIENTO_IE.Services
             {
                 string sql = @"
                     SELECT
-                    c.PLACAS AS Placas,
-                    cxd.fecha AS Fecha,
                     i.f120_descripcion AS Descripcion,
                     dcxd.item AS Item,
+                    dcxd.PTO_ENVIO as Destino,
                     i.f120_id_unidad_inventario as UNIDAD,
                     i.f120_id_unidad_empaque as EMB,
                     SUM(dcxd.CANTIDAD_PLANIFICADA) AS CantTotalPedido,
@@ -61,7 +67,7 @@ namespace ALISTAMIENTO_IE.Services
                 WHERE
                     cxd.COD_CAMION = @idCamionDia AND i.f120_id_cia = 2
                 GROUP BY
-                    cxd.COD_CAMION, c.PLACAS, cxd.FECHA, i.f120_id_unidad_inventario, i.f120_id, i.f120_descripcion,
+                    cxd.COD_CAMION, c.PLACAS, i.f120_id_unidad_inventario, i.f120_id, i.f120_descripcion,
                     dcxd.item, cxd.ESTADO, a.estado, i.f120_id_unidad_empaque, dcxd.PTO_ENVIO
                 ORDER BY
                     CantTotalPedido DESC;
@@ -269,11 +275,22 @@ namespace ALISTAMIENTO_IE.Services
             throw new NotImplementedException();
         }
 
-        public Task<object> ObtenerAlistamiento(int idAlistamiento)
+        public async Task<Alistamiento> ObtenerAlistamiento(int idAlistamiento)
         {
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionStringMAIN))
+            {
+                string sql = @"SELECT * FROM ALISTAMIENTO
+                       WHERE idAlistamiento = @idAlistamiento;";
+
+                var parameters = new { idAlistamiento = idAlistamiento };
+
+                var result = await connection.QueryFirstOrDefaultAsync<Alistamiento>(sql, parameters);
+                return result;
+            }
         }
-        public async Task<Alistamiento> ObtenerAlistamientoCompletoPorCamionDia(int idCamionDia)
+
+
+        public async Task<Alistamiento> ObtenerAlistamientoPorCamionDia(int idCamionDia)
         {
             using (var connection = new SqlConnection(_connectionStringMAIN))
             {
@@ -284,11 +301,6 @@ namespace ALISTAMIENTO_IE.Services
                 return alistamiento;
 
             }
-        }
-
-        public Task<Alistamiento> ObtenerAlistamientoPorCamionDia(int idCamionDia)
-        {
-            throw new NotImplementedException();
         }
 
 
@@ -302,7 +314,7 @@ namespace ALISTAMIENTO_IE.Services
             List<AlistamientoItemDTO> alistados;
             try
             {
-                alistados = await _alistamientoEtiquetaService.GetItemsAlistadosAsync(idCamion);
+                alistados = await _alistamientoEtiquetaService.ObtenerItemAlistados(idCamion);
             }
             catch
             {

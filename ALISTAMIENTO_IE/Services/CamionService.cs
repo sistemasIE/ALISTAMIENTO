@@ -1,4 +1,5 @@
-﻿using ALISTAMIENTO_IE.Models;
+﻿using ALISTAMIENTO_IE.Interfaces;
+using ALISTAMIENTO_IE.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Configuration;
@@ -12,7 +13,7 @@ namespace ALISTAMIENTO_IE.Services
     /// Servicio para la capa de acceso a datos de los camiones.
     /// Utiliza Dapper para consultar la base de datos de manera eficiente.
     /// </summary>
-    public class CamionService
+    public class CamionService : ICamionService
     {
         private readonly string _connectionString;
 

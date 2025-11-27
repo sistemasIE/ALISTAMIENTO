@@ -1,10 +1,11 @@
-﻿using Dapper;
+﻿using ALISTAMIENTO_IE.Interfaces;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Configuration;
 
 namespace ALISTAMIENTO_IE.Services
 {
-    public class CamionXDiaService
+    public class CamionXDiaService : ICamionXDiaService
     {
         private readonly string _connectionStringSIE;
 

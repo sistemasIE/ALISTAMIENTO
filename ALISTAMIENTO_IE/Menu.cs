@@ -5,58 +5,75 @@ using ALISTAMIENTO_IE.Utils;
 using Common.cache;
 //using DocumentFormat.OpenXml.Spreadsheet;
 using ExcelDataReader;
+using Microsoft.Extensions.DependencyInjection;
 using System.Data;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ALISTAMIENTO_IE
 {
     public partial class Menu : Form
     {
-        private readonly AlistamientoService alistamientoService;
-        private readonly IPdfService _pdfService;
-        private readonly CamionXDiaService _camionXDiaService;
-        private readonly DetalleCamionXDiaService _detalleCamionXDiaService;
-        private readonly AlistamientoEtiquetaService _alistamientoEtiquetaService; // reporte
-        private readonly KardexService _kardexService; // reporte
-        private readonly IDataGridViewExporter _dataGridViewExporter; // reporte
-        private readonly CargueMasivoService _cargueMasivoService;
-        private readonly EmailService _emailService;
-        private List<CamionDetallesDTO> _camiones;
-        private readonly TimerTurnos _turnoTimerManager; // Manejador de Timer y Turnos
-        private readonly System.Windows.Forms.Timer _timer;
-        private System.Windows.Forms.Timer _cooldownTimer;
         private bool _canClick = true;
-
-        private List<MovimientoDocumentoDto> listaNormal = new();
-        private List<GrupoMovimientosDto> listaAgrupada = new();
-        private Dictionary<string, string> _cacheItemsEquivalentes = new Dictionary<string, string>();
-        private List<long> codCamiones = new List<long>();
-
-
-        private int codCamionSeleccionado;
-        private String placaCamionSeleccionado;
         private bool _hasUploaded = false;
+        private Dictionary<string, string> _cacheItemsEquivalentes = new Dictionary<string, string>();
+        private int codCamionSeleccionado;
+        private List<CamionDetallesDTO> _camiones;
+        private List<GrupoMovimientosDto> listaAgrupada = new();
+        private List<long> codCamiones = new List<long>();
+        private List<MovimientoDocumentoDto> listaNormal = new();
+        private ListViewItem[] camionesSeleccionados;
+
+        private readonly IServiceScopeFactory _scopeFactory;
+
+        private readonly IAlistamientoService _alistamientoService;
+        private readonly IPdfService _pdfService;
+        private readonly ICamionXDiaService _camionXDiaService;
+        private readonly IDetalleCamionXDiaService _detalleCamionXDiaService;
+        private readonly IAlistamientoEtiquetaService _alistamientoEtiquetaService;
+        private readonly IKardexService _kardexService;
+        private readonly IDataGridViewExporter _dataGridViewExporter;
+        private readonly CargueMasivoService _cargueMasivoService;
+        private readonly IEmailService _emailService;
 
 
-        public Menu()
+        private readonly System.Windows.Forms.Timer _timer;
+        private readonly TimerTurnos _turnoTimerManager; // Manejador de Timer y Turnos
+        private String placaCamionSeleccionado;
+        private System.Windows.Forms.Timer _cooldownTimer;
+
+        public Menu(
+             IAlistamientoService alistamientoService,
+             IPdfService pdfService,
+             ICamionXDiaService camionXDiaService,
+             IDetalleCamionXDiaService detalleCamionXDiaService,
+             IAlistamientoEtiquetaService alistamientoEtiquetaService,
+             IKardexService kardexService,
+             IDataGridViewExporter dataGridViewExporter,
+             CargueMasivoService cargueMasivoService,
+             IEmailService emailService,
+             IServiceScopeFactory scopeFactory
+         )
         {
             InitializeComponent();
-
             this.Icon = ALISTAMIENTO_IE.Properties.Resources.Icono;
 
-            _detalleCamionXDiaService = new DetalleCamionXDiaService();
-            alistamientoService = new AlistamientoService();
-            _alistamientoEtiquetaService = new AlistamientoEtiquetaService();
-            _camionXDiaService = new CamionXDiaService();
-            _turnoTimerManager = new TimerTurnos(this); // inicializar el timer
-            _cargueMasivoService = new CargueMasivoService();
-            _dataGridViewExporter = new DataGridViewExporter();
-            _kardexService = new KardexService();
-            _pdfService = new QuestPDFService(_dataGridViewExporter);
-            _emailService = new EmailService();
+            // 1. Asignación de servicios (Adiós a los new())
+            _alistamientoService = alistamientoService;
+            _pdfService = pdfService;
+            _camionXDiaService = camionXDiaService;
+            _detalleCamionXDiaService = detalleCamionXDiaService;
+            _alistamientoEtiquetaService = alistamientoEtiquetaService;
+            _kardexService = kardexService;
+            _dataGridViewExporter = dataGridViewExporter;
+            _cargueMasivoService = cargueMasivoService;
+            _emailService = emailService;
+            _scopeFactory = scopeFactory; // Asignamos la fábrica
+
+            _turnoTimerManager = new TimerTurnos(this);
+
             CargarUI();
+
 
             lvwListasCamiones.DoubleClick += lvwListasCamiones_DoubleClick;
             lvwListasCamiones.Click += lvwListasCamiones_DoubleClick;
@@ -85,9 +102,7 @@ namespace ALISTAMIENTO_IE
             tbcTurnos.SelectedIndexChanged += TbcTurnos_SelectedIndexChanged;
 
             // Validaciones:
-
             LimitarVistaPorUsuario();
-
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
@@ -188,7 +203,7 @@ namespace ALISTAMIENTO_IE
         private void CargarCamiones()
         {
 
-            List<CamionEnAlistamientoDTO> _camiones = alistamientoService.ObtenerCamionesEnAlistamiento().ToList();
+            List<CamionEnAlistamientoDTO> _camiones = _alistamientoService.ObtenerCamionesEnAlistamiento().ToList();
             lvwListasCamiones.Items.Clear();
             foreach (CamionEnAlistamientoDTO camion in _camiones)
             {
@@ -229,6 +244,8 @@ namespace ALISTAMIENTO_IE
 
         private async void lvwListasCamiones_DoubleClick(object sender, EventArgs e)
         {
+
+            // Si no se seleccionó nada
             if (lvwListasCamiones.SelectedItems.Count == 0)
             {
                 dgvItems.DataSource = null;
@@ -264,7 +281,7 @@ namespace ALISTAMIENTO_IE
 
                 if (estadoAlistamiento == "ALISTADO" || estadoAlistamiento == "ALISTADO_INCOMPLETO")
                 {
-                    await alistamientoService.CargarCamionDia(codCamionSeleccionado, this.dgvItems);
+                    await _alistamientoService.CargarCamionDia(codCamionSeleccionado, this.dgvItems);
 
                 }
                 else
@@ -274,15 +291,16 @@ namespace ALISTAMIENTO_IE
                     btnAlistar.Visible = true;
 
                 }
-
+                // Muestra el camión en la UI
                 lblTituloCamion.Text = $"CAMIÓN - {placaCamionSeleccionado}";
-                lblFechaValor.Text = fecha.ToString("dd/MM/yyyy"); // lo muestras en formato lindo
+                // Se muestra la fecha
+                lblFechaValor.Text = fecha.ToString("dd/MM/yyyy");
             }
         }
 
         private async void MostrarItemsDeCamion(int codCamion)
         {
-            List<CamionItemsDto> items = new List<CamionItemsDto>(await alistamientoService.ObtenerItemsPorAlistarCamion(codCamion));
+            List<CamionItemsDto> items = new List<CamionItemsDto>(await _alistamientoService.ObtenerItemsPorAlistarCamion(codCamion));
             dgvItems.DataSource = items;
         }
 
@@ -298,7 +316,10 @@ namespace ALISTAMIENTO_IE
 
         private void btnAlistar_Click(object sender, EventArgs e)
         {
+            // Obtiene el id del camión
             int? codCamion = GetSelectedCamionId();
+
+            // Verificación
             if (codCamion == null || codCamion <= 0)
             {
                 MessageBox.Show("Seleccione un camión para alistar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -351,8 +372,17 @@ namespace ALISTAMIENTO_IE
             {
                 // IMPORTANTE: Pasar el estado original para que ALISTAMIENTO sepa cómo manejarlo
                 // pero el formulario ALISTAMIENTO se encargará de cambiar el estado a EN_PROCESO internamente
-                var alistamientoForm = new ALISTAMIENTO(codCamion.Value, estadoActual);
-                alistamientoForm.ShowDialog(this);
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    // ActivatorUtilities resuelve automáticamente todas las dependencias
+                    // del constructor de ALISTAMIENTO (excepto los parámetros de contexto).
+                    var formAlistamiento = ActivatorUtilities.CreateInstance<ALISTAMIENTO>(
+                        scope.ServiceProvider,
+                        codCamionSeleccionado,
+                        estadoActual
+                    );
+                    formAlistamiento.ShowDialog(this);
+                }
 
                 // Recargar los camiones después de cerrar el formulario para reflejar cambios
                 CargarCamiones();
@@ -1005,49 +1035,59 @@ namespace ALISTAMIENTO_IE
         }
 
 
-
-
-
-
-
-
-
-        private async void button1_Click_1(object sender, EventArgs e)
+        private async void btnImprimir_Click(object sender, EventArgs e)
         {
-            // Obtener los ítems del camión
-            IEnumerable<CamionItemsDto> items = await alistamientoService.ObtenerItemsPorAlistarCamion(codCamionSeleccionado);
+            var logs = new List<string>();
 
-            // Extraer códigos de ítems para el kardex
-            var validItems = items.Select(x => x.Item).ToList();
-
-            if (validItems.Count == 0)
+            foreach (ListViewItem camion in camionesSeleccionados)
             {
-                MessageBox.Show("No hay ítems válidos para el camión seleccionado.",
-                                "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                var idCamionSeleccionado = camion.Tag;
+                var placaDelCamion = camion.SubItems[0].Text;
+
+                CamionXDia? cxd = await _camionXDiaService.GetByIdAsync(idCamionSeleccionado is int cod ? cod : 0);
+
+                if (cxd == null)
+                {
+                    logs.Add($"❌ {placaDelCamion}: NO se encontró el camión.");
+                    continue;
+                }
+
+                IEnumerable<CamionItemsDto> items = await _alistamientoService.ObtenerItemsPorAlistarCamion((int)cxd.CodCamion);
+
+                var validItems = items.Select(x => x.Item).ToList();
+
+                if (validItems.Count == 0)
+                {
+                    logs.Add($"⚠️ {placaDelCamion}: No tiene ítems válidos.");
+                    continue;
+                }
+
+                var totales = _alistamientoService.CalcularTotalesReporte(items);
+
+                DataTable dt1 = _dataGridViewExporter.ToDataTable(items);
+                _alistamientoService.AgregarFilaTotalesADataTable(dt1, totales);
+
+                DataTable dt2 = _kardexService.ObtenerDatosDeItems(validItems);
+
+                List<string> titles = new()
+        {
+            $"PLACA: {placaDelCamion}",
+            cxd.Fecha?.ToString("dd/MM/yyyy") ?? ""
+        };
+
+                _pdfService.Generate(dt1, dt2, titles);
+
+                logs.Add($"✔️ {placaDelCamion}: PDF generado. " +
+                         $"Pacas: {totales.TotalPacasEsperadas:N2}, " +
+                         $"Kilos: {totales.TotalKilosEsperados:N2}");
             }
 
-            // Calcular totales usando el servicio
-            ReporteImpresionTotalesDto totales = alistamientoService.CalcularTotalesReporte(items);
-
-            // Convertir items a DataTable
-            DataTable dt1 = _dataGridViewExporter.ToDataTable(items);
-
-            // Agregar fila de totales usando el servicio
-            alistamientoService.AgregarFilaTotalesADataTable(dt1, totales);
-
-            // Obtener datos del kardex
-            DataTable dt2 = _kardexService.ObtenerDatosDeItems(validItems);
-
-            // Generar PDF
-            _pdfService.Generate(dt1, dt2, $"PLACA: {placaCamionSeleccionado}");
-
-            // Mostrar mensaje de éxito con los totales
-            MessageBox.Show($"PDF generado exitosamente.\n\nTotales:\n" +
-                          $"Cantidad Total: {totales.TotalCantTotalPedido:N2}\n" +
-                          $"Pacas Esperadas: {totales.TotalPacasEsperadas:N2}\n" +
-                          $"Kilos Esperados: {totales.TotalKilosEsperados:N2}");
+            // Mostrar solo UNA ventana al final
+            string resultado = string.Join("\n", logs);
+            MessageBox.Show($"Resultados de impresión:\n\n{resultado}",
+                            "Resumen", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
         public void AjustarListas(ListBox Lista)
         {
             // Permite dibujar ítems con varias líneas
@@ -1105,7 +1145,7 @@ namespace ALISTAMIENTO_IE
 
 
         }
-
+        // Función para listar los camiones y ordenarlos.
         private async void ALISTAR_CAMION_Load(object sender, EventArgs e)
         {
             AjustarListas(lstErrores);
@@ -1160,9 +1200,9 @@ namespace ALISTAMIENTO_IE
             long codCamion = codCamiones[lstCamiones.SelectedIndex];
             string texto = lstCamiones.GetItemText(lstCamiones.SelectedItem);
 
-            var alistamiento = await _alistamientoEtiquetaService.GetItemsAlistadosAsync(Convert.ToInt32(codCamion));
+            var alistamiento = await _alistamientoEtiquetaService.ObtenerItemAlistados(Convert.ToInt32(codCamion));
 
-            if( alistamiento.Count > 0)
+            if (alistamiento.Count > 0)
             {
                 MessageBox.Show("No se puede anular el camión porque tiene alistamientos asociados.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -1218,5 +1258,52 @@ namespace ALISTAMIENTO_IE
             }
         }
 
+
+        private async void btnVerMas_Click(object? sender, EventArgs e)
+        {
+            int? codCamion = GetSelectedCamionId();
+            if (codCamion == null || codCamion <= 0)
+            {
+                MessageBox.Show("Seleccione un camión para ver más.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Placas del camión seleccionado
+            var placas = placaCamionSeleccionado;
+            if (string.IsNullOrWhiteSpace(placas) && lvwListasCamiones.SelectedItems.Count > 0)
+            {
+                placas = lvwListasCamiones.SelectedItems[0].SubItems[0].Text;
+            }
+
+            // Obtener alistamiento actual por camión
+            var alistamiento = await _alistamientoService.ObtenerAlistamientoPorCamionDia(codCamion.Value);
+            if (alistamiento == null || alistamiento.IdAlistamiento <= 0)
+            {
+                MessageBox.Show("No hay alistamiento para este camión.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            using var scope = _scopeFactory.CreateScope();
+            var form = ActivatorUtilities.CreateInstance<ALISTAMIENTO_IE.Forms.FormDetalleAlistamiento>(
+                scope.ServiceProvider,
+                alistamiento.IdAlistamiento,
+                placas
+            );
+            form.ShowDialog(this);
+        }
+
+        private void lvwListasCamiones_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lvwListasCamiones.SelectedItems.Count == 0)
+            {
+                camionesSeleccionados = Array.Empty<ListViewItem>();
+                return;
+            }
+
+            camionesSeleccionados = lvwListasCamiones
+                .SelectedItems
+                .Cast<ListViewItem>()
+                .ToArray();
+        }
     }
 }

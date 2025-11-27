@@ -14,7 +14,7 @@ public class QuestPDFService : IPdfService
         _dataGridViewExporter = dataGridViewExporter;
     }
 
-    public void Generate(DataTable dt1, DataTable dt2, string title = "Documento", string outputPath = "C:\\temp\\reporte_final_dt.pdf")
+    public void Generate(DataTable dt1, DataTable dt2, List<string> titles, string outputPath = "C:\\temp\\reporte_final_dt.pdf")
     {
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
 
@@ -27,6 +27,10 @@ public class QuestPDFService : IPdfService
                 page.Content().Column(col =>
                 {
                     col.Spacing(10);
+                    for(int i = 0; i < titles.Count; i++)
+                    {
+                        col.Item().Text(titles[i]).FontSize(18).Bold().AlignCenter(); 
+                    }
                     col.Item().Text("Reporte de Alistamiento - Información General").FontSize(19).Bold().AlignCenter(); // Reducido de 22 a 19
                     col.Item().Text($"Generado el: {DateTime.Now:dd/MM/yyyy HH:mm}").FontSize(9).Italic(); // Reducido de 10 a 9
 
@@ -51,9 +55,111 @@ public class QuestPDFService : IPdfService
                 page.Content().Column(col =>
                 {
                     col.Spacing(10);
-                    col.Item().Text(title).FontSize(18).Bold().AlignCenter(); // Reducido de 20 a 18
+                    for (int i = 0; i < titles.Count; i++)
+                    {
+                        col.Item().Text(titles[i]).FontSize(18).Bold().AlignCenter();
+                    }
                     col.Item().Text("Listado completo de Registros Detallados").FontSize(18).Bold().AlignCenter(); // Reducido de 20 a 18
                     col.Item().Element(c => AddLargeDataTableWithCustomColumns(c, dt2));
+                });
+            });
+        });
+
+        document.GeneratePdf(outputPath);
+        try
+        {
+            // Esto le dice al sistema operativo: "Abre este archivo con el programa asociado (.pdf)"
+            System.Diagnostics.Process.Start(new ProcessStartInfo(outputPath) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            // Manejo de error si, por ejemplo, el archivo no se encontró o el OS no tiene app predeterminada.
+            // Esto es un buen hábito de ingeniero mecatrónico/informático.
+            MessageBox.Show($"Error al intentar abrir el PDF: {ex.Message}", "Error de Apertura", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    public void Generate(DataGridView dgv1, DataGridView bigDgv, string title = "Documento", string outputPath = "C:\\temp\\reporte_final.pdf")
+    {
+
+        // Crear el directorio si no existe
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+
+
+        var document = Document.Create(container =>
+        {
+            // Página 1
+            container.Page(page =>
+            {
+                page.Margin(30);
+                page.Content().Column(col =>
+                {
+                    col.Spacing(10);
+                    col.Item().Text("Reporte de Alistamiento - Página 1").FontSize(20).Bold().AlignCenter();
+                    col.Item().Text("Información general del reporte.").Italic();
+                    col.Item().Element(c => AddTable(c, dgv1));
+                    col.Item().PaddingVertical(10);
+                    col.Item().Element(c => AddTable(c, dgv1));
+                    col.Item().PaddingVertical(10);
+                    col.Item().Element(c => AddTable(c, dgv1));
+                });
+            });
+
+            // Página 2 (automáticamente agrega más si el DGV es largo)
+            container.Page(page =>
+            {
+                page.Margin(30);
+                page.Content().Column(col =>
+                {
+                    col.Spacing(10);
+                    col.Item().Text(title).FontSize(20).Bold().AlignCenter();
+                    col.Item().Text("Listado completo de registros").FontSize(20).Bold().AlignCenter();
+                    col.Item().Element(c => AddLargeTable(c, bigDgv));
+                });
+            });
+        });
+
+        document.GeneratePdf(outputPath);
+        try
+        {
+            System.Diagnostics.Process.Start(new ProcessStartInfo(outputPath) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error al intentar abrir el PDF: {ex.Message}", "Error de Apertura", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    public void Generate(DataTable dataTable, DataGridView bigDgv, string title = "Documento", string outputPath = "C:\\temp\\reporte_final.pdf")
+    {
+        var document = Document.Create(container =>
+        {
+            // Página 1
+            container.Page(page =>
+            {
+                page.Margin(30);
+                page.Content().Column(col =>
+                {
+                    col.Spacing(10);
+                    col.Item().Text("Reporte de Alistamiento - Página 1").FontSize(20).Bold().AlignCenter();
+                    col.Item().Text("Información general del reporte.").Italic();
+                    col.Item().Element(c => AddDataTable(c, dataTable));
+                    col.Item().PaddingVertical(10);
+                    col.Item().Element(c => AddDataTable(c, dataTable));
+                    col.Item().PaddingVertical(10);
+                    col.Item().Element(c => AddDataTable(c, dataTable));
+                });
+            });
+
+            // Página 2 (automáticamente agrega más si el DGV es largo)
+            container.Page(page =>
+            {
+                page.Margin(30);
+                page.Content().Column(col =>
+                {
+                    col.Spacing(10);
+                    col.Item().Text(title).FontSize(20).Bold().AlignCenter();
+                    col.Item().Element(c => AddLargeTable(c, bigDgv));
                 });
             });
         });
@@ -174,142 +280,6 @@ public class QuestPDFService : IPdfService
           });
     }
 
-    public void Generate(DataGridView dgv1, DataGridView bigDgv, string title = "Documento", string outputPath = "C:\\temp\\reporte_final.pdf")
-    {
-
-        // Crear el directorio si no existe
-        Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
-
-
-        var document = Document.Create(container =>
-        {
-            // Página 1
-            container.Page(page =>
-            {
-                page.Margin(30);
-                page.Content().Column(col =>
-                {
-                    col.Spacing(10);
-                    col.Item().Text("Reporte de Alistamiento - Página 1").FontSize(20).Bold().AlignCenter();
-                    col.Item().Text("Información general del reporte.").Italic();
-                    col.Item().Element(c => AddTable(c, dgv1));
-                    col.Item().PaddingVertical(10);
-                    col.Item().Element(c => AddTable(c, dgv1));
-                    col.Item().PaddingVertical(10);
-                    col.Item().Element(c => AddTable(c, dgv1));
-                });
-            });
-
-            // Página 2 (automáticamente agrega más si el DGV es largo)
-            container.Page(page =>
-            {
-                page.Margin(30);
-                page.Content().Column(col =>
-                {
-                    col.Spacing(10);
-                    col.Item().Text(title).FontSize(20).Bold().AlignCenter();
-                    col.Item().Text("Listado completo de registros").FontSize(20).Bold().AlignCenter();
-                    col.Item().Element(c => AddLargeTable(c, bigDgv));
-                });
-            });
-        });
-
-        document.GeneratePdf(outputPath);
-        try
-        {
-            System.Diagnostics.Process.Start(new ProcessStartInfo(outputPath) { UseShellExecute = true });
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error al intentar abrir el PDF: {ex.Message}", "Error de Apertura", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
-    public void Generate(DataTable dataTable, DataGridView bigDgv, string title = "Documento", string outputPath = "C:\\temp\\reporte_final.pdf")
-    {
-        var document = Document.Create(container =>
-        {
-            // Página 1
-            container.Page(page =>
-            {
-                page.Margin(30);
-                page.Content().Column(col =>
-                {
-                    col.Spacing(10);
-                    col.Item().Text("Reporte de Alistamiento - Página 1").FontSize(20).Bold().AlignCenter();
-                    col.Item().Text("Información general del reporte.").Italic();
-                    col.Item().Element(c => AddDataTable(c, dataTable));
-                    col.Item().PaddingVertical(10);
-                    col.Item().Element(c => AddDataTable(c, dataTable));
-                    col.Item().PaddingVertical(10);
-                    col.Item().Element(c => AddDataTable(c, dataTable));
-                });
-            });
-
-            // Página 2 (automáticamente agrega más si el DGV es largo)
-            container.Page(page =>
-            {
-                page.Margin(30);
-                page.Content().Column(col =>
-                {
-                    col.Spacing(10);
-                    col.Item().Text(title).FontSize(20).Bold().AlignCenter();
-                    col.Item().Element(c => AddLargeTable(c, bigDgv));
-                });
-            });
-        });
-
-        document.GeneratePdf(outputPath);
-        try
-        {
-            // Esto le dice al sistema operativo: "Abre este archivo con el programa asociado (.pdf)"
-            System.Diagnostics.Process.Start(new ProcessStartInfo(outputPath) { UseShellExecute = true });
-        }
-        catch (Exception ex)
-        {
-            // Manejo de error si, por ejemplo, el archivo no se encontró o el OS no tiene app predeterminada.
-            // Esto es un buen hábito de ingeniero mecatrónico/informático.
-            MessageBox.Show($"Error al intentar abrir el PDF: {ex.Message}", "Error de Apertura", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
-    private void AddTable(IContainer container, DataGridView dgv)
-    {
-        if (dgv == null || dgv.Columns.Count == 0)
-        {
-            container.Text("No hay datos disponibles para mostrar en esta tabla.").Italic().FontSize(12).AlignCenter();
-            return;
-        }
-
-        container.Table(table =>
-        {
-            // ✅ Definir columnas una sola vez
-            table.ColumnsDefinition(columns =>
-            {
-                for (int i = 0; i < dgv.Columns.Count; i++)
-                    columns.RelativeColumn();
-            });
-
-            // Encabezados
-            table.Header(header =>
-            {
-                foreach (DataGridViewColumn col in dgv.Columns)
-                    header.Cell().Border(1).Padding(3).Text(col.HeaderText).Bold();
-            });
-
-            // Filas
-            foreach (DataGridViewRow row in dgv.Rows)
-            {
-                if (row.IsNewRow) continue;
-
-                foreach (DataGridViewCell cell in row.Cells)
-                {
-                    string value = cell.Value?.ToString() ?? "";
-                    table.Cell().Border(1).Padding(3).Text(value);
-                }
-            }
-        });
-    }
 
     private void AddLargeTable(IContainer container, DataGridView dgv)
     {
@@ -389,6 +359,43 @@ public class QuestPDFService : IPdfService
                 {
                     string cellValue = value?.ToString() ?? "";
                     table.Cell().Border(1).Padding(3).Text(cellValue);
+                }
+            }
+        });
+    }
+    private void AddTable(IContainer container, DataGridView dgv)
+    {
+        if (dgv == null || dgv.Columns.Count == 0)
+        {
+            container.Text("No hay datos disponibles para mostrar en esta tabla.").Italic().FontSize(12).AlignCenter();
+            return;
+        }
+
+        container.Table(table =>
+        {
+            // ✅ Definir columnas una sola vez
+            table.ColumnsDefinition(columns =>
+            {
+                for (int i = 0; i < dgv.Columns.Count; i++)
+                    columns.RelativeColumn();
+            });
+
+            // Encabezados
+            table.Header(header =>
+            {
+                foreach (DataGridViewColumn col in dgv.Columns)
+                    header.Cell().Border(1).Padding(3).Text(col.HeaderText).Bold();
+            });
+
+            // Filas
+            foreach (DataGridViewRow row in dgv.Rows)
+            {
+                if (row.IsNewRow) continue;
+
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    string value = cell.Value?.ToString() ?? "";
+                    table.Cell().Border(1).Padding(3).Text(value);
                 }
             }
         });
