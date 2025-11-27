@@ -38,10 +38,9 @@ namespace ALISTAMIENTO_IE.Services
             {
                 string sql = @"
                     SELECT
-                    c.PLACAS AS Placas,
-                    cxd.fecha AS Fecha,
                     i.f120_descripcion AS Descripcion,
                     dcxd.item AS Item,
+                    dcxd.PTO_ENVIO as Destino,
                     i.f120_id_unidad_inventario as UNIDAD,
                     i.f120_id_unidad_empaque as EMB,
                     SUM(dcxd.CANTIDAD_PLANIFICADA) AS CantTotalPedido,
@@ -68,7 +67,7 @@ namespace ALISTAMIENTO_IE.Services
                 WHERE
                     cxd.COD_CAMION = @idCamionDia AND i.f120_id_cia = 2
                 GROUP BY
-                    cxd.COD_CAMION, c.PLACAS, cxd.FECHA, i.f120_id_unidad_inventario, i.f120_id, i.f120_descripcion,
+                    cxd.COD_CAMION, c.PLACAS, i.f120_id_unidad_inventario, i.f120_id, i.f120_descripcion,
                     dcxd.item, cxd.ESTADO, a.estado, i.f120_id_unidad_empaque, dcxd.PTO_ENVIO
                 ORDER BY
                     CantTotalPedido DESC;

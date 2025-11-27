@@ -22,18 +22,19 @@ namespace ALISTAMIENTO_IE
         private List<GrupoMovimientosDto> listaAgrupada = new();
         private List<long> codCamiones = new List<long>();
         private List<MovimientoDocumentoDto> listaNormal = new();
+        private ListViewItem[] camionesSeleccionados;
 
-        private readonly IServiceScopeFactory _scopeFactory; // <<< NUEVO: Para crear Forms
+        private readonly IServiceScopeFactory _scopeFactory;
 
         private readonly IAlistamientoService _alistamientoService;
         private readonly IPdfService _pdfService;
-        private readonly ICamionXDiaService _camionXDiaService; // Agregué esta interfaz
+        private readonly ICamionXDiaService _camionXDiaService;
         private readonly IDetalleCamionXDiaService _detalleCamionXDiaService;
         private readonly IAlistamientoEtiquetaService _alistamientoEtiquetaService;
         private readonly IKardexService _kardexService;
         private readonly IDataGridViewExporter _dataGridViewExporter;
         private readonly CargueMasivoService _cargueMasivoService;
-        private readonly IEmailService _emailService;// Agregué esta interfaz
+        private readonly IEmailService _emailService;
 
 
         private readonly System.Windows.Forms.Timer _timer;
@@ -44,14 +45,14 @@ namespace ALISTAMIENTO_IE
         public Menu(
              IAlistamientoService alistamientoService,
              IPdfService pdfService,
-             ICamionXDiaService camionXDiaService,       // ¡Nueva Interfaz!
+             ICamionXDiaService camionXDiaService,
              IDetalleCamionXDiaService detalleCamionXDiaService,
              IAlistamientoEtiquetaService alistamientoEtiquetaService,
              IKardexService kardexService,
              IDataGridViewExporter dataGridViewExporter,
-             CargueMasivoService cargueMasivoService,    // Clase Concreta
-             IEmailService emailService,                 // ¡Nueva Interfaz!
-             IServiceScopeFactory scopeFactory           // La clave para la creación dinámica
+             CargueMasivoService cargueMasivoService,
+             IEmailService emailService,
+             IServiceScopeFactory scopeFactory
          )
         {
             InitializeComponent();
@@ -69,8 +70,6 @@ namespace ALISTAMIENTO_IE
             _emailService = emailService;
             _scopeFactory = scopeFactory; // Asignamos la fábrica
 
-            // 2. Instanciación de clases con dependencia circular a 'this' (casos especiales)
-            // Se debe instanciar aquí y no inyectar
             _turnoTimerManager = new TimerTurnos(this);
 
             CargarUI();
@@ -1038,40 +1037,57 @@ namespace ALISTAMIENTO_IE
 
         private async void btnImprimir_Click(object sender, EventArgs e)
         {
-            // Obtener los ítems del camión
-            IEnumerable<CamionItemsDto> items = await _alistamientoService.ObtenerItemsPorAlistarCamion(codCamionSeleccionado);
+            var logs = new List<string>();
 
-            // Extraer códigos de ítems para el kardex
-            var validItems = items.Select(x => x.Item).ToList();
-
-            if (validItems.Count == 0)
+            foreach (ListViewItem camion in camionesSeleccionados)
             {
-                MessageBox.Show("No hay ítems válidos para el camión seleccionado.",
-                                "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                var idCamionSeleccionado = camion.Tag;
+                var placaDelCamion = camion.SubItems[0].Text;
+
+                CamionXDia? cxd = await _camionXDiaService.GetByIdAsync(idCamionSeleccionado is int cod ? cod : 0);
+
+                if (cxd == null)
+                {
+                    logs.Add($"❌ {placaDelCamion}: NO se encontró el camión.");
+                    continue;
+                }
+
+                IEnumerable<CamionItemsDto> items = await _alistamientoService.ObtenerItemsPorAlistarCamion((int)cxd.CodCamion);
+
+                var validItems = items.Select(x => x.Item).ToList();
+
+                if (validItems.Count == 0)
+                {
+                    logs.Add($"⚠️ {placaDelCamion}: No tiene ítems válidos.");
+                    continue;
+                }
+
+                var totales = _alistamientoService.CalcularTotalesReporte(items);
+
+                DataTable dt1 = _dataGridViewExporter.ToDataTable(items);
+                _alistamientoService.AgregarFilaTotalesADataTable(dt1, totales);
+
+                DataTable dt2 = _kardexService.ObtenerDatosDeItems(validItems);
+
+                List<string> titles = new()
+        {
+            $"PLACA: {placaDelCamion}",
+            cxd.Fecha?.ToString("dd/MM/yyyy") ?? ""
+        };
+
+                _pdfService.Generate(dt1, dt2, titles);
+
+                logs.Add($"✔️ {placaDelCamion}: PDF generado. " +
+                         $"Pacas: {totales.TotalPacasEsperadas:N2}, " +
+                         $"Kilos: {totales.TotalKilosEsperados:N2}");
             }
 
-            // Calcular totales usando el servicio
-            ReporteImpresionTotalesDto totales = _alistamientoService.CalcularTotalesReporte(items);
-
-            // Convertir items a DataTable
-            DataTable dt1 = _dataGridViewExporter.ToDataTable(items);
-
-            // Agregar fila de totales usando el servicio
-            _alistamientoService.AgregarFilaTotalesADataTable(dt1, totales);
-
-            // Obtener datos del kardex
-            DataTable dt2 = _kardexService.ObtenerDatosDeItems(validItems);
-
-            // Generar PDF
-            _pdfService.Generate(dt1, dt2, $"PLACA: {placaCamionSeleccionado}");
-
-            // Mostrar mensaje de éxito con los totales
-            MessageBox.Show($"PDF generado exitosamente.\n\nTotales:\n" +
-                          $"Cantidad Total: {totales.TotalCantTotalPedido:N2}\n" +
-                          $"Pacas Esperadas: {totales.TotalPacasEsperadas:N2}\n" +
-                          $"Kilos Esperados: {totales.TotalKilosEsperados:N2}");
+            // Mostrar solo UNA ventana al final
+            string resultado = string.Join("\n", logs);
+            MessageBox.Show($"Resultados de impresión:\n\n{resultado}",
+                            "Resumen", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
         public void AjustarListas(ListBox Lista)
         {
             // Permite dibujar ítems con varias líneas
@@ -1276,5 +1292,18 @@ namespace ALISTAMIENTO_IE
             form.ShowDialog(this);
         }
 
+        private void lvwListasCamiones_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lvwListasCamiones.SelectedItems.Count == 0)
+            {
+                camionesSeleccionados = Array.Empty<ListViewItem>();
+                return;
+            }
+
+            camionesSeleccionados = lvwListasCamiones
+                .SelectedItems
+                .Cast<ListViewItem>()
+                .ToArray();
+        }
     }
 }

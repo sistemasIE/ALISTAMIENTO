@@ -205,12 +205,12 @@
             lvwListasCamiones.FullRowSelect = true;
             lvwListasCamiones.Location = new Point(2, 28);
             lvwListasCamiones.Margin = new Padding(2);
-            lvwListasCamiones.MultiSelect = false;
             lvwListasCamiones.Name = "lvwListasCamiones";
             lvwListasCamiones.Size = new Size(506, 428);
             lvwListasCamiones.TabIndex = 0;
             lvwListasCamiones.UseCompatibleStateImageBehavior = false;
             lvwListasCamiones.View = View.Details;
+            lvwListasCamiones.SelectedIndexChanged += lvwListasCamiones_SelectedIndexChanged;
             // 
             // colPlaca
             // 
@@ -370,7 +370,6 @@
             btnImprimir.TabIndex = 11;
             btnImprimir.Text = "IMPRIMIR";
             btnImprimir.UseVisualStyleBackColor = false;
-            btnImprimir.Visible = false;
             btnImprimir.Click += btnImprimir_Click;
             // 
             // btnVerMas
