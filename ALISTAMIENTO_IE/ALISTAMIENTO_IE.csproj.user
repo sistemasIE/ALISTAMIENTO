@@ -4,6 +4,9 @@
     <Compile Update="Forms\EtqsEliminadasEnAlistamiento.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Forms\FormDetalleAlistamiento.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Forms\FormOperarEtiquetas.cs">
       <SubType>Form</SubType>
     </Compile>
