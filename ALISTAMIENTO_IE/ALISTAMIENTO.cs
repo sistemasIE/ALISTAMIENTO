@@ -826,7 +826,7 @@ namespace ALISTAMIENTO_IE
                 if (confirmacion != DialogResult.Yes)
                     return;
 
-                // 2️⃣ Solicitar nuevo valor numérico
+                // Solicitar nuevo valor numérico
                 string input = Microsoft.VisualBasic.Interaction.InputBox(
                     "Introduce el nuevo valor del ITEM:",
                     "Editar valor",
@@ -839,23 +839,12 @@ namespace ALISTAMIENTO_IE
                     return;
                 }
 
-                // 3️⃣ Solicitar autorización con contraseña
-                string password = Microsoft.VisualBasic.Interaction.InputBox(
-                    "Introduce la contraseña de autorización:",
-                    "Autorización requerida"
-                );
 
-                password = BCrypt.Net.BCrypt.HashPassword(password);
-
-                int area = 21; // id del área de Alistamiento
-                int idRol = 1; // Id del Rol de Administrador
+                // si no se autoriza.
+                if (! await validarAutorizacionArea()) return;
 
 
-                if (await _authorizationService.ValidatePasswordAsync(area, idRol, password))
-                {
-                    MessageBox.Show("Contraseña incorrecta. No se realizó ningún cambio.", "Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
+              
 
                 // 4️⃣ Aplicar el cambio si todo está correcto
                 dgvMain.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = nuevoValor;
@@ -867,6 +856,28 @@ namespace ALISTAMIENTO_IE
             }
         }
 
+        private async Task<bool> validarAutorizacionArea()
+        {
+            // Solicitar autorización con contraseña
+            string password = Microsoft.VisualBasic.Interaction.InputBox(
+                "Introduce la contraseña de autorización:",
+                "Autorización requerida"
+            );
+
+            password = BCrypt.Net.BCrypt.HashPassword(password);
+
+            int area = 21; // id del área de Alistamiento
+            int idRol = 1; // Id del Rol de Administrador
+
+
+            if (await _authorizationService.ValidatePasswordAsync(area, idRol, password))
+            {
+                MessageBox.Show("Contraseña incorrecta. No se realizó ningún cambio.", "Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            return true;
+        }
 
         private void btnPausa_Click(object sender, EventArgs e)
         {
@@ -922,6 +933,10 @@ namespace ALISTAMIENTO_IE
             // Confirmación antes de operar
             var confirm = MessageBox.Show($"¿Desea eliminar {etiquetasSeleccionadas.Length} etiqueta(s) del alistamiento?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (confirm != DialogResult.Yes) return;
+
+            // Brindar la contraseña 
+            if (!await validarAutorizacionArea()) return;
+
 
             // 1) Pedir observaciones al usuario
             string observaciones = Interaction.InputBox("Ingrese las observaciones de la eliminación:", "Observaciones", "");
