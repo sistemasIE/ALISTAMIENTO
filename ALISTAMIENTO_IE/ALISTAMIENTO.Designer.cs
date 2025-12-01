@@ -349,6 +349,7 @@
             btnBuscar.Size = new Size(62, 61);
             btnBuscar.TabIndex = 20;
             btnBuscar.Text = "🔍";
+            btnBuscar.Click += btnBuscar_Click;
             // 
             // btnTerminar
             // 
@@ -470,6 +471,7 @@
             txtEtiqueta.Size = new Size(810, 32);
             txtEtiqueta.TabIndex = 7;
             txtEtiqueta.TextAlign = HorizontalAlignment.Center;
+            txtEtiqueta.TextChanged += txtEtiqueta_TextChanged;
             // 
             // btnManual
             // 
