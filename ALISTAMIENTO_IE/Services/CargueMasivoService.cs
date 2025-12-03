@@ -587,6 +587,13 @@ namespace ALISTAMIENTO_IE.Services
 
                         await connection.ExecuteAsync(sqlDelete, new { CodCamion = codCamion }, transaction);
 
+
+                        string sqlDeleteDetalle = @"
+                    DELETE FROM DETALLE_CAMION_X_DIA 
+                    WHERE COD_CAMION = @CodCamion";
+
+                        await connection.ExecuteAsync(sqlDeleteDetalle, new { CodCamion = codCamion }, transaction);
+
                         // 3. Confirma la transacción
                         transaction.Commit();
                         return true;
