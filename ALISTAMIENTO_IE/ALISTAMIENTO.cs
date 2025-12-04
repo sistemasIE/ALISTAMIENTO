@@ -282,7 +282,7 @@ namespace ALISTAMIENTO_IE
                 _timer.Start();
                 ActualizarTimer();
 
-                // Construir resumen inicial
+                // Construir (Kilos Esperados, Pacas Esperadas y demás)
                 await cargarDgvMain();
 
 
@@ -294,10 +294,7 @@ namespace ALISTAMIENTO_IE
                 btnBuscar.Cursor = Cursors.Hand;
                 btnTerminar.Cursor = Cursors.Hand;
                 txtEtiqueta.Cursor = Cursors.Hand;
-
                 txtEtiqueta.Enabled = true;
-
-
 
             }
             catch (Exception ex)

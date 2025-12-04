@@ -50,6 +50,37 @@ namespace ALISTAMIENTO_IE.Services
             }
         }
 
+
+
+        public async Task<IEnumerable<CamionXDia>> ObtenerCamionesDespachadosPorFecha(DateTime fecha)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionStringSIE))
+            {
+                string sql = @"
+                            SELECT 
+                                COD_CAMION AS CodCamion,
+                                FECHA AS Fecha,
+                                COD_EMPRESA_TRANSPORTE AS CodEmpresaTransporte,
+                                ESTADO AS Estado,
+                                COD_REGISTRO_CAMION AS CodRegistroCamion,
+                                COD_CONDUCTOR AS CodConductor
+                            FROM CAMION_X_DIA cxd
+                            WHERE 
+                                cxd.ESTADO = 'D'
+                                AND cxd.FECHA >= @Fecha
+                            ORDER BY 
+                                cxd.FECHA DESC;
+                            ";
+
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Fecha", fecha.Date);
+
+                return await connection.QueryAsync<CamionXDia>(sql, parameters);
+            }
+        }
+
+
         // === GET BY STATUS ===
         public async Task<IEnumerable<dynamic>> GetByStatusAsync()
         {
@@ -141,5 +172,8 @@ namespace ALISTAMIENTO_IE.Services
                 return await connection.ExecuteAsync(sql, new { CodCamion = codCamion });
             }
         }
+
+
+     
     }
 }

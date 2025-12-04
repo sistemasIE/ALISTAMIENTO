@@ -58,4 +58,17 @@
 
     }
 
+
+    public class ReporteTrazabilidadDto
+    {
+        public int CodCamion { get; set; }
+        public string Placas { get; set; }
+        public string Item { get; set; }
+        public decimal Cant_Planificada { get; set; }
+        public decimal Cant_Alistada{ get; set; }
+        public decimal Cant_Despachada{ get; set; }
+        public decimal PlanVsAlistado { get; set; }
+        public decimal AlistadoVsDespachado { get; set; }
+    }
+
 }

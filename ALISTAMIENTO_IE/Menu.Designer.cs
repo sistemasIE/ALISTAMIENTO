@@ -58,11 +58,14 @@
             dtpFechaReporte = new DateTimePicker();
             lblFechaTituloRpt = new Label();
             tlpResumenHost = new TableLayoutPanel();
-            tbcTurnos = new TabControl();
+            tbcReportes = new TabControl();
             tabTotal = new TabPage();
             tabTurno1 = new TabPage();
             tabTurno2 = new TabPage();
             tabTurno3 = new TabPage();
+            tabAlistamientos = new TabPage();
+            label6 = new Label();
+            cmbReporteFull = new ComboBox();
             grpResumen = new GroupBox();
             tlpResumen = new TableLayoutPanel();
             dgvResumen = new DataGridView();
@@ -107,7 +110,8 @@
             grpFecha.SuspendLayout();
             tlpFecha.SuspendLayout();
             tlpResumenHost.SuspendLayout();
-            tbcTurnos.SuspendLayout();
+            tbcReportes.SuspendLayout();
+            tabAlistamientos.SuspendLayout();
             grpResumen.SuspendLayout();
             tlpResumen.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvResumen).BeginInit();
@@ -335,39 +339,33 @@
             // tlpBotones
             // 
             tlpBotones.ColumnCount = 4;
-            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 146F));
-            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 42.24138F));
-            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 57.75862F));
-            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 183F));
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 145F));
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 177F));
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 129F));
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 8F));
             tlpBotones.Controls.Add(btnImprimir, 3, 0);
-            tlpBotones.Controls.Add(btnVerMas, 2, 0);
-            tlpBotones.Controls.Add(btnRecargar, 1, 0);
+            tlpBotones.Controls.Add(btnVerMas, 1, 0);
+            tlpBotones.Controls.Add(btnRecargar, 2, 0);
             tlpBotones.Controls.Add(btnAlistar, 0, 0);
             tlpBotones.Dock = DockStyle.Fill;
             tlpBotones.GrowStyle = TableLayoutPanelGrowStyle.AddColumns;
             tlpBotones.Location = new Point(3, 355);
             tlpBotones.Name = "tlpBotones";
             tlpBotones.RowCount = 1;
-            tlpBotones.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tlpBotones.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tlpBotones.Size = new Size(631, 62);
             tlpBotones.TabIndex = 8;
             // 
             // btnImprimir
             // 
-            btnImprimir.AutoSize = true;
-            btnImprimir.BackColor = Color.MediumBlue;
+            btnImprimir.BackColor = Color.Blue;
             btnImprimir.Cursor = Cursors.Hand;
             btnImprimir.Dock = DockStyle.Fill;
-            btnImprimir.FlatAppearance.BorderColor = Color.FromArgb(155, 187, 89);
-            btnImprimir.FlatStyle = FlatStyle.Flat;
-            btnImprimir.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
-            btnImprimir.ForeColor = Color.White;
-            btnImprimir.Location = new Point(449, 2);
-            btnImprimir.Margin = new Padding(2);
+            btnImprimir.ForeColor = SystemColors.HighlightText;
+            btnImprimir.Location = new Point(454, 3);
             btnImprimir.Name = "btnImprimir";
-            btnImprimir.Padding = new Padding(10, 5, 10, 5);
-            btnImprimir.Size = new Size(180, 58);
-            btnImprimir.TabIndex = 11;
+            btnImprimir.Size = new Size(174, 56);
+            btnImprimir.TabIndex = 13;
             btnImprimir.Text = "IMPRIMIR";
             btnImprimir.UseVisualStyleBackColor = false;
             btnImprimir.Click += btnImprimir_Click;
@@ -382,23 +380,22 @@
             btnVerMas.FlatStyle = FlatStyle.Flat;
             btnVerMas.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
             btnVerMas.ForeColor = Color.White;
-            btnVerMas.Location = new Point(275, 2);
+            btnVerMas.Location = new Point(147, 2);
             btnVerMas.Margin = new Padding(2);
             btnVerMas.Name = "btnVerMas";
             btnVerMas.Padding = new Padding(10, 5, 10, 5);
-            btnVerMas.Size = new Size(170, 58);
-            btnVerMas.TabIndex = 10;
+            btnVerMas.Size = new Size(173, 58);
+            btnVerMas.TabIndex = 12;
             btnVerMas.Text = "VER MÁS";
             btnVerMas.UseVisualStyleBackColor = false;
-            btnVerMas.Click += btnVerMas_Click;
             // 
             // btnRecargar
             // 
             btnRecargar.Cursor = Cursors.Hand;
             btnRecargar.Dock = DockStyle.Fill;
-            btnRecargar.Location = new Point(149, 3);
+            btnRecargar.Location = new Point(325, 3);
             btnRecargar.Name = "btnRecargar";
-            btnRecargar.Size = new Size(121, 56);
+            btnRecargar.Size = new Size(123, 56);
             btnRecargar.TabIndex = 8;
             btnRecargar.Text = "RECARGAR";
             btnRecargar.UseVisualStyleBackColor = true;
@@ -417,7 +414,7 @@
             btnAlistar.Margin = new Padding(2);
             btnAlistar.Name = "btnAlistar";
             btnAlistar.Padding = new Padding(10, 5, 10, 5);
-            btnAlistar.Size = new Size(142, 58);
+            btnAlistar.Size = new Size(141, 58);
             btnAlistar.TabIndex = 7;
             btnAlistar.Text = "ALISTAR";
             btnAlistar.UseVisualStyleBackColor = false;
@@ -427,11 +424,11 @@
             // tabReportes
             // 
             tabReportes.Controls.Add(tlpReportes);
-            tabReportes.Location = new Point(4, 24);
+            tabReportes.Location = new Point(4, 30);
             tabReportes.Margin = new Padding(2);
             tabReportes.Name = "tabReportes";
             tabReportes.Padding = new Padding(6);
-            tabReportes.Size = new Size(1202, 488);
+            tabReportes.Size = new Size(1202, 482);
             tabReportes.TabIndex = 1;
             tabReportes.Text = "Reportes";
             tabReportes.UseVisualStyleBackColor = true;
@@ -449,7 +446,7 @@
             tlpReportes.Name = "tlpReportes";
             tlpReportes.RowCount = 1;
             tlpReportes.RowStyles.Add(new RowStyle(SizeType.Absolute, 16F));
-            tlpReportes.Size = new Size(1190, 476);
+            tlpReportes.Size = new Size(1190, 470);
             tlpReportes.TabIndex = 0;
             // 
             // tlpFiltros
@@ -470,7 +467,7 @@
             tlpFiltros.RowStyles.Add(new RowStyle());
             tlpFiltros.RowStyles.Add(new RowStyle());
             tlpFiltros.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tlpFiltros.Size = new Size(220, 472);
+            tlpFiltros.Size = new Size(220, 466);
             tlpFiltros.TabIndex = 0;
             // 
             // lblEscogeFecha
@@ -539,7 +536,7 @@
             // 
             tlpResumenHost.ColumnCount = 1;
             tlpResumenHost.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 16F));
-            tlpResumenHost.Controls.Add(tbcTurnos, 0, 0);
+            tlpResumenHost.Controls.Add(tbcReportes, 0, 0);
             tlpResumenHost.Controls.Add(grpResumen, 0, 1);
             tlpResumenHost.Dock = DockStyle.Fill;
             tlpResumenHost.Location = new Point(226, 2);
@@ -548,24 +545,25 @@
             tlpResumenHost.RowCount = 2;
             tlpResumenHost.RowStyles.Add(new RowStyle());
             tlpResumenHost.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tlpResumenHost.Size = new Size(962, 472);
+            tlpResumenHost.Size = new Size(962, 466);
             tlpResumenHost.TabIndex = 1;
             // 
-            // tbcTurnos
+            // tbcReportes
             // 
-            tbcTurnos.Controls.Add(tabTotal);
-            tbcTurnos.Controls.Add(tabTurno1);
-            tbcTurnos.Controls.Add(tabTurno2);
-            tbcTurnos.Controls.Add(tabTurno3);
-            tbcTurnos.Dock = DockStyle.Fill;
-            tbcTurnos.ItemSize = new Size(100, 28);
-            tbcTurnos.Location = new Point(2, 2);
-            tbcTurnos.Margin = new Padding(2);
-            tbcTurnos.Name = "tbcTurnos";
-            tbcTurnos.SelectedIndex = 0;
-            tbcTurnos.Size = new Size(958, 80);
-            tbcTurnos.SizeMode = TabSizeMode.Fixed;
-            tbcTurnos.TabIndex = 0;
+            tbcReportes.Controls.Add(tabTotal);
+            tbcReportes.Controls.Add(tabTurno1);
+            tbcReportes.Controls.Add(tabTurno2);
+            tbcReportes.Controls.Add(tabTurno3);
+            tbcReportes.Controls.Add(tabAlistamientos);
+            tbcReportes.Dock = DockStyle.Fill;
+            tbcReportes.ItemSize = new Size(100, 28);
+            tbcReportes.Location = new Point(2, 2);
+            tbcReportes.Margin = new Padding(2);
+            tbcReportes.Name = "tbcReportes";
+            tbcReportes.SelectedIndex = 0;
+            tbcReportes.Size = new Size(958, 80);
+            tbcReportes.SizeMode = TabSizeMode.Fixed;
+            tbcReportes.TabIndex = 0;
             // 
             // tabTotal
             // 
@@ -607,6 +605,38 @@
             tabTurno3.Text = "TURNO3";
             tabTurno3.UseVisualStyleBackColor = true;
             // 
+            // tabAlistamientos
+            // 
+            tabAlistamientos.Controls.Add(label6);
+            tabAlistamientos.Controls.Add(cmbReporteFull);
+            tabAlistamientos.Location = new Point(4, 32);
+            tabAlistamientos.Name = "tabAlistamientos";
+            tabAlistamientos.Padding = new Padding(3);
+            tabAlistamientos.Size = new Size(950, 44);
+            tabAlistamientos.TabIndex = 4;
+            tabAlistamientos.Text = "CAMIONES";
+            tabAlistamientos.UseVisualStyleBackColor = true;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            label6.Location = new Point(206, 6);
+            label6.Margin = new Padding(0, 0, 0, 6);
+            label6.Name = "label6";
+            label6.Size = new Size(177, 21);
+            label6.TabIndex = 2;
+            label6.Text = "Seleccione un camión";
+            // 
+            // cmbReporteFull
+            // 
+            cmbReporteFull.FormattingEnabled = true;
+            cmbReporteFull.Location = new Point(408, 6);
+            cmbReporteFull.Name = "cmbReporteFull";
+            cmbReporteFull.Size = new Size(266, 29);
+            cmbReporteFull.TabIndex = 0;
+            cmbReporteFull.SelectedIndexChanged += cmbReporteFull_SelectedIndexChanged;
+            // 
             // grpResumen
             // 
             grpResumen.Controls.Add(tlpResumen);
@@ -615,15 +645,15 @@
             grpResumen.Margin = new Padding(2);
             grpResumen.Name = "grpResumen";
             grpResumen.Padding = new Padding(6);
-            grpResumen.Size = new Size(958, 384);
+            grpResumen.Size = new Size(958, 378);
             grpResumen.TabIndex = 1;
             grpResumen.TabStop = false;
             // 
             // tlpResumen
             // 
             tlpResumen.ColumnCount = 2;
-            tlpResumen.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70F));
-            tlpResumen.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
+            tlpResumen.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 79.3868942F));
+            tlpResumen.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20.6131077F));
             tlpResumen.Controls.Add(dgvResumen, 0, 0);
             tlpResumen.Controls.Add(pnlKpis, 1, 0);
             tlpResumen.Controls.Add(dgvMovimientos, 0, 1);
@@ -634,7 +664,7 @@
             tlpResumen.RowCount = 2;
             tlpResumen.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
             tlpResumen.RowStyles.Add(new RowStyle(SizeType.Percent, 45F));
-            tlpResumen.Size = new Size(946, 350);
+            tlpResumen.Size = new Size(946, 344);
             tlpResumen.TabIndex = 0;
             // 
             // dgvResumen
@@ -643,16 +673,17 @@
             dgvResumen.AllowUserToDeleteRows = false;
             dgvResumen.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvResumen.BackgroundColor = SystemColors.Window;
-            dgvResumen.ColumnHeadersHeight = 29;
+            dgvResumen.ColumnHeadersHeight = 35;
             dgvResumen.Dock = DockStyle.Fill;
+            dgvResumen.EditMode = DataGridViewEditMode.EditOnF2;
+            dgvResumen.GridColor = SystemColors.GrayText;
             dgvResumen.Location = new Point(2, 2);
             dgvResumen.Margin = new Padding(2);
             dgvResumen.Name = "dgvResumen";
             dgvResumen.ReadOnly = true;
-            dgvResumen.RowHeadersVisible = false;
             dgvResumen.RowHeadersWidth = 51;
             dgvResumen.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvResumen.Size = new Size(658, 188);
+            dgvResumen.Size = new Size(747, 185);
             dgvResumen.TabIndex = 0;
             // 
             // pnlKpis
@@ -662,18 +693,18 @@
             pnlKpis.Controls.Add(lblUnidadesTexto);
             pnlKpis.Controls.Add(lblUnidadesPacas);
             pnlKpis.Dock = DockStyle.Fill;
-            pnlKpis.Location = new Point(664, 2);
+            pnlKpis.Location = new Point(753, 2);
             pnlKpis.Margin = new Padding(2);
             pnlKpis.Name = "pnlKpis";
             pnlKpis.Padding = new Padding(6);
-            pnlKpis.Size = new Size(280, 188);
+            pnlKpis.Size = new Size(191, 185);
             pnlKpis.TabIndex = 1;
             // 
             // lblCamionesTexto
             // 
             lblCamionesTexto.AutoSize = true;
             lblCamionesTexto.Font = new Font("Segoe UI", 11F);
-            lblCamionesTexto.Location = new Point(10, 109);
+            lblCamionesTexto.Location = new Point(24, 115);
             lblCamionesTexto.Margin = new Padding(2, 0, 2, 0);
             lblCamionesTexto.Name = "lblCamionesTexto";
             lblCamionesTexto.Size = new Size(72, 20);
@@ -684,7 +715,7 @@
             // 
             lblCamionesNumero.AutoSize = true;
             lblCamionesNumero.Font = new Font("Segoe UI", 24F, FontStyle.Bold);
-            lblCamionesNumero.Location = new Point(6, 74);
+            lblCamionesNumero.Location = new Point(20, 80);
             lblCamionesNumero.Margin = new Padding(2, 0, 2, 0);
             lblCamionesNumero.Name = "lblCamionesNumero";
             lblCamionesNumero.Size = new Size(38, 45);
@@ -695,7 +726,7 @@
             // 
             lblUnidadesTexto.AutoSize = true;
             lblUnidadesTexto.Font = new Font("Segoe UI", 11F);
-            lblUnidadesTexto.Location = new Point(10, 42);
+            lblUnidadesTexto.Location = new Point(24, 48);
             lblUnidadesTexto.Margin = new Padding(2, 0, 2, 0);
             lblUnidadesTexto.Name = "lblUnidadesTexto";
             lblUnidadesTexto.Size = new Size(69, 20);
@@ -706,7 +737,7 @@
             // 
             lblUnidadesPacas.AutoSize = true;
             lblUnidadesPacas.Font = new Font("Segoe UI", 24F, FontStyle.Bold);
-            lblUnidadesPacas.Location = new Point(6, 6);
+            lblUnidadesPacas.Location = new Point(20, 12);
             lblUnidadesPacas.Margin = new Padding(2, 0, 2, 0);
             lblUnidadesPacas.Name = "lblUnidadesPacas";
             lblUnidadesPacas.Size = new Size(38, 45);
@@ -722,14 +753,14 @@
             dgvMovimientos.ColumnHeadersHeight = 29;
             tlpResumen.SetColumnSpan(dgvMovimientos, 2);
             dgvMovimientos.Dock = DockStyle.Fill;
-            dgvMovimientos.Location = new Point(2, 194);
+            dgvMovimientos.Location = new Point(2, 191);
             dgvMovimientos.Margin = new Padding(2);
             dgvMovimientos.Name = "dgvMovimientos";
             dgvMovimientos.ReadOnly = true;
             dgvMovimientos.RowHeadersVisible = false;
             dgvMovimientos.RowHeadersWidth = 51;
             dgvMovimientos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvMovimientos.Size = new Size(942, 154);
+            dgvMovimientos.Size = new Size(942, 151);
             dgvMovimientos.TabIndex = 2;
             // 
             // tabCargueMasivo
@@ -959,7 +990,9 @@
             tlpFecha.ResumeLayout(false);
             tlpFecha.PerformLayout();
             tlpResumenHost.ResumeLayout(false);
-            tbcTurnos.ResumeLayout(false);
+            tbcReportes.ResumeLayout(false);
+            tabAlistamientos.ResumeLayout(false);
+            tabAlistamientos.PerformLayout();
             grpResumen.ResumeLayout(false);
             tlpResumen.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvResumen).EndInit();
@@ -993,7 +1026,7 @@
         private Label lblFechaTituloRpt; // lbl
         private DateTimePicker dtpFechaReporte; // dtp
         private TableLayoutPanel tlpResumenHost; // tlp
-        private TabControl tbcTurnos; // tab
+        private TabControl tbcReportes; // tab
         private TabPage tabTurno3; // tab
         private GroupBox grpResumen; // grp
         private TableLayoutPanel tlpResumen; // tlp
@@ -1039,9 +1072,12 @@
         private Button btnCerrarCamion;
         private DataGridView dgvItems;
         private TableLayoutPanel tlpBotones;
-        private Button btnRecargar;
+        private TabPage tabAlistamientos;
+        private Label label6;
+        private ComboBox cmbReporteFull;
         private Button btnAlistar;
-        private Button btnImprimir;
+        private Button btnRecargar;
         private Button btnVerMas;
+        private Button btnImprimir;
     }
 }

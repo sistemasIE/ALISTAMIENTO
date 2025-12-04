@@ -42,25 +42,33 @@ public class EtiquetaService : IEtiquetaService
             await connection.OpenAsync();
 
             // Buscar en las tres tablas
-            var etiqueta = await connection.QueryFirstOrDefaultAsync<Etiqueta>(
+            Etiqueta? etiqueta = await connection.QueryFirstOrDefaultAsync<Etiqueta>(
                 "SELECT * FROM ETIQUETA WHERE COD_ETIQUETA = @codigo", new { codigo = codigoEtiqueta });
 
-            var etiquetaLiner = await connection.QueryFirstOrDefaultAsync<EtiquetaLiner>(
+            EtiquetaLiner? etiquetaLiner = await connection.QueryFirstOrDefaultAsync<EtiquetaLiner>(
                 "SELECT * FROM ETIQUETA_LINER WHERE COD_ETIQUETA_LINER = @codigo", new { codigo = codigoEtiqueta });
 
-            var etiquetaRollo = await connection.QueryFirstOrDefaultAsync<EtiquetaRollo>(
+            EtiquetaRollo? etiquetaRollo = await connection.QueryFirstOrDefaultAsync<EtiquetaRollo>(
                 @"SELECT 
                    *
                 FROM ETIQUETA_ROLLO 
                 WHERE Cod_Etiqueta_Rollo = @codigo",
                 new { codigo = codigoEtiqueta });
 
-            var kardex = await connection.QueryFirstOrDefaultAsync<dynamic>(
+            KardexBodega? kardex = await connection.QueryFirstOrDefaultAsync<KardexBodega>(
                 "SELECT * FROM KARDEX_BODEGA WHERE enBodega = 1 and etiqueta = @codigo", new { codigo = codigoEtiqueta });
             result.ExisteEnKardex = kardex != null;
 
             if ((etiqueta != null || etiquetaLiner != null || etiquetaRollo != null))
             {
+
+                // Obtener el item: 
+                var item = etiqueta?.COD_ITEM ?? etiquetaLiner?.ITEM ?? etiquetaRollo?.Item;
+
+                // Obtener el tipo de unidad del item.
+
+
+
                 result.Existe = true;
 
                 // Determinar el tipo de etiqueta (prioridad: ETIQUETA > ETIQUETA_LINER > ETIQUETA_ROLLO)

@@ -5,28 +5,22 @@ using System.Data;
 
 public interface IAlistamientoService
 {
-    // --- CONSULTAS PRINCIPALES ---
 
-
-    Task<Alistamiento> ObtenerAlistamiento(int idAlistamiento);
-    Task<Alistamiento> ObtenerAlistamientoPorCamionDia(int idCamionDia);
-
-    Task<IEnumerable<CamionItemsDto>> ObtenerItemsPorAlistarCamion(int camionId);
-    IEnumerable<CamionEnAlistamientoDTO> ObtenerCamionesEnAlistamiento();
-    IEnumerable<Alistamiento> ObtenerAlistamientosActivosOrdenados();
-    IEnumerable<DetalleCamionXDia> ObtenerDetallesPorAlistamientosActivos(DetalleCamionXDiaService detalleService);
     Alistamiento ObtenerAlistamientoPorCodCamionYEstado(int idCamionDia, string estado);
 
-    // --- REPORTES / CÁLCULOS ---
-    ReporteImpresionTotalesDto CalcularTotalesReporte(IEnumerable<CamionItemsDto> items);
-    void AgregarFilaTotalesADataTable(DataTable dataTable, ReporteImpresionTotalesDto totales);
-
-    // --- CRUD OPERACIONES DE ALISTAMIENTO ---
+    Task<IEnumerable<Alistamiento>> ObtenerAlistamientosRealizadosPorFecha(DateTime fechaInicio);
+    IEnumerable<Alistamiento> ObtenerAlistamientosActivosOrdenados();
+    IEnumerable<CamionEnAlistamientoDTO> ObtenerCamionesEnAlistamiento();
+    IEnumerable<DetalleCamionXDia> ObtenerDetallesPorAlistamientosActivos(DetalleCamionXDiaService detalleService);
     int InsertarAlistamiento(int idCamionDia, int idUsuario);
-    void ActualizarAlistamiento(int idAlistamiento, string nuevoEstado, string observaciones, DateTime? fechaFin);
-
-    // --- MÉTODOS UTILITARIOS (Extensión futura) ---
-    Task<bool> ExisteAlistamientoActivo(int idCamionDia);
+    ReporteImpresionTotalesDto CalcularTotalesReporte(IEnumerable<CamionItemsDto> items);
     Task CargarCamionDia(int idCamion, DataGridView dgv);
+    Task<Alistamiento> ObtenerAlistamiento(int idAlistamiento);
+    Task<Alistamiento> ObtenerAlistamientoPorCamionDia(int idCamionDia);
+    Task<bool> ExisteAlistamientoActivo(int idCamionDia);
+    Task<IEnumerable<CamionItemsDto>> ObtenerItemsPorAlistarCamion(int camionId);
+    Task<List<ReporteTrazabilidadDto>> ObtenerReporteTrazabilidad(IEnumerable<int> codCamiones);
+    void ActualizarAlistamiento(int idAlistamiento, string nuevoEstado, string observaciones, DateTime? fechaFin);
+    void AgregarFilaTotalesADataTable(DataTable dataTable, ReporteImpresionTotalesDto totales);
 
 }

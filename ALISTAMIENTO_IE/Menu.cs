@@ -6,6 +6,7 @@ using Common.cache;
 //using DocumentFormat.OpenXml.Spreadsheet;
 using ExcelDataReader;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
@@ -23,6 +24,8 @@ namespace ALISTAMIENTO_IE
         private List<long> codCamiones = new List<long>();
         private List<MovimientoDocumentoDto> listaNormal = new();
         private ListViewItem[] camionesSeleccionados;
+        private List<ReporteTrazabilidadDto> _reporte;
+
 
         private readonly IServiceScopeFactory _scopeFactory;
 
@@ -41,6 +44,7 @@ namespace ALISTAMIENTO_IE
         private readonly TimerTurnos _turnoTimerManager; // Manejador de Timer y Turnos
         private String placaCamionSeleccionado;
         private System.Windows.Forms.Timer _cooldownTimer;
+
 
         public Menu(
              IAlistamientoService alistamientoService,
@@ -99,7 +103,7 @@ namespace ALISTAMIENTO_IE
             // Reportes: cargar al entrar en la pestaña y al cambiar fecha y turno
             tabMain.SelectedIndexChanged += TabMain_SelectedIndexChanged;
             dtpFechaReporte.ValueChanged += DtpFechaReporte_ValueChanged;
-            tbcTurnos.SelectedIndexChanged += TbcTurnos_SelectedIndexChanged;
+            tbcReportes.SelectedIndexChanged += TbcTurnos_SelectedIndexChanged;
 
             // Validaciones:
             LimitarVistaPorUsuario();
@@ -133,6 +137,8 @@ namespace ALISTAMIENTO_IE
             {
                 await CargarReportesYTotales();
             }
+
+
         }
 
         private async void TbcTurnos_SelectedIndexChanged(object sender, EventArgs e)
@@ -148,20 +154,62 @@ namespace ALISTAMIENTO_IE
         {
             // Primero, determinar el filtro de turno
             string? turnoLike = null;
-            if (tbcTurnos.SelectedTab == tabTurno1)
+            if (tbcReportes.SelectedTab == tabTurno1)
             {
                 turnoLike = "%TURNO1%";
             }
-            else if (tbcTurnos.SelectedTab == tabTurno2)
+            else if (tbcReportes.SelectedTab == tabTurno2)
             {
                 turnoLike = "%TURNO2%";
             }
-            else if (tbcTurnos.SelectedTab == tabTurno3)
+            else if (tbcReportes.SelectedTab == tabTurno3)
             {
                 turnoLike = "%TURNO3%";
             }
             // Si el tab es "TOTAL", turnoLike se mantiene en null, lo cual es correcto
+            else if(tbcReportes.SelectedTab == tabAlistamientos)
+            {
+                // 1. Traer todos los alistamientos que se dieron ese día. 
 
+                IEnumerable<CamionXDia> alistamientosEnDia = await _camionXDiaService.ObtenerCamionesDespachadosPorFecha(dtpFechaReporte.Value);
+
+                // 2. Obtener los id's camiones
+
+                List<long> codCamionesEnDia = alistamientosEnDia.Select(a => a.CodCamion).Distinct().ToList();
+                List<int> listaInt = codCamionesEnDia.Select(x => (int)x).ToList();
+
+                // Mostrar la cantidad de camiones obtenidos en el día (usar la lista local, no la variable de clase codCamiones)
+                lblCamionesNumero.Text = codCamionesEnDia.Count.ToString();
+                 
+                // 3. Obtener el Reporte:
+
+                _reporte = await _alistamientoService.ObtenerReporteTrazabilidad(codCamionesEnDia.Select(x => (int)x).ToList());
+
+                // Distintos camiones y placas
+                var itemsCombo = _reporte
+                    .GroupBy(r => new { r.CodCamion, r.Placas })
+                    .Select(g => new
+                    {
+                        Id = g.Key.CodCamion,
+                        Texto = $"{g.Key.Placas} (ID {g.Key.CodCamion})"
+                    })
+                    .ToList();
+
+                cmbReporteFull.DisplayMember = "Texto";
+                cmbReporteFull.ValueMember = "Id";
+                cmbReporteFull.DataSource = itemsCombo;
+
+                var unidadesEnConflicto = Math.Round(Math.Abs(_reporte.Sum(r => r.PlanVsAlistado + r.AlistadoVsDespachado)), 2);
+                lblUnidadesTexto.Text = "Unidades en Conflicto";
+                lblUnidadesPacas.Text = unidadesEnConflicto.ToString();
+
+                dgvResumen.DataSource = _dataGridViewExporter.ConvertDynamicToDataTable(_reporte);
+                
+      
+                
+                return;
+
+            }
             try
             {
                 // Llamar al método para obtener los totales de pacas y camiones.
@@ -610,6 +658,7 @@ namespace ALISTAMIENTO_IE
                     var conductor = await _cargueMasivoService.ObtenerConductorPorCodigoAsync(codConductorLong);
                     var camion = await _cargueMasivoService.ObtenerCamionPorCodigoAsync(codCamionLong);
                     var movsDoc = await _cargueMasivoService.ObtenerMovimientosPorConsecutivoAsync(idDocumento, tipoDocumento, int.Parse(empresa));
+
 
 
 
@@ -1306,5 +1355,28 @@ namespace ALISTAMIENTO_IE
                 .Cast<ListViewItem>()
                 .ToArray();
         }
+
+        private void cmbReporteFull_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_reporte == null || cmbReporteFull.SelectedValue == null)
+                return;
+
+            int idSeleccionado = (int)cmbReporteFull.SelectedValue;
+
+            var filtrado = _reporte
+                .Where(r => r.CodCamion == idSeleccionado)
+                .ToList();
+
+            var unidadesEnConflicto = Math.Round(Math.Abs(filtrado.Sum(r => r.PlanVsAlistado + r.AlistadoVsDespachado)), 1);
+            lblUnidadesTexto.Text = "Unidades en Conflicto";
+            lblUnidadesPacas.Text = unidadesEnConflicto.ToString();
+
+            lblCamionesNumero.Text = "1";
+
+            dgvResumen.DataSource = _dataGridViewExporter.ConvertDynamicToDataTable(filtrado);
+            
+      
+        }
+
     }
 }
