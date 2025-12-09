@@ -61,7 +61,7 @@ namespace ALISTAMIENTO_IE
         {
             InitializeComponent();
             this.Icon = ALISTAMIENTO_IE.Properties.Resources.Icono;
-            lstCamiones.MouseDown += lvwListasCamiones_MouseDown;
+            lstCamiones.MouseDown += lstCamiones_MouseDown;
 
             // 1. Asignación de servicios (Adiós a los new())
             _alistamientoService = alistamientoService;
@@ -1327,6 +1327,18 @@ namespace ALISTAMIENTO_IE
 
         private void lvwListasCamiones_MouseDown(object sender, MouseEventArgs e)
         {
+            
+        }
+
+        private void btnExportar_Click(object sender, EventArgs e)
+        {
+
+            _dataGridViewExporter.ExportarExcelConDialog(dataGridView1);
+            MessageBox.Show("Reporte generado correctamente");
+        }
+
+        private void lstCamiones_MouseDown(object sender, MouseEventArgs e)
+        {
             CheckedListBox clb = sender as CheckedListBox;
 
             // Obtiene el índice del ítem donde se hizo clic
@@ -1337,13 +1349,6 @@ namespace ALISTAMIENTO_IE
                 bool current = clb.GetItemChecked(index);
                 clb.SetItemChecked(index, !current);
             }
-        }
-
-        private void btnExportar_Click(object sender, EventArgs e)
-        {
-
-            _dataGridViewExporter.ExportarExcelConDialog(dataGridView1);
-            MessageBox.Show("Reporte generado correctamente");
         }
     }
 }

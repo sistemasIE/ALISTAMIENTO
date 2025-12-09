@@ -88,9 +88,9 @@
             dtgCargueMasivo = new DataGridView();
             tabAdmonCamiones = new TabPage();
             lstCamiones = new CheckedListBox();
+            btnExportar = new Button();
             btnCerrarCamion = new Button();
             dataGridView1 = new DataGridView();
-            btnExportar = new Button();
             tabMain.SuspendLayout();
             tabAlistar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splMain).BeginInit();
@@ -906,6 +906,18 @@
             lstCamiones.Size = new Size(304, 412);
             lstCamiones.TabIndex = 14;
             lstCamiones.SelectedIndexChanged += lstCamiones_SelectedIndexChanged_1;
+            lstCamiones.MouseDown += lstCamiones_MouseDown;
+            // 
+            // btnExportar
+            // 
+            btnExportar.FlatStyle = FlatStyle.Flat;
+            btnExportar.Location = new Point(1011, 144);
+            btnExportar.Name = "btnExportar";
+            btnExportar.Size = new Size(183, 80);
+            btnExportar.TabIndex = 13;
+            btnExportar.Text = "EXPORTAR REPORTE";
+            btnExportar.UseVisualStyleBackColor = true;
+            btnExportar.Click += btnExportar_Click;
             // 
             // btnCerrarCamion
             // 
@@ -925,17 +937,6 @@
             dataGridView1.Name = "dataGridView1";
             dataGridView1.Size = new Size(674, 421);
             dataGridView1.TabIndex = 12;
-            // 
-            // btnExportar
-            // 
-            btnExportar.FlatStyle = FlatStyle.Flat;
-            btnExportar.Location = new Point(1011, 144);
-            btnExportar.Name = "btnExportar";
-            btnExportar.Size = new Size(183, 80);
-            btnExportar.TabIndex = 13;
-            btnExportar.Text = "EXPORTAR REPORTE";
-            btnExportar.UseVisualStyleBackColor = true;
-            btnExportar.Click += btnExportar_Click;
             // 
             // Menu
             // 
