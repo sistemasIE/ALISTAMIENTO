@@ -1,6 +1,7 @@
 ﻿using ALISTAMIENTO_IE.Interfaces;
 using ClosedXML.Excel;
 using System.Data;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
@@ -37,9 +38,11 @@ public class DataGridViewExporter : IDataGridViewExporter
     public void ExportToExcel(DataGridView dgv, string filePath)
     {
         var dt = new DataTable();
+
         // Add columns
         foreach (DataGridViewColumn col in dgv.Columns)
             dt.Columns.Add(col.HeaderText);
+
         // Add rows
         foreach (DataGridViewRow row in dgv.Rows)
         {
@@ -51,12 +54,20 @@ public class DataGridViewExporter : IDataGridViewExporter
                 dt.Rows.Add(dr);
             }
         }
+
         using (var wb = new XLWorkbook())
         {
             var ws = wb.Worksheets.Add(dt, "Items");
             ws.Columns().AdjustToContents();
             wb.SaveAs(filePath);
         }
+
+        // 👉 Abrir automáticamente el archivo Excel
+        System.Diagnostics.Process.Start(new ProcessStartInfo()
+        {
+            FileName = filePath,
+            UseShellExecute = true
+        });
     }
 
     public DataTable ConvertDynamicToDataTable(IEnumerable<dynamic> items)
@@ -148,6 +159,50 @@ public class DataGridViewExporter : IDataGridViewExporter
         }
 
         return dt;
+    }
+    public void ExportarExcelConDialog(DataGridView dgv)
+    {
+        using (SaveFileDialog sfd = new SaveFileDialog())
+        {
+            sfd.Filter = "Excel (*.xlsx)|*.xlsx";
+            sfd.Title = "Guardar reporte en Excel";
+            sfd.FileName = "Reporte.xlsx";
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                // Crear DataTable desde el DataGridView
+                DataTable dt = new DataTable();
+
+                foreach (DataGridViewColumn col in dgv.Columns)
+                    dt.Columns.Add(col.HeaderText);
+
+                foreach (DataGridViewRow row in dgv.Rows)
+                {
+                    if (!row.IsNewRow)
+                    {
+                        DataRow dr = dt.NewRow();
+                        for (int i = 0; i < dgv.Columns.Count; i++)
+                            dr[i] = row.Cells[i].Value ?? "";
+                        dt.Rows.Add(dr);
+                    }
+                }
+
+                // Exportar usando ClosedXML
+                using (var wb = new XLWorkbook())
+                {
+                    var ws = wb.Worksheets.Add(dt, "Hoja1");
+                    ws.Columns().AdjustToContents();
+                    wb.SaveAs(sfd.FileName);
+                }
+
+                // Abrir el archivo Excel
+                System.Diagnostics.Process.Start(new ProcessStartInfo()
+                {
+                    FileName = sfd.FileName,
+                    UseShellExecute = true
+                });
+            }
+        }
     }
 
 }

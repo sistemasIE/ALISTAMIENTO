@@ -10,5 +10,6 @@ namespace ALISTAMIENTO_IE.Interfaces
         void ExportToCsv(DataGridView dgv, string filePath);
         void ExportToExcel(DataGridView dgv, string filePath);
 
+        void ExportarExcelConDialog(DataGridView dgv);
     }
 }

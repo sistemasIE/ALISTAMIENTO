@@ -87,9 +87,10 @@
             progressBar1 = new ProgressBar();
             dtgCargueMasivo = new DataGridView();
             tabAdmonCamiones = new TabPage();
+            lstCamiones = new CheckedListBox();
             btnCerrarCamion = new Button();
             dataGridView1 = new DataGridView();
-            lstCamiones = new ListBox();
+            btnExportar = new Button();
             tabMain.SuspendLayout();
             tabAlistar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splMain).BeginInit();
@@ -211,6 +212,7 @@
             lvwListasCamiones.UseCompatibleStateImageBehavior = false;
             lvwListasCamiones.View = View.Details;
             lvwListasCamiones.SelectedIndexChanged += lvwListasCamiones_SelectedIndexChanged;
+            lvwListasCamiones.MouseDown += lvwListasCamiones_MouseDown;
             // 
             // colPlaca
             // 
@@ -427,11 +429,11 @@
             // tabReportes
             // 
             tabReportes.Controls.Add(tlpReportes);
-            tabReportes.Location = new Point(4, 30);
+            tabReportes.Location = new Point(4, 24);
             tabReportes.Margin = new Padding(2);
             tabReportes.Name = "tabReportes";
             tabReportes.Padding = new Padding(6);
-            tabReportes.Size = new Size(1202, 482);
+            tabReportes.Size = new Size(1202, 488);
             tabReportes.TabIndex = 1;
             tabReportes.Text = "Reportes";
             tabReportes.UseVisualStyleBackColor = true;
@@ -449,7 +451,7 @@
             tlpReportes.Name = "tlpReportes";
             tlpReportes.RowCount = 1;
             tlpReportes.RowStyles.Add(new RowStyle(SizeType.Absolute, 16F));
-            tlpReportes.Size = new Size(1190, 470);
+            tlpReportes.Size = new Size(1190, 476);
             tlpReportes.TabIndex = 0;
             // 
             // tlpFiltros
@@ -470,7 +472,7 @@
             tlpFiltros.RowStyles.Add(new RowStyle());
             tlpFiltros.RowStyles.Add(new RowStyle());
             tlpFiltros.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tlpFiltros.Size = new Size(220, 466);
+            tlpFiltros.Size = new Size(220, 472);
             tlpFiltros.TabIndex = 0;
             // 
             // lblEscogeFecha
@@ -548,7 +550,7 @@
             tlpResumenHost.RowCount = 2;
             tlpResumenHost.RowStyles.Add(new RowStyle());
             tlpResumenHost.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tlpResumenHost.Size = new Size(962, 466);
+            tlpResumenHost.Size = new Size(962, 472);
             tlpResumenHost.TabIndex = 1;
             // 
             // tbcTurnos
@@ -615,7 +617,7 @@
             grpResumen.Margin = new Padding(2);
             grpResumen.Name = "grpResumen";
             grpResumen.Padding = new Padding(6);
-            grpResumen.Size = new Size(958, 378);
+            grpResumen.Size = new Size(958, 384);
             grpResumen.TabIndex = 1;
             grpResumen.TabStop = false;
             // 
@@ -634,7 +636,7 @@
             tlpResumen.RowCount = 2;
             tlpResumen.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
             tlpResumen.RowStyles.Add(new RowStyle(SizeType.Percent, 45F));
-            tlpResumen.Size = new Size(946, 344);
+            tlpResumen.Size = new Size(946, 350);
             tlpResumen.TabIndex = 0;
             // 
             // dgvResumen
@@ -652,7 +654,7 @@
             dgvResumen.RowHeadersVisible = false;
             dgvResumen.RowHeadersWidth = 51;
             dgvResumen.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvResumen.Size = new Size(658, 185);
+            dgvResumen.Size = new Size(658, 188);
             dgvResumen.TabIndex = 0;
             // 
             // pnlKpis
@@ -666,7 +668,7 @@
             pnlKpis.Margin = new Padding(2);
             pnlKpis.Name = "pnlKpis";
             pnlKpis.Padding = new Padding(6);
-            pnlKpis.Size = new Size(280, 185);
+            pnlKpis.Size = new Size(280, 188);
             pnlKpis.TabIndex = 1;
             // 
             // lblCamionesTexto
@@ -722,14 +724,14 @@
             dgvMovimientos.ColumnHeadersHeight = 29;
             tlpResumen.SetColumnSpan(dgvMovimientos, 2);
             dgvMovimientos.Dock = DockStyle.Fill;
-            dgvMovimientos.Location = new Point(2, 191);
+            dgvMovimientos.Location = new Point(2, 194);
             dgvMovimientos.Margin = new Padding(2);
             dgvMovimientos.Name = "dgvMovimientos";
             dgvMovimientos.ReadOnly = true;
             dgvMovimientos.RowHeadersVisible = false;
             dgvMovimientos.RowHeadersWidth = 51;
             dgvMovimientos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvMovimientos.Size = new Size(942, 151);
+            dgvMovimientos.Size = new Size(942, 154);
             dgvMovimientos.TabIndex = 2;
             // 
             // tabCargueMasivo
@@ -744,9 +746,9 @@
             tabCargueMasivo.Controls.Add(dtgAgrupada);
             tabCargueMasivo.Controls.Add(btnCargarArchivo);
             tabCargueMasivo.Controls.Add(tableLayoutPanel2);
-            tabCargueMasivo.Location = new Point(4, 30);
+            tabCargueMasivo.Location = new Point(4, 24);
             tabCargueMasivo.Name = "tabCargueMasivo";
-            tabCargueMasivo.Size = new Size(1202, 482);
+            tabCargueMasivo.Size = new Size(1202, 488);
             tabCargueMasivo.TabIndex = 2;
             tabCargueMasivo.Text = "Cargue Masivo";
             tabCargueMasivo.UseVisualStyleBackColor = true;
@@ -885,15 +887,25 @@
             // 
             // tabAdmonCamiones
             // 
+            tabAdmonCamiones.Controls.Add(lstCamiones);
+            tabAdmonCamiones.Controls.Add(btnExportar);
             tabAdmonCamiones.Controls.Add(btnCerrarCamion);
             tabAdmonCamiones.Controls.Add(dataGridView1);
-            tabAdmonCamiones.Controls.Add(lstCamiones);
             tabAdmonCamiones.Location = new Point(4, 30);
             tabAdmonCamiones.Name = "tabAdmonCamiones";
             tabAdmonCamiones.Size = new Size(1202, 482);
             tabAdmonCamiones.TabIndex = 3;
             tabAdmonCamiones.Text = "AdministracionCamiones";
             tabAdmonCamiones.UseVisualStyleBackColor = true;
+            // 
+            // lstCamiones
+            // 
+            lstCamiones.FormattingEnabled = true;
+            lstCamiones.Location = new Point(8, 31);
+            lstCamiones.Name = "lstCamiones";
+            lstCamiones.Size = new Size(304, 412);
+            lstCamiones.TabIndex = 14;
+            lstCamiones.SelectedIndexChanged += lstCamiones_SelectedIndexChanged_1;
             // 
             // btnCerrarCamion
             // 
@@ -914,15 +926,16 @@
             dataGridView1.Size = new Size(674, 421);
             dataGridView1.TabIndex = 12;
             // 
-            // lstCamiones
+            // btnExportar
             // 
-            lstCamiones.FormattingEnabled = true;
-            lstCamiones.ItemHeight = 21;
-            lstCamiones.Location = new Point(8, 28);
-            lstCamiones.Name = "lstCamiones";
-            lstCamiones.Size = new Size(291, 424);
-            lstCamiones.TabIndex = 11;
-            lstCamiones.SelectedIndexChanged += lstCamiones_SelectedIndexChanged;
+            btnExportar.FlatStyle = FlatStyle.Flat;
+            btnExportar.Location = new Point(1011, 144);
+            btnExportar.Name = "btnExportar";
+            btnExportar.Size = new Size(183, 80);
+            btnExportar.TabIndex = 13;
+            btnExportar.Text = "EXPORTAR REPORTE";
+            btnExportar.UseVisualStyleBackColor = true;
+            btnExportar.Click += btnExportar_Click;
             // 
             // Menu
             // 
@@ -1034,7 +1047,6 @@
         private Label label4;
         private ListBox lstErrores;
         private TabPage tabAdmonCamiones;
-        private ListBox lstCamiones;
         private DataGridView dataGridView1;
         private Button btnCerrarCamion;
         private DataGridView dgvItems;
@@ -1043,5 +1055,7 @@
         private Button btnAlistar;
         private Button btnImprimir;
         private Button btnVerMas;
+        private CheckedListBox lstCamiones;
+        private Button btnExportar;
     }
 }
