@@ -77,12 +77,15 @@ namespace ALISTAMIENTO_IE.Services
     {
         public DateTime Fecha { get; set; }
         public string Secuencial { get; set; }
+
+        public string Legalizacion { get; set; }
         public string Item { get; set; }
         public string DescripcionItem { get; set; }
         public string RazonSocial { get; set; }
         public decimal CantidadPlanificada { get; set; }
-        public string NombreConductor { get; set; }
         public string Placas { get; set; }
+        public string NombreConductor { get; set; }
+        
     }
     public class CargueMasivoService
     {

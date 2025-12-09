@@ -1318,10 +1318,30 @@ namespace ALISTAMIENTO_IE
             {
                 var detalle = _cargueMasivoService.GetCamionesDespachadosAsync(camionesMarcados);
                 dataGridView1.DataSource = detalle.ToList();
+                //AgregarColumnaEnBlanco();
+
             }
             else
             {
                 dataGridView1.DataSource = null;
+            }
+        }
+        private void AgregarColumnaEnBlanco()
+        {
+            // Nombre único para evitar duplicados al refrescar
+            string colName = "ColumnaVacia";
+
+            // Si ya existe, no la agregues otra vez
+            if (!dataGridView1.Columns.Contains(colName))
+            {
+                DataGridViewTextBoxColumn colVacia = new DataGridViewTextBoxColumn();
+                colVacia.HeaderText = "Legalizacion";      // Nombre visible (vacío)
+                colVacia.Name = colName;       // Nombre interno
+                colVacia.Width = 80;           // Ajusta el ancho si quieres
+
+                // Insertar DESPUÉS de "Secuencial"
+                int indexSecuencial = dataGridView1.Columns["Secuencial"].Index;
+                dataGridView1.Columns.Insert(indexSecuencial + 1, colVacia);
             }
         }
 
