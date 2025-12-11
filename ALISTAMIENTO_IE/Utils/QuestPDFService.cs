@@ -68,13 +68,10 @@ public class QuestPDFService : IPdfService
         document.GeneratePdf(outputPath);
         try
         {
-            // Esto le dice al sistema operativo: "Abre este archivo con el programa asociado (.pdf)"
             System.Diagnostics.Process.Start(new ProcessStartInfo(outputPath) { UseShellExecute = true });
         }
         catch (Exception ex)
         {
-            // Manejo de error si, por ejemplo, el archivo no se encontró o el OS no tiene app predeterminada.
-            // Esto es un buen hábito de ingeniero mecatrónico/informático.
             MessageBox.Show($"Error al intentar abrir el PDF: {ex.Message}", "Error de Apertura", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }

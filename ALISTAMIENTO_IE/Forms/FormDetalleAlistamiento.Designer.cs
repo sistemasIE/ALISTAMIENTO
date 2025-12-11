@@ -245,7 +245,7 @@ namespace ALISTAMIENTO_IE.Forms
             dgvEtiquetas.Name = "dgvEtiquetas";
             dgvEtiquetas.ReadOnly = true;
             dgvEtiquetas.RowHeadersVisible = false;
-            dgvEtiquetas.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvEtiquetas.SelectionMode = DataGridViewSelectionMode.CellSelect;
             dgvEtiquetas.Size = new Size(492, 136);
             dgvEtiquetas.TabIndex = 2;
             // 

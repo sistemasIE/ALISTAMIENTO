@@ -167,7 +167,7 @@ namespace ALISTAMIENTO_IE
                 turnoLike = "%TURNO3%";
             }
             // Si el tab es "TOTAL", turnoLike se mantiene en null, lo cual es correcto
-            else if(tbcReportes.SelectedTab == tabAlistamientos)
+            else if (tbcReportes.SelectedTab == tabAlistamientos)
             {
                 // 1. Traer todos los alistamientos que se dieron ese día. 
 
@@ -180,7 +180,7 @@ namespace ALISTAMIENTO_IE
 
                 // Mostrar la cantidad de camiones obtenidos en el día (usar la lista local, no la variable de clase codCamiones)
                 lblCamionesNumero.Text = codCamionesEnDia.Count.ToString();
-                 
+
                 // 3. Obtener el Reporte:
 
                 _reporte = await _alistamientoService.ObtenerReporteTrazabilidad(codCamionesEnDia.Select(x => (int)x).ToList());
@@ -200,13 +200,13 @@ namespace ALISTAMIENTO_IE
                 cmbReporteFull.DataSource = itemsCombo;
 
                 var unidadesEnConflicto = Math.Round(Math.Abs(_reporte.Sum(r => r.PlanVsAlistado + r.AlistadoVsDespachado)), 2);
-                lblUnidadesTexto.Text = "Unidades en Conflicto";
+                lblUnidadesTexto.Text = "Novedades";
                 lblUnidadesPacas.Text = unidadesEnConflicto.ToString();
 
                 dgvResumen.DataSource = _dataGridViewExporter.ConvertDynamicToDataTable(_reporte);
-                
-      
-                
+
+
+
                 return;
 
             }
@@ -724,7 +724,7 @@ namespace ALISTAMIENTO_IE
                             CANT_SALDO = m.CANT_SALDO,
                             NOTAS_DEL_DOCTO = m.NOTAS_DEL_DOCTO
                         };
-                        if (movimiento.BOD_SALIDA is not ("BODEGA INTEGRAL EMPAQUES" or "BODEGA TERCEROS IE" or "017" or "051C" or "050"))
+                        if (movimiento.BOD_SALIDA is not ("BODEGA INTEGRAL EMPAQUES" or "BODEGA TERCEROS IE" or "017" or "051C" or "050" or "045"))
                         {
 
                             //MessageBox.Show("Por favor revise la bodega de salida del Documento " + movimiento.NUM_DOCUMENTO);
@@ -954,7 +954,7 @@ namespace ALISTAMIENTO_IE
         }
 
 
-        private async void button1_Click(object sender, EventArgs e)
+        private async void btnCrearCamiones_Click(object sender, EventArgs e)
         {
             if (listaAgrupada is null || listaAgrupada.Count == 0)
             {
@@ -1125,7 +1125,7 @@ namespace ALISTAMIENTO_IE
             cxd.Fecha?.ToString("dd/MM/yyyy") ?? ""
         };
 
-                _pdfService.Generate(dt1, dt2, titles);
+                _pdfService.Generate(dt1, dt2, titles, "C:\\temp\\reporte"+ placaDelCamion+".pdf");
 
                 logs.Add($"✔️ {placaDelCamion}: PDF generado. " +
                          $"Pacas: {totales.TotalPacasEsperadas:N2}, " +
@@ -1179,15 +1179,19 @@ namespace ALISTAMIENTO_IE
         {
             string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
 
-            if (!UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]"))
-            {
-                tabMain.TabPages.Remove(tabReportes);
-                tabMain.TabPages.Remove(tabCargueMasivo);
-                tabMain.TabPages.Remove(tabAdmonCamiones);
 
+
+                if (!UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]"))
+            {
+                if (!UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]"))
+                    tabMain.TabPages.Remove(tabCargueMasivo);
+
+                    tabMain.TabPages.Remove(tabReportes);
+                tabMain.TabPages.Remove(tabAdmonCamiones);
                 if (!UserLoginCache.TienePermisoLike($"Operador - [{nombreApp}]"))
                 {
                     btnAlistar.Visible = false;
+                    btnVerMas.Visible = false;
                     btnImprimir.Visible = false;
                 }
             }
@@ -1368,15 +1372,16 @@ namespace ALISTAMIENTO_IE
                 .ToList();
 
             var unidadesEnConflicto = Math.Round(Math.Abs(filtrado.Sum(r => r.PlanVsAlistado + r.AlistadoVsDespachado)), 1);
-            lblUnidadesTexto.Text = "Unidades en Conflicto";
+            lblUnidadesTexto.Text = "Novedades";
             lblUnidadesPacas.Text = unidadesEnConflicto.ToString();
 
             lblCamionesNumero.Text = "1";
 
             dgvResumen.DataSource = _dataGridViewExporter.ConvertDynamicToDataTable(filtrado);
-            
-      
+
+
         }
 
+      
     }
 }
