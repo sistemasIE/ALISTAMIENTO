@@ -1226,10 +1226,7 @@ namespace ALISTAMIENTO_IE
 
         }
 
-        private void lstCamiones_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
+      
         public async void RefrescarListaCamiones()
         {
             var result = await _camionXDiaService.GetByStatusAsync();
@@ -1365,7 +1362,7 @@ namespace ALISTAMIENTO_IE
                 .ToArray();
         }
 
-        private void lstCamiones_SelectedIndexChanged_1(object sender, EventArgs e)
+        private void lstCamiones_SelectedIndexChanged(object sender, EventArgs e)
         {
 
             camionesMarcados.Clear();
