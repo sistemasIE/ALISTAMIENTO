@@ -336,7 +336,13 @@ namespace ALISTAMIENTO_IE
                 {
 
                     MostrarItemsDeCamion(codCamionSeleccionado);
-                    btnAlistar.Visible = true;
+
+                    string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
+
+
+                    // Si es un Operador o un Administrador, le permitirá 'Alistar'
+                    if (!UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]"))                    
+                        btnAlistar.Visible = true;
 
                 }
                 // Muestra el camión en la UI
@@ -1179,21 +1185,24 @@ namespace ALISTAMIENTO_IE
         {
             string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
 
-
-
-                if (!UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]"))
+            if (!UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]"))
             {
                 if (!UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]"))
+                {
                     tabMain.TabPages.Remove(tabCargueMasivo);
-
                     tabMain.TabPages.Remove(tabReportes);
-                tabMain.TabPages.Remove(tabAdmonCamiones);
+                    tabMain.TabPages.Remove(tabAdmonCamiones);
+                }
+                  
                 if (!UserLoginCache.TienePermisoLike($"Operador - [{nombreApp}]"))
                 {
                     btnAlistar.Visible = false;
                     btnVerMas.Visible = false;
                     btnImprimir.Visible = false;
                 }
+
+                tabMain.TabPages.Remove(tabReportes);
+                tabMain.TabPages.Remove(tabAdmonCamiones);
             }
 
 

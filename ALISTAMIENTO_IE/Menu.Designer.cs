@@ -109,6 +109,7 @@
             btnCerrarCamion = new Button();
             dataGridView1 = new DataGridView();
             lstCamiones = new ListBox();
+            tabAdministrar = new TabPage();
             tabMain.SuspendLayout();
             tabAlistar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)tlpMain).BeginInit();
@@ -156,6 +157,7 @@
             tabMain.Controls.Add(tabReportes);
             tabMain.Controls.Add(tabCargueMasivo);
             tabMain.Controls.Add(tabAdmonCamiones);
+            tabMain.Controls.Add(tabAdministrar);
             tabMain.Dock = DockStyle.Fill;
             tabMain.Location = new Point(0, 0);
             tabMain.Margin = new Padding(2);
@@ -818,9 +820,9 @@
             // 
             tabCargueMasivo.Controls.Add(lblProgreso);
             tabCargueMasivo.Controls.Add(tableLayoutPanel2);
-            tabCargueMasivo.Location = new Point(4, 30);
+            tabCargueMasivo.Location = new Point(4, 24);
             tabCargueMasivo.Name = "tabCargueMasivo";
-            tabCargueMasivo.Size = new Size(1202, 482);
+            tabCargueMasivo.Size = new Size(1202, 488);
             tabCargueMasivo.TabIndex = 2;
             tabCargueMasivo.Text = "Cargue";
             tabCargueMasivo.UseVisualStyleBackColor = true;
@@ -1118,9 +1120,9 @@
             tabAdmonCamiones.Controls.Add(btnCerrarCamion);
             tabAdmonCamiones.Controls.Add(dataGridView1);
             tabAdmonCamiones.Controls.Add(lstCamiones);
-            tabAdmonCamiones.Location = new Point(4, 24);
+            tabAdmonCamiones.Location = new Point(4, 30);
             tabAdmonCamiones.Name = "tabAdmonCamiones";
-            tabAdmonCamiones.Size = new Size(1202, 488);
+            tabAdmonCamiones.Size = new Size(1202, 482);
             tabAdmonCamiones.TabIndex = 3;
             tabAdmonCamiones.Text = "Camiones";
             tabAdmonCamiones.UseVisualStyleBackColor = true;
@@ -1189,6 +1191,16 @@
             lstCamiones.Size = new Size(291, 382);
             lstCamiones.TabIndex = 11;
             lstCamiones.SelectedIndexChanged += lstCamiones_SelectedIndexChanged;
+            // 
+            // tabAdministrar
+            // 
+            tabAdministrar.Location = new Point(4, 30);
+            tabAdministrar.Name = "tabAdministrar";
+            tabAdministrar.Padding = new Padding(3);
+            tabAdministrar.Size = new Size(1202, 482);
+            tabAdministrar.TabIndex = 4;
+            tabAdministrar.Text = "Administrar";
+            tabAdministrar.UseVisualStyleBackColor = true;
             // 
             // Menu
             // 
@@ -1343,5 +1355,6 @@
         private PictureBox pictureBox3;
         public Label label4;
         private Label label10;
+        private TabPage tabAdministrar;
     }
 }
