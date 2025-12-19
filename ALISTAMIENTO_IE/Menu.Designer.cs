@@ -103,12 +103,13 @@
             btnCargarArchivo = new Button();
             panel1 = new Panel();
             tabAdmonCamiones = new TabPage();
+            lstCamiones = new CheckedListBox();
+            btnExportar = new Button();
             label10 = new Label();
             label4 = new Label();
             pictureBox3 = new PictureBox();
             btnCerrarCamion = new Button();
             dataGridView1 = new DataGridView();
-            lstCamiones = new ListBox();
             tabAdministrar = new TabPage();
             tabMain.SuspendLayout();
             tabAlistar.SuspendLayout();
@@ -241,6 +242,7 @@
             lvwListasCamiones.UseCompatibleStateImageBehavior = false;
             lvwListasCamiones.View = View.Details;
             lvwListasCamiones.SelectedIndexChanged += lvwListasCamiones_SelectedIndexChanged;
+            lvwListasCamiones.MouseDown += lvwListasCamiones_MouseDown;
             // 
             // colPlaca
             // 
@@ -1114,12 +1116,10 @@
             // 
             // tabAdmonCamiones
             // 
-            tabAdmonCamiones.Controls.Add(label10);
-            tabAdmonCamiones.Controls.Add(label4);
-            tabAdmonCamiones.Controls.Add(pictureBox3);
+            tabAdmonCamiones.Controls.Add(lstCamiones);
+            tabAdmonCamiones.Controls.Add(btnExportar);
             tabAdmonCamiones.Controls.Add(btnCerrarCamion);
             tabAdmonCamiones.Controls.Add(dataGridView1);
-            tabAdmonCamiones.Controls.Add(lstCamiones);
             tabAdmonCamiones.Location = new Point(4, 30);
             tabAdmonCamiones.Name = "tabAdmonCamiones";
             tabAdmonCamiones.Size = new Size(1202, 482);
@@ -1181,26 +1181,6 @@
             dataGridView1.Name = "dataGridView1";
             dataGridView1.Size = new Size(674, 382);
             dataGridView1.TabIndex = 12;
-            // 
-            // lstCamiones
-            // 
-            lstCamiones.FormattingEnabled = true;
-            lstCamiones.ItemHeight = 21;
-            lstCamiones.Location = new Point(8, 70);
-            lstCamiones.Name = "lstCamiones";
-            lstCamiones.Size = new Size(291, 382);
-            lstCamiones.TabIndex = 11;
-            lstCamiones.SelectedIndexChanged += lstCamiones_SelectedIndexChanged;
-            // 
-            // tabAdministrar
-            // 
-            tabAdministrar.Location = new Point(4, 30);
-            tabAdministrar.Name = "tabAdministrar";
-            tabAdministrar.Padding = new Padding(3);
-            tabAdministrar.Size = new Size(1202, 482);
-            tabAdministrar.TabIndex = 4;
-            tabAdministrar.Text = "Administrar";
-            tabAdministrar.UseVisualStyleBackColor = true;
             // 
             // Menu
             // 
@@ -1321,7 +1301,6 @@
         private TableLayoutPanel tableLayoutPanel2;
         private Label label2;
         private TabPage tabAdmonCamiones;
-        private ListBox lstCamiones;
         private DataGridView dataGridView1;
         private Button btnCerrarCamion;
         private DataGridView dgvItems;

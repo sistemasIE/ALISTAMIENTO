@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ALISTAMIENTO_IE
 {
@@ -25,6 +26,7 @@ namespace ALISTAMIENTO_IE
         private List<MovimientoDocumentoDto> listaNormal = new();
         private ListViewItem[] camionesSeleccionados;
         private List<ReporteTrazabilidadDto> _reporte;
+        List<long> camionesMarcados = new List<long>();
 
 
         private readonly IServiceScopeFactory _scopeFactory;
@@ -38,6 +40,7 @@ namespace ALISTAMIENTO_IE
         private readonly IDataGridViewExporter _dataGridViewExporter;
         private readonly CargueMasivoService _cargueMasivoService;
         private readonly IEmailService _emailService;
+
 
 
         private readonly System.Windows.Forms.Timer _timer;
@@ -61,6 +64,7 @@ namespace ALISTAMIENTO_IE
         {
             InitializeComponent();
             this.Icon = ALISTAMIENTO_IE.Properties.Resources.Icono;
+            lstCamiones.MouseDown += lstCamiones_MouseDown;
 
             // 1. Asignación de servicios (Adiós a los new())
             _alistamientoService = alistamientoService;
@@ -1218,35 +1222,27 @@ namespace ALISTAMIENTO_IE
             lstCamiones.Items.Clear();
             codCamiones.Clear();
 
-            foreach (var c in result.OrderByDescending(x => (DateTime)x.FECHA))
-            {
-                string fecha = ((DateTime)c.FECHA).ToString("dd/MM/yyyy");
-                lstCamiones.Items.Add($"{c.PLACAS} ---> {fecha}");
-                codCamiones.Add((long)c.COD_CAMION);
-            }
+            RefrescarListaCamiones();
 
         }
 
         private void lstCamiones_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lstCamiones.SelectedIndex >= 0)
-            {
-                long codCamion = codCamiones[lstCamiones.SelectedIndex];
-                string texto = lstCamiones.SelectedItem.ToString();
 
-                var detalle = _detalleCamionXDiaService.ObtenerPorCodCamion((int)codCamion);
-                dataGridView1.DataSource = detalle;
-            }
         }
         public async void RefrescarListaCamiones()
         {
             var result = await _camionXDiaService.GetByStatusAsync();
+
             lstCamiones.Items.Clear();
             codCamiones.Clear();
+
             foreach (var c in result.OrderByDescending(x => (DateTime)x.FECHA))
             {
                 string fecha = ((DateTime)c.FECHA).ToString("dd/MM/yyyy");
-                lstCamiones.Items.Add($"{c.PLACAS} ---> {fecha}");
+                string display = $"{c.PLACAS}  ---> {fecha} --> {c.COD_CAMION}";
+
+                lstCamiones.Items.Add(display);
                 codCamiones.Add((long)c.COD_CAMION);
             }
 
@@ -1367,6 +1363,73 @@ namespace ALISTAMIENTO_IE
                 .SelectedItems
                 .Cast<ListViewItem>()
                 .ToArray();
+        }
+
+        private void lstCamiones_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+
+            camionesMarcados.Clear();
+
+            foreach (int index in lstCamiones.CheckedIndices)
+            {
+                camionesMarcados.Add(codCamiones[index]);
+            }
+
+            if (camionesMarcados.Count > 0)
+            {
+                var detalle = _cargueMasivoService.GetCamionesDespachadosAsync(camionesMarcados);
+                dataGridView1.DataSource = detalle.ToList();
+                //AgregarColumnaEnBlanco();
+
+            }
+            else
+            {
+                dataGridView1.DataSource = null;
+            }
+        }
+        private void AgregarColumnaEnBlanco()
+        {
+            // Nombre único para evitar duplicados al refrescar
+            string colName = "ColumnaVacia";
+
+            // Si ya existe, no la agregues otra vez
+            if (!dataGridView1.Columns.Contains(colName))
+            {
+                DataGridViewTextBoxColumn colVacia = new DataGridViewTextBoxColumn();
+                colVacia.HeaderText = "Legalizacion";      // Nombre visible (vacío)
+                colVacia.Name = colName;       // Nombre interno
+                colVacia.Width = 80;           // Ajusta el ancho si quieres
+
+                // Insertar DESPUÉS de "Secuencial"
+                int indexSecuencial = dataGridView1.Columns["Secuencial"].Index;
+                dataGridView1.Columns.Insert(indexSecuencial + 1, colVacia);
+            }
+        }
+
+        private void lvwListasCamiones_MouseDown(object sender, MouseEventArgs e)
+        {
+            
+        }
+
+        private void btnExportar_Click(object sender, EventArgs e)
+        {
+
+            _dataGridViewExporter.ExportarExcelConDialog(dataGridView1);
+            MessageBox.Show("Reporte generado correctamente");
+        }
+
+        private void lstCamiones_MouseDown(object sender, MouseEventArgs e)
+        {
+            CheckedListBox clb = sender as CheckedListBox;
+
+            // Obtiene el índice del ítem donde se hizo clic
+            int index = clb.IndexFromPoint(e.Location);
+            if (index != ListBox.NoMatches)
+            {
+                // Cambia el estado del check manualmente
+                bool current = clb.GetItemChecked(index);
+                clb.SetItemChecked(index, !current);
+            }
         }
 
         private void cmbReporteFull_SelectedIndexChanged(object sender, EventArgs e)

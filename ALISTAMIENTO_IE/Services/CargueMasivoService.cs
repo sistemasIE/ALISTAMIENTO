@@ -73,6 +73,20 @@ namespace ALISTAMIENTO_IE.Services
         public string SECUENCIAL { get; set; } = "";
         public long COD_CAMION { get; set; }
     }
+    public class CamionDespachoDto
+    {
+        public DateTime Fecha { get; set; }
+        public string Secuencial { get; set; }
+
+        public string Legalizacion { get; set; }
+        public string Item { get; set; }
+        public string DescripcionItem { get; set; }
+        public string RazonSocial { get; set; }
+        public decimal CantidadPlanificada { get; set; }
+        public string Placas { get; set; }
+        public string NombreConductor { get; set; }
+        
+    }
     public class CargueMasivoService
     {
         private readonly string _connectionString;
@@ -605,6 +619,50 @@ namespace ALISTAMIENTO_IE.Services
                         return false;
                     }
                 }
+            }
+        }
+        public IEnumerable<CamionDespachoDto> GetCamionesDespachadosAsync(List<long> codCamiones)
+        {
+            if (codCamiones == null || codCamiones.Count == 0)
+                return Enumerable.Empty<CamionDespachoDto>();
+
+            using (var connection = new SqlConnection(_connectionStringSIIE))
+            {
+                string sql = @"
+    SELECT 
+        CAST(cxd.FECHA AS DATE) AS Fecha,
+        dcxd.SECUENCIAL,
+        dcxd.ITEM,
+        i.F120_DESCRIPCION AS DescripcionItem,
+        t.f200_razon_social AS RazonSocial,
+        SUM(dcxd.CANTIDAD_PLANIFICADA) AS CantidadPlanificada,
+        c.NOMBRES AS NombreConductor,
+        ca.PLACAS AS Placas
+    FROM CAMION_X_DIA cxd
+    LEFT JOIN DETALLE_CAMION_X_DIA dcxd 
+        ON dcxd.COD_CAMION = cxd.COD_CAMION
+    LEFT JOIN [192.168.99.68].UnoEE_Doron.dbo.t120_mc_items i
+        ON i.F120_ID = dcxd.ITEM
+        AND i.F120_ID_CIA = 2
+    LEFT JOIN [192.168.99.68].UnoEE_Doron.dbo.t200_mm_terceros t
+        ON t.f200_rowid = i.f120_rowid_tercero_cli
+    LEFT JOIN CONDUCTOR c 
+        ON c.COD_CONDUCTOR = cxd.COD_CONDUCTOR
+    LEFT JOIN CAMION ca 
+        ON ca.COD_CAMION = cxd.COD_REGISTRO_CAMION
+    WHERE cxd.COD_CAMION IN @Ids
+    GROUP BY
+        CAST(cxd.FECHA AS DATE),
+        dcxd.SECUENCIAL,
+        dcxd.ITEM,
+        i.F120_DESCRIPCION,
+        t.f200_razon_social,
+        c.NOMBRES,
+        ca.PLACAS
+    ORDER BY Fecha DESC;
+";
+
+                return connection.Query<CamionDespachoDto>(sql, new { Ids = codCamiones });
             }
         }
     }
