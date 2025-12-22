@@ -4,6 +4,8 @@ namespace ALISTAMIENTO_IE.Interfaces
 {
     public interface ICamionXDiaService
     {
+        Task<bool> ActualizarRegistroCamionAsync(long codCamion, long codRegistroCamion);
+
         Task<List<CamionXDia>> GetAllAsync();
         Task<CamionXDia?> GetByIdAsync(long codCamion);
         Task<IEnumerable<CamionXDia>> ObtenerCamionesDespachadosPorFecha(DateTime fecha);

@@ -135,6 +135,23 @@ namespace ALISTAMIENTO_IE.Services
             }
         }
 
+        public async Task<bool> ActualizarRegistroCamionAsync(long codCamion, long codRegistroCamion)
+        {
+            using (var connection = new SqlConnection(_connectionStringSIE))
+            {
+                const string query = @"UPDATE CAMION_X_DIA
+                                       SET COD_REGISTRO_CAMION = @CodRegistroCamion
+                                       WHERE COD_CAMION = @CodCamion";
+                var affectedRows = await connection.ExecuteAsync(query, new
+                {
+                    CodRegistroCamion = codRegistroCamion,
+                    CodCamion = codCamion
+                });
+                return affectedRows > 0;
+            }
+        }
+
+
         // === DELETE ===
         public async Task<bool> DeleteAsync(long codCamion)
         {

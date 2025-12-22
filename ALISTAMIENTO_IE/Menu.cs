@@ -1,5 +1,6 @@
 ﻿using ALISTAMIENTO_IE.DTOs;
 using ALISTAMIENTO_IE.Interfaces;
+using ALISTAMIENTO_IE.Models;
 using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
 using Common.cache;
@@ -19,7 +20,8 @@ namespace ALISTAMIENTO_IE
         private bool _canClick = true;
         private bool _hasUploaded = false;
         private Dictionary<string, string> _cacheItemsEquivalentes = new Dictionary<string, string>();
-        private int codCamionSeleccionado;
+        private int codCamionSeleccionado; // ID de la tabla CAMION_X_DIA
+        private long codRegistroCamionSeleccionado = 0; // ID de la tabla CAMION
         private List<CamionDetallesDTO> _camiones;
         private List<GrupoMovimientosDto> listaAgrupada = new();
         private List<long> codCamiones = new List<long>();
@@ -27,6 +29,10 @@ namespace ALISTAMIENTO_IE
         private ListViewItem[] camionesSeleccionados;
         private List<ReporteTrazabilidadDto> _reporte;
         List<long> camionesMarcados = new List<long>();
+        List<Camion> listadoCamiones;
+        string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
+        string _estadoAlistamiento;
+        private bool _cambioManual = false;
 
 
         private readonly IServiceScopeFactory _scopeFactory;
@@ -40,7 +46,7 @@ namespace ALISTAMIENTO_IE
         private readonly IDataGridViewExporter _dataGridViewExporter;
         private readonly CargueMasivoService _cargueMasivoService;
         private readonly IEmailService _emailService;
-
+        public readonly ICamionService _camionService;
 
 
         private readonly System.Windows.Forms.Timer _timer;
@@ -57,6 +63,7 @@ namespace ALISTAMIENTO_IE
              IAlistamientoEtiquetaService alistamientoEtiquetaService,
              IKardexService kardexService,
              IDataGridViewExporter dataGridViewExporter,
+             ICamionService camionService,
              CargueMasivoService cargueMasivoService,
              IEmailService emailService,
              IServiceScopeFactory scopeFactory
@@ -72,6 +79,7 @@ namespace ALISTAMIENTO_IE
             _camionXDiaService = camionXDiaService;
             _detalleCamionXDiaService = detalleCamionXDiaService;
             _alistamientoEtiquetaService = alistamientoEtiquetaService;
+            _camionService = camionService;
             _kardexService = kardexService;
             _dataGridViewExporter = dataGridViewExporter;
             _cargueMasivoService = cargueMasivoService;
@@ -122,8 +130,8 @@ namespace ALISTAMIENTO_IE
         private void CargarUI()
         {
             CargarCamiones();
-        }
 
+        }
 
         private async void TabMain_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -307,11 +315,10 @@ namespace ALISTAMIENTO_IE
 
             ListViewItem selectedItem = lvwListasCamiones.SelectedItems[0];
 
-            // Recuperar el CodCamion que se guardó en el Tag
+            // Recuperar el CodCamion que se guardó en el Tag (El CodCamion de CAMION_X_DIA)
             codCamionSeleccionado = selectedItem.Tag is int tag ? tag : 0;
             // Acceder al estado del alistamiento (columna índice 3)
-            string estadoAlistamiento = selectedItem.SubItems[3].Text;
-
+            _estadoAlistamiento = selectedItem.SubItems[3].Text;
 
             // Recuperar los valores de cada columna (SubItems)
             placaCamionSeleccionado = selectedItem.SubItems[0].Text;     // Placas
@@ -331,9 +338,12 @@ namespace ALISTAMIENTO_IE
             else if (codCamionSeleccionado > 0)
             {
 
-                if (estadoAlistamiento == "ALISTADO" || estadoAlistamiento == "ALISTADO_INCOMPLETO")
+
+                if (_estadoAlistamiento == "ALISTADO" || _estadoAlistamiento == "ALISTADO_INCOMPLETO")
                 {
                     await _alistamientoService.CargarCamionDia(codCamionSeleccionado, this.dgvItems);
+
+                    // Muestra el checkbox de 'Cambiar Camión'
 
                 }
                 else
@@ -341,14 +351,14 @@ namespace ALISTAMIENTO_IE
 
                     MostrarItemsDeCamion(codCamionSeleccionado);
 
-                    string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
-
-
                     // Si es un Operador o un Administrador, le permitirá 'Alistar'
-                    if (!UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]"))                    
+                    if (!UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]"))
                         btnAlistar.Visible = true;
 
                 }
+
+                chkCambiarCamion.Visible = true;
+
                 // Muestra el camión en la UI
                 lblTituloCamion.Text = $"CAMIÓN - {placaCamionSeleccionado}";
                 // Se muestra la fecha
@@ -1135,7 +1145,7 @@ namespace ALISTAMIENTO_IE
             cxd.Fecha?.ToString("dd/MM/yyyy") ?? ""
         };
 
-                _pdfService.Generate(dt1, dt2, titles, "C:\\temp\\reporte"+ placaDelCamion+".pdf");
+                _pdfService.Generate(dt1, dt2, titles, "C:\\temp\\reporte" + placaDelCamion + ".pdf");
 
                 logs.Add($"✔️ {placaDelCamion}: PDF generado. " +
                          $"Pacas: {totales.TotalPacasEsperadas:N2}, " +
@@ -1197,7 +1207,7 @@ namespace ALISTAMIENTO_IE
                     tabMain.TabPages.Remove(tabReportes);
                     tabMain.TabPages.Remove(tabAdmonCamiones);
                 }
-                  
+
                 if (!UserLoginCache.TienePermisoLike($"Operador - [{nombreApp}]"))
                 {
                     btnAlistar.Visible = false;
@@ -1222,11 +1232,17 @@ namespace ALISTAMIENTO_IE
             lstCamiones.Items.Clear();
             codCamiones.Clear();
 
+
+            // Obtener la lista de Camiones (solo el Modelo de Camion)
+            var res = await _camionService.ObtenerTodosAsync();
+
+            listadoCamiones = res.ToList(); // Asignar camiones (Luego, cuando se dé doble click, el comboBox se llena.)
+
             RefrescarListaCamiones();
 
         }
 
-      
+
         public async void RefrescarListaCamiones()
         {
             var result = await _camionXDiaService.GetByStatusAsync();
@@ -1405,7 +1421,7 @@ namespace ALISTAMIENTO_IE
 
         private void lvwListasCamiones_MouseDown(object sender, MouseEventArgs e)
         {
-            
+
         }
 
         private void btnExportar_Click(object sender, EventArgs e)
@@ -1451,6 +1467,79 @@ namespace ALISTAMIENTO_IE
 
         }
 
-      
+        private async void cmbCambiarCamion_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!_cambioManual) return;
+            if (cmbCambiarCamion.SelectedItem == null) return;
+
+            string nuevaPlaca = cmbCambiarCamion.Text;
+
+            if (nuevaPlaca.Equals(placaCamionSeleccionado, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            var result = MessageBox.Show(
+                $"¿Está seguro de cambiar el camión de {placaCamionSeleccionado} a {nuevaPlaca}?",
+                "Confirmar cambio",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+
+                long nuevoCodRegistroCamion = (long)cmbCambiarCamion.SelectedValue;
+                await _camionXDiaService.ActualizarRegistroCamionAsync(codCamionSeleccionado, nuevoCodRegistroCamion);
+                codRegistroCamionSeleccionado = nuevoCodRegistroCamion;
+                placaCamionSeleccionado = nuevaPlaca;
+                MessageBox.Show("Camión actualizado con éxito");
+                CargarUI();
+                lblTituloCamion.Text = $"CAMIÓN - {placaCamionSeleccionado}";
+
+
+            }
+            else
+            {
+                // Revertir selección
+                _cambioManual = false;
+                cmbCambiarCamion.SelectedIndex =
+                    listadoCamiones.FindIndex(a =>
+                        a.PLACAS.Equals(placaCamionSeleccionado, StringComparison.OrdinalIgnoreCase));
+                _cambioManual = true;
+            }
+        }
+
+        private void chkCambiarCamion_CheckedChanged(object sender, EventArgs e)
+        {
+            bool mostrar = chkCambiarCamion.Checked;
+
+            // Permisos:
+            bool tienePermiso =
+                UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]") ||
+                UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]");
+
+            if (!tienePermiso)
+            {
+                chkCambiarCamion.Checked = false;
+                return;
+            }
+
+            cmbCambiarCamion.Visible = mostrar;
+            _cambioManual = false;
+
+            if (mostrar)
+            {
+                // Cargar combo SOLO cuando se muestra
+                cmbCambiarCamion.DataSource = listadoCamiones;
+                cmbCambiarCamion.DisplayMember = "PLACAS";
+                cmbCambiarCamion.ValueMember = "COD_CAMION";
+
+                cmbCambiarCamion.SelectedValue = codCamionSeleccionado;
+            }
+            else
+            {
+                cmbCambiarCamion.SelectedValue = codCamionSeleccionado;
+            }
+
+            _cambioManual = true;
+        }
     }
 }
