@@ -500,6 +500,7 @@
             Margin = new Padding(7, 5, 7, 5);
             Name = "ALISTAMIENTO";
             Text = "ALISTAMIENTO";
+            WindowState = FormWindowState.Maximized;
             grpErrores.ResumeLayout(false);
             tableLayoutPanel4.ResumeLayout(false);
             tableLayoutPanel4.PerformLayout();

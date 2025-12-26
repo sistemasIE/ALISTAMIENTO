@@ -110,6 +110,15 @@
             btnCerrarCamion = new Button();
             dataGridView1 = new DataGridView();
             tabAdministrar = new TabPage();
+            tableLayoutPanel7 = new TableLayoutPanel();
+            tableLayoutPanel9 = new TableLayoutPanel();
+            tableLayoutPanel12 = new TableLayoutPanel();
+            tableLayoutPanel13 = new TableLayoutPanel();
+            label12 = new Label();
+            tableLayoutPanel8 = new TableLayoutPanel();
+            label11 = new Label();
+            tableLayoutPanel10 = new TableLayoutPanel();
+            tableLayoutPanel11 = new TableLayoutPanel();
             label10 = new Label();
             label4 = new Label();
             pictureBox3 = new PictureBox();
@@ -151,6 +160,12 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             tabAdmonCamiones.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            tabAdministrar.SuspendLayout();
+            tableLayoutPanel7.SuspendLayout();
+            tableLayoutPanel9.SuspendLayout();
+            tableLayoutPanel12.SuspendLayout();
+            tableLayoutPanel8.SuspendLayout();
+            tableLayoutPanel10.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
             SuspendLayout();
             // 
@@ -374,10 +389,10 @@
             // tlpBotones
             // 
             tlpBotones.ColumnCount = 4;
-            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 145F));
-            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 177F));
-            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 129F));
-            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 8F));
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             tlpBotones.Controls.Add(btnImprimir, 3, 0);
             tlpBotones.Controls.Add(btnVerMas, 1, 0);
             tlpBotones.Controls.Add(btnRecargar, 2, 0);
@@ -397,9 +412,9 @@
             btnImprimir.Cursor = Cursors.Hand;
             btnImprimir.Dock = DockStyle.Fill;
             btnImprimir.ForeColor = SystemColors.HighlightText;
-            btnImprimir.Location = new Point(454, 3);
+            btnImprimir.Location = new Point(654, 3);
             btnImprimir.Name = "btnImprimir";
-            btnImprimir.Size = new Size(411, 56);
+            btnImprimir.Size = new Size(211, 56);
             btnImprimir.TabIndex = 13;
             btnImprimir.Text = "IMPRIMIR";
             btnImprimir.UseVisualStyleBackColor = false;
@@ -415,11 +430,11 @@
             btnVerMas.FlatStyle = FlatStyle.Flat;
             btnVerMas.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
             btnVerMas.ForeColor = Color.White;
-            btnVerMas.Location = new Point(147, 2);
+            btnVerMas.Location = new Point(219, 2);
             btnVerMas.Margin = new Padding(2);
             btnVerMas.Name = "btnVerMas";
             btnVerMas.Padding = new Padding(10, 5, 10, 5);
-            btnVerMas.Size = new Size(173, 58);
+            btnVerMas.Size = new Size(213, 58);
             btnVerMas.TabIndex = 12;
             btnVerMas.Text = "VER MÁS";
             btnVerMas.UseVisualStyleBackColor = false;
@@ -429,9 +444,9 @@
             // 
             btnRecargar.Cursor = Cursors.Hand;
             btnRecargar.Dock = DockStyle.Fill;
-            btnRecargar.Location = new Point(325, 3);
+            btnRecargar.Location = new Point(437, 3);
             btnRecargar.Name = "btnRecargar";
-            btnRecargar.Size = new Size(123, 56);
+            btnRecargar.Size = new Size(211, 56);
             btnRecargar.TabIndex = 8;
             btnRecargar.Text = "RECARGAR";
             btnRecargar.UseVisualStyleBackColor = true;
@@ -450,7 +465,7 @@
             btnAlistar.Margin = new Padding(2);
             btnAlistar.Name = "btnAlistar";
             btnAlistar.Padding = new Padding(10, 5, 10, 5);
-            btnAlistar.Size = new Size(141, 58);
+            btnAlistar.Size = new Size(213, 58);
             btnAlistar.TabIndex = 7;
             btnAlistar.Text = "ALISTAR";
             btnAlistar.UseVisualStyleBackColor = false;
@@ -1202,10 +1217,150 @@
             // 
             // tabAdministrar
             // 
+            tabAdministrar.Controls.Add(tableLayoutPanel7);
             tabAdministrar.Location = new Point(4, 24);
             tabAdministrar.Name = "tabAdministrar";
             tabAdministrar.Size = new Size(1202, 488);
             tabAdministrar.TabIndex = 4;
+            tabAdministrar.Text = "Administrar";
+            // 
+            // tableLayoutPanel7
+            // 
+            tableLayoutPanel7.ColumnCount = 2;
+            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 603F));
+            tableLayoutPanel7.Controls.Add(tableLayoutPanel9, 1, 0);
+            tableLayoutPanel7.Controls.Add(tableLayoutPanel8, 0, 0);
+            tableLayoutPanel7.Dock = DockStyle.Fill;
+            tableLayoutPanel7.Location = new Point(0, 0);
+            tableLayoutPanel7.Name = "tableLayoutPanel7";
+            tableLayoutPanel7.RowCount = 1;
+            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel7.Size = new Size(1202, 488);
+            tableLayoutPanel7.TabIndex = 0;
+            // 
+            // tableLayoutPanel9
+            // 
+            tableLayoutPanel9.ColumnCount = 1;
+            tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel9.Controls.Add(tableLayoutPanel12, 0, 1);
+            tableLayoutPanel9.Controls.Add(label12, 0, 0);
+            tableLayoutPanel9.Dock = DockStyle.Fill;
+            tableLayoutPanel9.Location = new Point(602, 3);
+            tableLayoutPanel9.Name = "tableLayoutPanel9";
+            tableLayoutPanel9.RowCount = 3;
+            tableLayoutPanel9.RowStyles.Add(new RowStyle(SizeType.Percent, 12.8125F));
+            tableLayoutPanel9.RowStyles.Add(new RowStyle(SizeType.Percent, 87.1875F));
+            tableLayoutPanel9.RowStyles.Add(new RowStyle(SizeType.Absolute, 43F));
+            tableLayoutPanel9.Size = new Size(597, 482);
+            tableLayoutPanel9.TabIndex = 1;
+            // 
+            // tableLayoutPanel12
+            // 
+            tableLayoutPanel12.ColumnCount = 1;
+            tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel12.Controls.Add(tableLayoutPanel13, 0, 4);
+            tableLayoutPanel12.Dock = DockStyle.Fill;
+            tableLayoutPanel12.Location = new Point(3, 59);
+            tableLayoutPanel12.Name = "tableLayoutPanel12";
+            tableLayoutPanel12.RowCount = 5;
+            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Percent, 38.57143F));
+            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Percent, 61.42857F));
+            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
+            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Absolute, 53F));
+            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Absolute, 37F));
+            tableLayoutPanel12.Size = new Size(591, 376);
+            tableLayoutPanel12.TabIndex = 2;
+            // 
+            // tableLayoutPanel13
+            // 
+            tableLayoutPanel13.ColumnCount = 4;
+            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel13.Dock = DockStyle.Fill;
+            tableLayoutPanel13.Location = new Point(3, 341);
+            tableLayoutPanel13.Name = "tableLayoutPanel13";
+            tableLayoutPanel13.RowCount = 1;
+            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel13.Size = new Size(585, 32);
+            tableLayoutPanel13.TabIndex = 0;
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Dock = DockStyle.Fill;
+            label12.Font = new Font("Segoe UI", 22F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label12.ForeColor = Color.Green;
+            label12.Location = new Point(3, 0);
+            label12.Name = "label12";
+            label12.Size = new Size(591, 56);
+            label12.TabIndex = 1;
+            label12.Text = "CONDUCTORES";
+            label12.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // tableLayoutPanel8
+            // 
+            tableLayoutPanel8.ColumnCount = 1;
+            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel8.Controls.Add(label11, 0, 0);
+            tableLayoutPanel8.Controls.Add(tableLayoutPanel10, 0, 1);
+            tableLayoutPanel8.Dock = DockStyle.Fill;
+            tableLayoutPanel8.Location = new Point(3, 3);
+            tableLayoutPanel8.Name = "tableLayoutPanel8";
+            tableLayoutPanel8.RowCount = 3;
+            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 13.4375F));
+            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 86.5625F));
+            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Absolute, 46F));
+            tableLayoutPanel8.Size = new Size(593, 482);
+            tableLayoutPanel8.TabIndex = 0;
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Dock = DockStyle.Fill;
+            label11.Font = new Font("Segoe UI", 22F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label11.ForeColor = Color.MediumBlue;
+            label11.Location = new Point(3, 0);
+            label11.Name = "label11";
+            label11.Size = new Size(587, 58);
+            label11.TabIndex = 0;
+            label11.Text = "CAMIONES";
+            label11.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // tableLayoutPanel10
+            // 
+            tableLayoutPanel10.ColumnCount = 1;
+            tableLayoutPanel10.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel10.Controls.Add(tableLayoutPanel11, 0, 5);
+            tableLayoutPanel10.Dock = DockStyle.Fill;
+            tableLayoutPanel10.Location = new Point(3, 61);
+            tableLayoutPanel10.Name = "tableLayoutPanel10";
+            tableLayoutPanel10.RowCount = 6;
+            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Absolute, 78F));
+            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Percent, 51.9047623F));
+            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Percent, 48.0952377F));
+            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Absolute, 78F));
+            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Absolute, 39F));
+            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Absolute, 37F));
+            tableLayoutPanel10.Size = new Size(587, 371);
+            tableLayoutPanel10.TabIndex = 1;
+            // 
+            // tableLayoutPanel11
+            // 
+            tableLayoutPanel11.ColumnCount = 4;
+            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel11.Dock = DockStyle.Fill;
+            tableLayoutPanel11.Location = new Point(3, 336);
+            tableLayoutPanel11.Name = "tableLayoutPanel11";
+            tableLayoutPanel11.RowCount = 1;
+            tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel11.Size = new Size(581, 32);
+            tableLayoutPanel11.TabIndex = 0;
             // 
             // label10
             // 
@@ -1251,6 +1406,7 @@
             MinimumSize = new Size(643, 408);
             Name = "Menu";
             Text = "Alistar Camión";
+            WindowState = FormWindowState.Maximized;
             FormClosing += ALISTAR_CAMION_FormClosing;
             Load += ALISTAR_CAMION_Load;
             tabMain.ResumeLayout(false);
@@ -1304,6 +1460,14 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             tabAdmonCamiones.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            tabAdministrar.ResumeLayout(false);
+            tableLayoutPanel7.ResumeLayout(false);
+            tableLayoutPanel9.ResumeLayout(false);
+            tableLayoutPanel9.PerformLayout();
+            tableLayoutPanel12.ResumeLayout(false);
+            tableLayoutPanel8.ResumeLayout(false);
+            tableLayoutPanel8.PerformLayout();
+            tableLayoutPanel10.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
             ResumeLayout(false);
         }
@@ -1396,5 +1560,14 @@
         private Button btnVerMas;
         private Button btnRecargar;
         private Button btnAlistar;
+        private TableLayoutPanel tableLayoutPanel7;
+        private TableLayoutPanel tableLayoutPanel9;
+        private Label label12;
+        private TableLayoutPanel tableLayoutPanel8;
+        private Label label11;
+        private TableLayoutPanel tableLayoutPanel12;
+        private TableLayoutPanel tableLayoutPanel13;
+        private TableLayoutPanel tableLayoutPanel10;
+        private TableLayoutPanel tableLayoutPanel11;
     }
 }

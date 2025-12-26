@@ -152,6 +152,7 @@
             Controls.Add(txtItems);
             Controls.Add(label1);
             Name = "CONSULTA_ITEMS_ETIQUETAS";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "FORM_CONSULTA_ITEMS";
             ((System.ComponentModel.ISupportInitialize)dgv).EndInit();
             ResumeLayout(false);

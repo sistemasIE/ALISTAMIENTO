@@ -37,49 +37,53 @@
             // lblDinamico
             // 
             lblDinamico.AutoSize = true;
-            lblDinamico.Location = new Point(30, 30);
+            lblDinamico.Location = new Point(26, 22);
             lblDinamico.Name = "lblDinamico";
-            lblDinamico.Size = new Size(54, 20);
+            lblDinamico.Size = new Size(44, 15);
             lblDinamico.TabIndex = 0;
             lblDinamico.Text = "Acción";
             // 
             // txtObservaciones
             // 
-            txtObservaciones.Location = new Point(30, 70);
+            txtObservaciones.Location = new Point(26, 52);
+            txtObservaciones.Margin = new Padding(3, 2, 3, 2);
             txtObservaciones.MaxLength = 255;
             txtObservaciones.Multiline = true;
             txtObservaciones.Name = "txtObservaciones";
-            txtObservaciones.Size = new Size(320, 120);
+            txtObservaciones.Size = new Size(280, 91);
             txtObservaciones.TabIndex = 1;
             // 
             // btnAceptar
             // 
-            btnAceptar.Location = new Point(60, 220);
+            btnAceptar.Location = new Point(52, 165);
+            btnAceptar.Margin = new Padding(3, 2, 3, 2);
             btnAceptar.Name = "btnAceptar";
-            btnAceptar.Size = new Size(100, 35);
+            btnAceptar.Size = new Size(88, 26);
             btnAceptar.TabIndex = 2;
             btnAceptar.Text = "Aceptar";
             btnAceptar.UseVisualStyleBackColor = true;
             // 
             // btnCancelar
             // 
-            btnCancelar.Location = new Point(200, 220);
+            btnCancelar.Location = new Point(175, 165);
+            btnCancelar.Margin = new Padding(3, 2, 3, 2);
             btnCancelar.Name = "btnCancelar";
-            btnCancelar.Size = new Size(100, 35);
+            btnCancelar.Size = new Size(88, 26);
             btnCancelar.TabIndex = 3;
             btnCancelar.Text = "Cancelar";
             btnCancelar.UseVisualStyleBackColor = true;
             // 
             // OBSERVACIONES
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(381, 300);
+            ClientSize = new Size(333, 225);
             Controls.Add(btnCancelar);
             Controls.Add(btnAceptar);
             Controls.Add(txtObservaciones);
             Controls.Add(lblDinamico);
             FormBorderStyle = FormBorderStyle.None;
+            Margin = new Padding(3, 2, 3, 2);
             Name = "OBSERVACIONES";
             Text = "OBSERVACIONES";
             ResumeLayout(false);

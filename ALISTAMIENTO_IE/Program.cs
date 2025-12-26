@@ -2,6 +2,7 @@
 using ALISTAMIENTO_IE.Forms;
 using ALISTAMIENTO_IE.Interfaces;
 using ALISTAMIENTO_IE.Services;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using LECTURA_DE_BANDA;
 using Microsoft.Extensions.DependencyInjection;
 using QuestPDF.Infrastructure;
@@ -22,8 +23,6 @@ namespace ALISTAMIENTO_IE
                 .AddTransient<IEliminacionAlistamientoEtiquetaService, EliminacionAlistamientoEtiquetaService>()
                 .AddTransient<IPdfService, QuestPDFService>() // Asumido
                 .AddTransient<IDataGridViewExporter, DataGridViewExporter>() // Asumido
-
-                // ¡Nuevas Interfaces!
                 .AddTransient<ICamionXDiaService, CamionXDiaService>()
                 .AddTransient<IDetalleCamionXDiaService, DetalleCamionXDiaService>()
                 .AddTransient<IEmailService, EmailService>()
