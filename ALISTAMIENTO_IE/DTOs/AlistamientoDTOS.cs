@@ -14,6 +14,11 @@
     }
 
 
+    public enum AdminContexto
+    {
+        Camiones,
+        Conductores
+    }
 
     public class AlistamientoItemDTO
     {

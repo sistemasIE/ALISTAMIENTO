@@ -4,14 +4,11 @@ using ALISTAMIENTO_IE.Models;
 using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
 using Common.cache;
-//using DocumentFormat.OpenXml.Spreadsheet;
 using ExcelDataReader;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ALISTAMIENTO_IE
 {
@@ -28,11 +25,25 @@ namespace ALISTAMIENTO_IE
         private List<MovimientoDocumentoDto> listaNormal = new();
         private ListViewItem[] camionesSeleccionados;
         private List<ReporteTrazabilidadDto> _reporte;
-        List<long> camionesMarcados = new List<long>();
-        List<Camion> listadoCamiones;
-        string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
-        string _estadoAlistamiento;
+        private List<long> camionesMarcados = new List<long>();
+        private List<Camion> listadoCamiones;
+        private string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
+        private string _estadoAlistamiento;
         private bool _cambioManual = false;
+
+        // Binding source para poder editar DataGridViews de administración
+        // Por cada nueva entidad administrable, agregar un BindingSource
+        private BindingSource bsCamiones = new();
+        private BindingSource bsConductores = new();
+
+        // ENUM para el contexto de administración, define a qué se le está haciendo CRUD.
+        private AdminContexto ContextoActual =>
+    tabContAdmin.SelectedTab == tabAdminCamiones
+        ? AdminContexto.Camiones
+        : AdminContexto.Conductores;
+
+        private bool _creandoEnAdministrar = false;
+
 
 
         private readonly IServiceScopeFactory _scopeFactory;
@@ -40,6 +51,7 @@ namespace ALISTAMIENTO_IE
         private readonly IAlistamientoService _alistamientoService;
         private readonly IPdfService _pdfService;
         private readonly ICamionXDiaService _camionXDiaService;
+        private readonly IConductorService _conductorService;
         private readonly IDetalleCamionXDiaService _detalleCamionXDiaService;
         private readonly IAlistamientoEtiquetaService _alistamientoEtiquetaService;
         private readonly IKardexService _kardexService;
@@ -59,6 +71,7 @@ namespace ALISTAMIENTO_IE
              IAlistamientoService alistamientoService,
              IPdfService pdfService,
              ICamionXDiaService camionXDiaService,
+             IConductorService conductorService,
              IDetalleCamionXDiaService detalleCamionXDiaService,
              IAlistamientoEtiquetaService alistamientoEtiquetaService,
              IKardexService kardexService,
@@ -77,6 +90,7 @@ namespace ALISTAMIENTO_IE
             _alistamientoService = alistamientoService;
             _pdfService = pdfService;
             _camionXDiaService = camionXDiaService;
+            _conductorService = conductorService;
             _detalleCamionXDiaService = detalleCamionXDiaService;
             _alistamientoEtiquetaService = alistamientoEtiquetaService;
             _camionService = camionService;
@@ -108,6 +122,7 @@ namespace ALISTAMIENTO_IE
             {
                 _canClick = true;
                 btnRecargar.Enabled = true;
+                btnAdminRecargar.Enabled = true;
                 _cooldownTimer.Stop();
             };
 
@@ -140,6 +155,32 @@ namespace ALISTAMIENTO_IE
                 // Al entrar a la pestaña de Reportes:
                 await CargarReportesYTotales();
             }
+
+            else if (tabMain.SelectedTab == tabAdministrar)
+            {
+                // Al entrar a la pestaña de Administrar:
+                await CargarInfoAdmin();
+            }
+        }
+
+        private async Task CargarInfoAdmin()
+        {
+            if (tabContAdmin.SelectedTab == tabAdminCamiones)
+            {
+                var camiones = await _camionService.ObtenerTodosAsync();
+                bsCamiones.DataSource = camiones;
+                dgvAdminCamiones.DataSource = bsCamiones;
+                dgvAdminCamiones.Columns["COD_CAMION"].Visible = false;
+            }
+            else if (tabContAdmin.SelectedTab == tabAdminConductores)
+            {
+                var conductores = await _conductorService.ObtenerTodosAsync();
+                bsConductores.DataSource = conductores;
+                dgvAdminConductores.DataSource = bsConductores;
+                dgvAdminConductores.Columns["COD_CONDUCTOR"].Visible = false;
+                dgvAdminConductores.Columns["TELEFONO"].Visible = false;
+
+            }
         }
 
         private async void DtpFechaReporte_ValueChanged(object sender, EventArgs e)
@@ -161,6 +202,8 @@ namespace ALISTAMIENTO_IE
                 await CargarReportesYTotales();
             }
         }
+
+
 
         private async Task CargarReportesYTotales()
         {
@@ -1199,29 +1242,41 @@ namespace ALISTAMIENTO_IE
         {
             string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
 
-            if (!UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]"))
-            {
-                if (!UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]"))
-                {
-                    tabMain.TabPages.Remove(tabCargueMasivo);
-                    tabMain.TabPages.Remove(tabReportes);
-                    tabMain.TabPages.Remove(tabAdmonCamiones);
-                }
+            bool esAdmin = UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]");
+            bool esCargueMasivo = UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]");
+            bool esOperador = UserLoginCache.TienePermisoLike($"Operador - [{nombreApp}]");
 
-                if (!UserLoginCache.TienePermisoLike($"Operador - [{nombreApp}]"))
-                {
-                    btnAlistar.Visible = false;
-                    btnVerMas.Visible = false;
-                    btnImprimir.Visible = false;
-                }
+            if (esAdmin)
+                return; // 🔓 ve todo, no tocar nada
 
-                tabMain.TabPages.Remove(tabReportes);
+            // ❌ Tabs que NO ve un no-admin
+           
+            if (tabMain.TabPages.Contains(tabAdmonCamiones))
                 tabMain.TabPages.Remove(tabAdmonCamiones);
+
+            if (tabMain.TabPages.Contains(tabReportes))
+                tabMain.TabPages.Remove(tabReportes);
+
+            // ❌ Si NO tiene cargue masivo
+            if (!esCargueMasivo)
+            {
+                if (tabMain.TabPages.Contains(tabCargueMasivo))
+                    tabMain.TabPages.Remove(tabCargueMasivo);
+
+                if (tabMain.TabPages.Contains(tabAdministrar))
+                    tabMain.TabPages.Remove(tabAdministrar);
+
             }
 
-
-
+            // ❌ Si NO es operador
+            if (!esOperador)
+            {
+                btnAlistar.Visible = false;
+                btnVerMas.Visible = false;
+                btnImprimir.Visible = false;
+            }
         }
+
         // Función para listar los camiones y ordenarlos.
         private async void ALISTAR_CAMION_Load(object sender, EventArgs e)
         {
@@ -1540,6 +1595,206 @@ namespace ALISTAMIENTO_IE
             }
 
             _cambioManual = true;
+        }
+
+        // |||||||||||||||||||||||||||||||||||||||||||||||||||||||
+        // ADMINISTRACIÓN
+        // |||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+        private void tabContAdmin_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CargarInfoAdmin();
+        }
+
+        private void btnAdminCrear_Click(object sender, EventArgs e)
+        {
+            if (_creandoEnAdministrar)
+            {
+                MessageBox.Show("Primero guarda o elimina el registro actual.");
+                return;
+            }
+
+
+            switch (ContextoActual)
+            {
+                case AdminContexto.Camiones:
+                    var nuevoCamion = new Camion();
+                    bsCamiones.Add(nuevoCamion);
+                    bsCamiones.MoveLast();
+                    _creandoEnAdministrar = true;
+                    break;
+
+
+                case AdminContexto.Conductores:
+                    var nuevoConductor = new Conductor();
+                    bsConductores.Add(nuevoConductor);
+                    bsConductores.MoveLast();
+                    _creandoEnAdministrar = true;
+                    break;
+
+            }
+
+
+        }
+
+        private async void btnAdminGuardar_Click(object sender, EventArgs e)
+        {
+            switch (ContextoActual)
+            {
+                case AdminContexto.Camiones:
+                    await GuardarCamion();
+                    break;
+
+                case AdminContexto.Conductores:
+                    await GuardarConductor();
+                    break;
+            }
+        }
+        private async Task GuardarCamion()
+        {
+            bsCamiones.EndEdit();
+
+            Camion camion = (Camion)bsCamiones.Current;
+
+            if (camion == null)
+                return;
+
+            camion.PLACAS = camion.PLACAS?.Trim().ToUpper();
+
+            if (string.IsNullOrWhiteSpace(camion.PLACAS))
+            {
+                MessageBox.Show("La placa es obligatoria");
+                return;
+            }
+
+            if (camion.PLACAS.Length != 6)
+            {
+                MessageBox.Show("La placa debe tener exactamente 6 caracteres");
+                return;
+            }
+
+            // Solo letras y números
+            if (!System.Text.RegularExpressions.Regex.IsMatch(camion.PLACAS, @"^[A-Z0-9]{6}$"))
+            {
+                MessageBox.Show("La placa no puede tener caracteres especiales");
+                return;
+            }
+
+            if (camion.COD_CAMION == 0)
+                await _camionService.InsertarAsync(camion);
+            else
+                await _camionService.ActualizarAsync(camion);
+
+            bsCamiones.DataSource = await _camionService.ObtenerTodosAsync();
+
+            // IMPORTANTE
+            _creandoEnAdministrar = false; // 🔓
+
+
+        }
+
+
+        private async Task GuardarConductor()
+        {
+            bsConductores.EndEdit();
+
+            var conductor = (Conductor)bsConductores.Current;
+
+            if (conductor == null) return;
+
+            if (conductor.COD_CONDUCTOR == 0)
+                await _conductorService.InsertarAsync(conductor);
+            else
+                await _conductorService.ActualizarAsync(conductor);
+
+            bsConductores.DataSource = await _conductorService.ObtenerTodosAsync();
+
+            // IMPORTANTE
+            _creandoEnAdministrar = false; // 🔓
+
+        }
+
+        private async Task EliminarCamion()
+        {
+            var camion = bsCamiones.Current as Camion;
+            if (camion == null) return;
+
+            var confirmar = MessageBox.Show(
+                "¿Eliminar el camión seleccionado? " + camion.PLACAS,
+                "Confirmar eliminación",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (confirmar != DialogResult.Yes) return;
+
+            // No existe en BD → solo quítalo del BindingSource
+            if (camion.COD_CAMION == 0)
+            {
+                bsCamiones.RemoveCurrent();
+                _creandoEnAdministrar = false; // 🔓
+                return;
+            }
+
+            await _camionService.EliminarAsync(camion.COD_CAMION);
+            bsCamiones.DataSource = await _camionService.ObtenerTodosAsync();
+            _creandoEnAdministrar = false; // 🔓
+        }
+
+
+        private async Task EliminarConductor()
+        {
+            var conductor = bsConductores.Current as Conductor;
+            if (conductor == null) return;
+
+            var confirmar = MessageBox.Show(
+                "¿Eliminar el conductor seleccionado?",
+                "Confirmar eliminación",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (confirmar != DialogResult.Yes) return;
+
+            if (conductor.COD_CONDUCTOR == 0)
+            {
+                bsConductores.RemoveCurrent();
+                _creandoEnAdministrar = false; // 🔓
+                return;
+            }
+
+            await _conductorService.EliminarAsync(conductor.COD_CONDUCTOR);
+            bsConductores.DataSource = await _conductorService.ObtenerTodosAsync();
+            _creandoEnAdministrar = false; // 🔓
+
+        }
+
+
+        private async void btnAdminEliminar_Click(object sender, EventArgs e)
+        {
+            switch (ContextoActual)
+            {
+                case AdminContexto.Camiones:
+                    await EliminarCamion();
+                    break;
+                case AdminContexto.Conductores:
+                    await EliminarConductor();
+                    break;
+            }
+
+        }
+
+        private void btnAdminRecargar_Click(object sender, EventArgs e)
+        {
+            if (!_canClick) return;  // Ignora si está en cooldown
+
+            _canClick = false;
+            btnAdminRecargar.Enabled = false;
+
+            CargarInfoAdmin();
+
+            _cooldownTimer.Start();
         }
     }
 }

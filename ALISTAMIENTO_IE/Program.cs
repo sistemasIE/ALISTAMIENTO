@@ -24,6 +24,7 @@ namespace ALISTAMIENTO_IE
                 .AddTransient<IPdfService, QuestPDFService>() // Asumido
                 .AddTransient<IDataGridViewExporter, DataGridViewExporter>() // Asumido
                 .AddTransient<ICamionXDiaService, CamionXDiaService>()
+                .AddTransient<IConductorService, ConductorService>()
                 .AddTransient<IDetalleCamionXDiaService, DetalleCamionXDiaService>()
                 .AddTransient<IEmailService, EmailService>()
                 .AddTransient<IItemService, ItemService>()

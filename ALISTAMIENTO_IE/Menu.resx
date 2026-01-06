@@ -117,6 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label13.Text" xml:space="preserve">
+    <value>INSTRUCCIONES
+
+
+- Para EDITAR debes de hacer doble click sobre el valor.
+- Los cambios se verán reflejados al oprimir el botón de GUARDAR.
+- Para CREAR, oprimir este botón y llenar los valores que se muestran en la tabla.
+- Para ELIMINAR seleccionar la fila que se requiere eliminar.
+</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="pictureBox2.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

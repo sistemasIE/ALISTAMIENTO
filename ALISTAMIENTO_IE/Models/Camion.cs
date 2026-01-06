@@ -5,19 +5,11 @@
     /// </summary>
     public class Camion
     {
-        /// <summary>
-        /// Código único del camión (PK)
-        /// </summary>
+
         public long COD_CAMION { get; set; }
 
-        /// <summary>
-        /// Placas del camión
-        /// </summary>
         public string? PLACAS { get; set; }
-
-        /// <summary>
-        /// Tipología del camión
-        /// </summary>
+           
         public byte? TIPOLOGIA { get; set; }
     }
 }

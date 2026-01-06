@@ -111,17 +111,28 @@
             dataGridView1 = new DataGridView();
             tabAdministrar = new TabPage();
             tableLayoutPanel7 = new TableLayoutPanel();
-            tableLayoutPanel9 = new TableLayoutPanel();
-            tableLayoutPanel12 = new TableLayoutPanel();
-            tableLayoutPanel13 = new TableLayoutPanel();
-            label12 = new Label();
+            tabContAdmin = new TabControl();
+            tabAdminCamiones = new TabPage();
             tableLayoutPanel8 = new TableLayoutPanel();
             label11 = new Label();
             tableLayoutPanel10 = new TableLayoutPanel();
+            dgvAdminCamiones = new DataGridView();
+            tabAdminConductores = new TabPage();
+            tableLayoutPanel9 = new TableLayoutPanel();
+            label12 = new Label();
+            tableLayoutPanel12 = new TableLayoutPanel();
+            dgvAdminConductores = new DataGridView();
             tableLayoutPanel11 = new TableLayoutPanel();
+            tableLayoutPanel14 = new TableLayoutPanel();
+            btnAdminRecargar = new Button();
+            btnAdminEliminar = new Button();
+            btnAdminGuardar = new Button();
+            btnAdminCrear = new Button();
+            pictureBox4 = new PictureBox();
             label10 = new Label();
             label4 = new Label();
             pictureBox3 = new PictureBox();
+            label13 = new Label();
             tabMain.SuspendLayout();
             tabAlistar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)tlpMain).BeginInit();
@@ -162,10 +173,18 @@
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             tabAdministrar.SuspendLayout();
             tableLayoutPanel7.SuspendLayout();
-            tableLayoutPanel9.SuspendLayout();
-            tableLayoutPanel12.SuspendLayout();
+            tabContAdmin.SuspendLayout();
+            tabAdminCamiones.SuspendLayout();
             tableLayoutPanel8.SuspendLayout();
             tableLayoutPanel10.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvAdminCamiones).BeginInit();
+            tabAdminConductores.SuspendLayout();
+            tableLayoutPanel9.SuspendLayout();
+            tableLayoutPanel12.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvAdminConductores).BeginInit();
+            tableLayoutPanel11.SuspendLayout();
+            tableLayoutPanel14.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
             SuspendLayout();
             // 
@@ -1168,9 +1187,9 @@
             tabAdmonCamiones.Controls.Add(btnExportar);
             tabAdmonCamiones.Controls.Add(btnCerrarCamion);
             tabAdmonCamiones.Controls.Add(dataGridView1);
-            tabAdmonCamiones.Location = new Point(4, 24);
+            tabAdmonCamiones.Location = new Point(4, 30);
             tabAdmonCamiones.Name = "tabAdmonCamiones";
-            tabAdmonCamiones.Size = new Size(1202, 488);
+            tabAdmonCamiones.Size = new Size(1202, 482);
             tabAdmonCamiones.TabIndex = 3;
             tabAdmonCamiones.Text = "Camiones";
             tabAdmonCamiones.UseVisualStyleBackColor = true;
@@ -1218,9 +1237,9 @@
             // tabAdministrar
             // 
             tabAdministrar.Controls.Add(tableLayoutPanel7);
-            tabAdministrar.Location = new Point(4, 24);
+            tabAdministrar.Location = new Point(4, 30);
             tabAdministrar.Name = "tabAdministrar";
-            tabAdministrar.Size = new Size(1202, 488);
+            tabAdministrar.Size = new Size(1202, 482);
             tabAdministrar.TabIndex = 4;
             tabAdministrar.Text = "Administrar";
             // 
@@ -1228,77 +1247,40 @@
             // 
             tableLayoutPanel7.ColumnCount = 2;
             tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 603F));
-            tableLayoutPanel7.Controls.Add(tableLayoutPanel9, 1, 0);
-            tableLayoutPanel7.Controls.Add(tableLayoutPanel8, 0, 0);
+            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 467F));
+            tableLayoutPanel7.Controls.Add(tabContAdmin, 0, 0);
+            tableLayoutPanel7.Controls.Add(tableLayoutPanel11, 1, 0);
             tableLayoutPanel7.Dock = DockStyle.Fill;
             tableLayoutPanel7.Location = new Point(0, 0);
             tableLayoutPanel7.Name = "tableLayoutPanel7";
             tableLayoutPanel7.RowCount = 1;
             tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel7.Size = new Size(1202, 488);
+            tableLayoutPanel7.Size = new Size(1202, 482);
             tableLayoutPanel7.TabIndex = 0;
             // 
-            // tableLayoutPanel9
+            // tabContAdmin
             // 
-            tableLayoutPanel9.ColumnCount = 1;
-            tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel9.Controls.Add(tableLayoutPanel12, 0, 1);
-            tableLayoutPanel9.Controls.Add(label12, 0, 0);
-            tableLayoutPanel9.Dock = DockStyle.Fill;
-            tableLayoutPanel9.Location = new Point(602, 3);
-            tableLayoutPanel9.Name = "tableLayoutPanel9";
-            tableLayoutPanel9.RowCount = 3;
-            tableLayoutPanel9.RowStyles.Add(new RowStyle(SizeType.Percent, 12.8125F));
-            tableLayoutPanel9.RowStyles.Add(new RowStyle(SizeType.Percent, 87.1875F));
-            tableLayoutPanel9.RowStyles.Add(new RowStyle(SizeType.Absolute, 43F));
-            tableLayoutPanel9.Size = new Size(597, 482);
-            tableLayoutPanel9.TabIndex = 1;
+            tabContAdmin.Controls.Add(tabAdminCamiones);
+            tabContAdmin.Controls.Add(tabAdminConductores);
+            tabContAdmin.Dock = DockStyle.Fill;
+            tabContAdmin.Font = new Font("Segoe UI Black", 12F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
+            tabContAdmin.Location = new Point(3, 3);
+            tabContAdmin.Name = "tabContAdmin";
+            tabContAdmin.SelectedIndex = 0;
+            tabContAdmin.Size = new Size(729, 476);
+            tabContAdmin.TabIndex = 2;
+            tabContAdmin.SelectedIndexChanged += tabContAdmin_SelectedIndexChanged;
             // 
-            // tableLayoutPanel12
+            // tabAdminCamiones
             // 
-            tableLayoutPanel12.ColumnCount = 1;
-            tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel12.Controls.Add(tableLayoutPanel13, 0, 4);
-            tableLayoutPanel12.Dock = DockStyle.Fill;
-            tableLayoutPanel12.Location = new Point(3, 59);
-            tableLayoutPanel12.Name = "tableLayoutPanel12";
-            tableLayoutPanel12.RowCount = 5;
-            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Percent, 38.57143F));
-            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Percent, 61.42857F));
-            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
-            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Absolute, 53F));
-            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Absolute, 37F));
-            tableLayoutPanel12.Size = new Size(591, 376);
-            tableLayoutPanel12.TabIndex = 2;
-            // 
-            // tableLayoutPanel13
-            // 
-            tableLayoutPanel13.ColumnCount = 4;
-            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel13.Dock = DockStyle.Fill;
-            tableLayoutPanel13.Location = new Point(3, 341);
-            tableLayoutPanel13.Name = "tableLayoutPanel13";
-            tableLayoutPanel13.RowCount = 1;
-            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel13.Size = new Size(585, 32);
-            tableLayoutPanel13.TabIndex = 0;
-            // 
-            // label12
-            // 
-            label12.AutoSize = true;
-            label12.Dock = DockStyle.Fill;
-            label12.Font = new Font("Segoe UI", 22F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label12.ForeColor = Color.Green;
-            label12.Location = new Point(3, 0);
-            label12.Name = "label12";
-            label12.Size = new Size(591, 56);
-            label12.TabIndex = 1;
-            label12.Text = "CONDUCTORES";
-            label12.TextAlign = ContentAlignment.MiddleCenter;
+            tabAdminCamiones.Controls.Add(tableLayoutPanel8);
+            tabAdminCamiones.Location = new Point(4, 30);
+            tabAdminCamiones.Name = "tabAdminCamiones";
+            tabAdminCamiones.Padding = new Padding(3);
+            tabAdminCamiones.Size = new Size(721, 442);
+            tabAdminCamiones.TabIndex = 0;
+            tabAdminCamiones.Text = "CAMIÓN 🚛";
+            tabAdminCamiones.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel8
             // 
@@ -1309,12 +1291,11 @@
             tableLayoutPanel8.Dock = DockStyle.Fill;
             tableLayoutPanel8.Location = new Point(3, 3);
             tableLayoutPanel8.Name = "tableLayoutPanel8";
-            tableLayoutPanel8.RowCount = 3;
-            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 13.4375F));
-            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 86.5625F));
-            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Absolute, 46F));
-            tableLayoutPanel8.Size = new Size(593, 482);
-            tableLayoutPanel8.TabIndex = 0;
+            tableLayoutPanel8.RowCount = 2;
+            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 9.174312F));
+            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 90.82569F));
+            tableLayoutPanel8.Size = new Size(715, 436);
+            tableLayoutPanel8.TabIndex = 1;
             // 
             // label11
             // 
@@ -1324,7 +1305,7 @@
             label11.ForeColor = Color.MediumBlue;
             label11.Location = new Point(3, 0);
             label11.Name = "label11";
-            label11.Size = new Size(587, 58);
+            label11.Size = new Size(709, 39);
             label11.TabIndex = 0;
             label11.Text = "CAMIONES";
             label11.TextAlign = ContentAlignment.MiddleCenter;
@@ -1333,34 +1314,222 @@
             // 
             tableLayoutPanel10.ColumnCount = 1;
             tableLayoutPanel10.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel10.Controls.Add(tableLayoutPanel11, 0, 5);
+            tableLayoutPanel10.Controls.Add(dgvAdminCamiones, 0, 0);
             tableLayoutPanel10.Dock = DockStyle.Fill;
-            tableLayoutPanel10.Location = new Point(3, 61);
+            tableLayoutPanel10.Location = new Point(3, 42);
             tableLayoutPanel10.Name = "tableLayoutPanel10";
-            tableLayoutPanel10.RowCount = 6;
-            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Absolute, 78F));
-            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Percent, 51.9047623F));
-            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Percent, 48.0952377F));
-            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Absolute, 78F));
-            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Absolute, 39F));
-            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Absolute, 37F));
-            tableLayoutPanel10.Size = new Size(587, 371);
+            tableLayoutPanel10.RowCount = 1;
+            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Absolute, 291F));
+            tableLayoutPanel10.Size = new Size(709, 391);
             tableLayoutPanel10.TabIndex = 1;
+            // 
+            // dgvAdminCamiones
+            // 
+            dgvAdminCamiones.AllowUserToAddRows = false;
+            dgvAdminCamiones.AllowUserToDeleteRows = false;
+            dgvAdminCamiones.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            dgvAdminCamiones.BackgroundColor = SystemColors.ButtonShadow;
+            dgvAdminCamiones.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvAdminCamiones.Dock = DockStyle.Fill;
+            dgvAdminCamiones.Location = new Point(3, 3);
+            dgvAdminCamiones.MultiSelect = false;
+            dgvAdminCamiones.Name = "dgvAdminCamiones";
+            dgvAdminCamiones.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvAdminCamiones.Size = new Size(703, 385);
+            dgvAdminCamiones.TabIndex = 0;
+            // 
+            // tabAdminConductores
+            // 
+            tabAdminConductores.Controls.Add(tableLayoutPanel9);
+            tabAdminConductores.Location = new Point(4, 30);
+            tabAdminConductores.Name = "tabAdminConductores";
+            tabAdminConductores.Padding = new Padding(3);
+            tabAdminConductores.Size = new Size(721, 442);
+            tabAdminConductores.TabIndex = 1;
+            tabAdminConductores.Text = "CONDUCTOR\U0001f9d1‍✈️";
+            tabAdminConductores.UseVisualStyleBackColor = true;
+            // 
+            // tableLayoutPanel9
+            // 
+            tableLayoutPanel9.ColumnCount = 1;
+            tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel9.Controls.Add(label12, 0, 0);
+            tableLayoutPanel9.Controls.Add(tableLayoutPanel12, 0, 1);
+            tableLayoutPanel9.Dock = DockStyle.Fill;
+            tableLayoutPanel9.Location = new Point(3, 3);
+            tableLayoutPanel9.Name = "tableLayoutPanel9";
+            tableLayoutPanel9.RowCount = 2;
+            tableLayoutPanel9.RowStyles.Add(new RowStyle(SizeType.Percent, 13.4375F));
+            tableLayoutPanel9.RowStyles.Add(new RowStyle(SizeType.Percent, 86.5625F));
+            tableLayoutPanel9.Size = new Size(715, 436);
+            tableLayoutPanel9.TabIndex = 2;
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Dock = DockStyle.Fill;
+            label12.Font = new Font("Segoe UI", 22F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label12.ForeColor = Color.MediumBlue;
+            label12.Location = new Point(3, 0);
+            label12.Name = "label12";
+            label12.Size = new Size(709, 58);
+            label12.TabIndex = 0;
+            label12.Text = "CONDUCTORES";
+            label12.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // tableLayoutPanel12
+            // 
+            tableLayoutPanel12.ColumnCount = 1;
+            tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel12.Controls.Add(dgvAdminConductores, 0, 0);
+            tableLayoutPanel12.Dock = DockStyle.Fill;
+            tableLayoutPanel12.Location = new Point(3, 61);
+            tableLayoutPanel12.Name = "tableLayoutPanel12";
+            tableLayoutPanel12.RowCount = 1;
+            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Absolute, 218F));
+            tableLayoutPanel12.Size = new Size(709, 372);
+            tableLayoutPanel12.TabIndex = 1;
+            // 
+            // dgvAdminConductores
+            // 
+            dgvAdminConductores.AllowUserToAddRows = false;
+            dgvAdminConductores.AllowUserToDeleteRows = false;
+            dgvAdminConductores.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            dgvAdminConductores.BackgroundColor = SystemColors.ButtonShadow;
+            dgvAdminConductores.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvAdminConductores.Dock = DockStyle.Fill;
+            dgvAdminConductores.Location = new Point(3, 3);
+            dgvAdminConductores.MultiSelect = false;
+            dgvAdminConductores.Name = "dgvAdminConductores";
+            dgvAdminConductores.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvAdminConductores.Size = new Size(703, 366);
+            dgvAdminConductores.TabIndex = 1;
             // 
             // tableLayoutPanel11
             // 
-            tableLayoutPanel11.ColumnCount = 4;
-            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel11.ColumnCount = 1;
+            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel11.Controls.Add(tableLayoutPanel14, 0, 1);
+            tableLayoutPanel11.Controls.Add(pictureBox4, 0, 1);
+            tableLayoutPanel11.Controls.Add(label13, 0, 0);
             tableLayoutPanel11.Dock = DockStyle.Fill;
-            tableLayoutPanel11.Location = new Point(3, 336);
+            tableLayoutPanel11.Location = new Point(738, 3);
             tableLayoutPanel11.Name = "tableLayoutPanel11";
-            tableLayoutPanel11.RowCount = 1;
-            tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel11.Size = new Size(581, 32);
-            tableLayoutPanel11.TabIndex = 0;
+            tableLayoutPanel11.RowCount = 3;
+            tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Absolute, 276F));
+            tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Percent, 22.7586212F));
+            tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Percent, 77.24138F));
+            tableLayoutPanel11.Size = new Size(461, 476);
+            tableLayoutPanel11.TabIndex = 3;
+            // 
+            // tableLayoutPanel14
+            // 
+            tableLayoutPanel14.ColumnCount = 4;
+            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel14.Controls.Add(btnAdminRecargar, 2, 0);
+            tableLayoutPanel14.Controls.Add(btnAdminEliminar, 3, 0);
+            tableLayoutPanel14.Controls.Add(btnAdminGuardar, 1, 0);
+            tableLayoutPanel14.Controls.Add(btnAdminCrear, 0, 0);
+            tableLayoutPanel14.Dock = DockStyle.Fill;
+            tableLayoutPanel14.Location = new Point(3, 279);
+            tableLayoutPanel14.Name = "tableLayoutPanel14";
+            tableLayoutPanel14.RowCount = 1;
+            tableLayoutPanel14.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel14.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel14.Size = new Size(455, 39);
+            tableLayoutPanel14.TabIndex = 1;
+            // 
+            // btnAdminRecargar
+            // 
+            btnAdminRecargar.AutoSize = true;
+            btnAdminRecargar.BackColor = Color.Silver;
+            btnAdminRecargar.Cursor = Cursors.Hand;
+            btnAdminRecargar.Dock = DockStyle.Fill;
+            btnAdminRecargar.FlatAppearance.BorderColor = Color.FromArgb(155, 187, 89);
+            btnAdminRecargar.FlatStyle = FlatStyle.Flat;
+            btnAdminRecargar.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
+            btnAdminRecargar.Location = new Point(228, 2);
+            btnAdminRecargar.Margin = new Padding(2);
+            btnAdminRecargar.Name = "btnAdminRecargar";
+            btnAdminRecargar.Padding = new Padding(10, 5, 10, 5);
+            btnAdminRecargar.Size = new Size(109, 35);
+            btnAdminRecargar.TabIndex = 12;
+            btnAdminRecargar.Text = "⟳";
+            btnAdminRecargar.UseVisualStyleBackColor = false;
+            btnAdminRecargar.Click += btnAdminRecargar_Click;
+            // 
+            // btnAdminEliminar
+            // 
+            btnAdminEliminar.AutoSize = true;
+            btnAdminEliminar.BackColor = Color.Red;
+            btnAdminEliminar.Cursor = Cursors.Hand;
+            btnAdminEliminar.Dock = DockStyle.Fill;
+            btnAdminEliminar.FlatAppearance.BorderColor = Color.FromArgb(155, 187, 89);
+            btnAdminEliminar.FlatStyle = FlatStyle.Flat;
+            btnAdminEliminar.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
+            btnAdminEliminar.ForeColor = SystemColors.Control;
+            btnAdminEliminar.Location = new Point(341, 2);
+            btnAdminEliminar.Margin = new Padding(2);
+            btnAdminEliminar.Name = "btnAdminEliminar";
+            btnAdminEliminar.Padding = new Padding(10, 5, 10, 5);
+            btnAdminEliminar.Size = new Size(112, 35);
+            btnAdminEliminar.TabIndex = 11;
+            btnAdminEliminar.Text = "ELIMINAR";
+            btnAdminEliminar.UseVisualStyleBackColor = false;
+            btnAdminEliminar.Click += btnAdminEliminar_Click;
+            // 
+            // btnAdminGuardar
+            // 
+            btnAdminGuardar.AutoSize = true;
+            btnAdminGuardar.BackColor = Color.Blue;
+            btnAdminGuardar.Cursor = Cursors.Hand;
+            btnAdminGuardar.Dock = DockStyle.Fill;
+            btnAdminGuardar.FlatAppearance.BorderColor = Color.FromArgb(155, 187, 89);
+            btnAdminGuardar.FlatStyle = FlatStyle.Flat;
+            btnAdminGuardar.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
+            btnAdminGuardar.ForeColor = SystemColors.Control;
+            btnAdminGuardar.Location = new Point(115, 2);
+            btnAdminGuardar.Margin = new Padding(2);
+            btnAdminGuardar.Name = "btnAdminGuardar";
+            btnAdminGuardar.Padding = new Padding(10, 5, 10, 5);
+            btnAdminGuardar.Size = new Size(109, 35);
+            btnAdminGuardar.TabIndex = 9;
+            btnAdminGuardar.Text = "GUARDAR";
+            btnAdminGuardar.UseVisualStyleBackColor = false;
+            btnAdminGuardar.Click += btnAdminGuardar_Click;
+            // 
+            // btnAdminCrear
+            // 
+            btnAdminCrear.AutoSize = true;
+            btnAdminCrear.BackColor = Color.FromArgb(198, 239, 206);
+            btnAdminCrear.Cursor = Cursors.Hand;
+            btnAdminCrear.Dock = DockStyle.Fill;
+            btnAdminCrear.FlatAppearance.BorderColor = Color.FromArgb(155, 187, 89);
+            btnAdminCrear.FlatStyle = FlatStyle.Flat;
+            btnAdminCrear.Font = new Font("Segoe UI Semibold", 10.8F, FontStyle.Bold);
+            btnAdminCrear.Location = new Point(2, 2);
+            btnAdminCrear.Margin = new Padding(2);
+            btnAdminCrear.Name = "btnAdminCrear";
+            btnAdminCrear.Padding = new Padding(10, 5, 10, 5);
+            btnAdminCrear.Size = new Size(109, 35);
+            btnAdminCrear.TabIndex = 8;
+            btnAdminCrear.Text = "CREAR";
+            btnAdminCrear.UseVisualStyleBackColor = false;
+            btnAdminCrear.Click += btnAdminCrear_Click;
+            // 
+            // pictureBox4
+            // 
+            pictureBox4.Dock = DockStyle.Fill;
+            pictureBox4.Image = Properties.Resources.logo_ie;
+            pictureBox4.Location = new Point(3, 324);
+            pictureBox4.Name = "pictureBox4";
+            pictureBox4.Size = new Size(455, 149);
+            pictureBox4.SizeMode = PictureBoxSizeMode.CenterImage;
+            pictureBox4.TabIndex = 2;
+            pictureBox4.TabStop = false;
             // 
             // label10
             // 
@@ -1394,6 +1563,15 @@
             pictureBox3.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox3.TabIndex = 15;
             pictureBox3.TabStop = false;
+            // 
+            // label13
+            // 
+            label13.AutoSize = true;
+            label13.Location = new Point(3, 0);
+            label13.Name = "label13";
+            label13.Size = new Size(424, 189);
+            label13.TabIndex = 3;
+            label13.Text = resources.GetString("label13.Text");
             // 
             // Menu
             // 
@@ -1462,12 +1640,22 @@
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             tabAdministrar.ResumeLayout(false);
             tableLayoutPanel7.ResumeLayout(false);
-            tableLayoutPanel9.ResumeLayout(false);
-            tableLayoutPanel9.PerformLayout();
-            tableLayoutPanel12.ResumeLayout(false);
+            tabContAdmin.ResumeLayout(false);
+            tabAdminCamiones.ResumeLayout(false);
             tableLayoutPanel8.ResumeLayout(false);
             tableLayoutPanel8.PerformLayout();
             tableLayoutPanel10.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvAdminCamiones).EndInit();
+            tabAdminConductores.ResumeLayout(false);
+            tableLayoutPanel9.ResumeLayout(false);
+            tableLayoutPanel9.PerformLayout();
+            tableLayoutPanel12.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvAdminConductores).EndInit();
+            tableLayoutPanel11.ResumeLayout(false);
+            tableLayoutPanel11.PerformLayout();
+            tableLayoutPanel14.ResumeLayout(false);
+            tableLayoutPanel14.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
             ResumeLayout(false);
         }
@@ -1561,13 +1749,24 @@
         private Button btnRecargar;
         private Button btnAlistar;
         private TableLayoutPanel tableLayoutPanel7;
-        private TableLayoutPanel tableLayoutPanel9;
-        private Label label12;
+        private TabControl tabContAdmin;
+        private TabPage tabAdminConductores;
+        private TableLayoutPanel tableLayoutPanel11;
+        private TableLayoutPanel tableLayoutPanel14;
+        private Button btnAdminCrear;
+        private TabPage tabAdminCamiones;
         private TableLayoutPanel tableLayoutPanel8;
         private Label label11;
+        private TableLayoutPanel tableLayoutPanel9;
+        private Label label12;
         private TableLayoutPanel tableLayoutPanel12;
-        private TableLayoutPanel tableLayoutPanel13;
+        private Button btnAdminGuardar;
+        private Button btnAdminEliminar;
+        private PictureBox pictureBox4;
         private TableLayoutPanel tableLayoutPanel10;
-        private TableLayoutPanel tableLayoutPanel11;
+        private DataGridView dgvAdminCamiones;
+        private DataGridView dgvAdminConductores;
+        private Button btnAdminRecargar;
+        private Label label13;
     }
 }
