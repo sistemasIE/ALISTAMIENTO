@@ -1,11 +1,13 @@
 ﻿using ALISTAMIENTO_IE.DTOs;
 using ALISTAMIENTO_IE.Interfaces;
+using ALISTAMIENTO_IE.Models;
 using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
 using Common.cache;
 //using DocumentFormat.OpenXml.Spreadsheet;
 using ExcelDataReader;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
@@ -18,13 +20,19 @@ namespace ALISTAMIENTO_IE
         private bool _canClick = true;
         private bool _hasUploaded = false;
         private Dictionary<string, string> _cacheItemsEquivalentes = new Dictionary<string, string>();
-        private int codCamionSeleccionado;
+        private int codCamionSeleccionado; // ID de la tabla CAMION_X_DIA
+        private long codRegistroCamionSeleccionado = 0; // ID de la tabla CAMION
         private List<CamionDetallesDTO> _camiones;
         private List<GrupoMovimientosDto> listaAgrupada = new();
         private List<long> codCamiones = new List<long>();
         private List<MovimientoDocumentoDto> listaNormal = new();
         private ListViewItem[] camionesSeleccionados;
+        private List<ReporteTrazabilidadDto> _reporte;
         List<long> camionesMarcados = new List<long>();
+        List<Camion> listadoCamiones;
+        string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
+        string _estadoAlistamiento;
+        private bool _cambioManual = false;
 
 
         private readonly IServiceScopeFactory _scopeFactory;
@@ -38,13 +46,14 @@ namespace ALISTAMIENTO_IE
         private readonly IDataGridViewExporter _dataGridViewExporter;
         private readonly CargueMasivoService _cargueMasivoService;
         private readonly IEmailService _emailService;
-
+        public readonly ICamionService _camionService;
 
 
         private readonly System.Windows.Forms.Timer _timer;
         private readonly TimerTurnos _turnoTimerManager; // Manejador de Timer y Turnos
         private String placaCamionSeleccionado;
         private System.Windows.Forms.Timer _cooldownTimer;
+
 
         public Menu(
              IAlistamientoService alistamientoService,
@@ -54,6 +63,7 @@ namespace ALISTAMIENTO_IE
              IAlistamientoEtiquetaService alistamientoEtiquetaService,
              IKardexService kardexService,
              IDataGridViewExporter dataGridViewExporter,
+             ICamionService camionService,
              CargueMasivoService cargueMasivoService,
              IEmailService emailService,
              IServiceScopeFactory scopeFactory
@@ -69,6 +79,7 @@ namespace ALISTAMIENTO_IE
             _camionXDiaService = camionXDiaService;
             _detalleCamionXDiaService = detalleCamionXDiaService;
             _alistamientoEtiquetaService = alistamientoEtiquetaService;
+            _camionService = camionService;
             _kardexService = kardexService;
             _dataGridViewExporter = dataGridViewExporter;
             _cargueMasivoService = cargueMasivoService;
@@ -104,7 +115,7 @@ namespace ALISTAMIENTO_IE
             // Reportes: cargar al entrar en la pestaña y al cambiar fecha y turno
             tabMain.SelectedIndexChanged += TabMain_SelectedIndexChanged;
             dtpFechaReporte.ValueChanged += DtpFechaReporte_ValueChanged;
-            tbcTurnos.SelectedIndexChanged += TbcTurnos_SelectedIndexChanged;
+            tbcReportes.SelectedIndexChanged += TbcTurnos_SelectedIndexChanged;
 
             // Validaciones:
             LimitarVistaPorUsuario();
@@ -119,8 +130,8 @@ namespace ALISTAMIENTO_IE
         private void CargarUI()
         {
             CargarCamiones();
-        }
 
+        }
 
         private async void TabMain_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -138,6 +149,8 @@ namespace ALISTAMIENTO_IE
             {
                 await CargarReportesYTotales();
             }
+
+
         }
 
         private async void TbcTurnos_SelectedIndexChanged(object sender, EventArgs e)
@@ -153,20 +166,62 @@ namespace ALISTAMIENTO_IE
         {
             // Primero, determinar el filtro de turno
             string? turnoLike = null;
-            if (tbcTurnos.SelectedTab == tabTurno1)
+            if (tbcReportes.SelectedTab == tabTurno1)
             {
                 turnoLike = "%TURNO1%";
             }
-            else if (tbcTurnos.SelectedTab == tabTurno2)
+            else if (tbcReportes.SelectedTab == tabTurno2)
             {
                 turnoLike = "%TURNO2%";
             }
-            else if (tbcTurnos.SelectedTab == tabTurno3)
+            else if (tbcReportes.SelectedTab == tabTurno3)
             {
                 turnoLike = "%TURNO3%";
             }
             // Si el tab es "TOTAL", turnoLike se mantiene en null, lo cual es correcto
+            else if (tbcReportes.SelectedTab == tabAlistamientos)
+            {
+                // 1. Traer todos los alistamientos que se dieron ese día. 
 
+                IEnumerable<CamionXDia> alistamientosEnDia = await _camionXDiaService.ObtenerCamionesDespachadosPorFecha(dtpFechaReporte.Value);
+
+                // 2. Obtener los id's camiones
+
+                List<long> codCamionesEnDia = alistamientosEnDia.Select(a => a.CodCamion).Distinct().ToList();
+                List<int> listaInt = codCamionesEnDia.Select(x => (int)x).ToList();
+
+                // Mostrar la cantidad de camiones obtenidos en el día (usar la lista local, no la variable de clase codCamiones)
+                lblCamionesNumero.Text = codCamionesEnDia.Count.ToString();
+
+                // 3. Obtener el Reporte:
+
+                _reporte = await _alistamientoService.ObtenerReporteTrazabilidad(codCamionesEnDia.Select(x => (int)x).ToList());
+
+                // Distintos camiones y placas
+                var itemsCombo = _reporte
+                    .GroupBy(r => new { r.CodCamion, r.Placas })
+                    .Select(g => new
+                    {
+                        Id = g.Key.CodCamion,
+                        Texto = $"{g.Key.Placas} (ID {g.Key.CodCamion})"
+                    })
+                    .ToList();
+
+                cmbReporteFull.DisplayMember = "Texto";
+                cmbReporteFull.ValueMember = "Id";
+                cmbReporteFull.DataSource = itemsCombo;
+
+                var unidadesEnConflicto = Math.Round(Math.Abs(_reporte.Sum(r => r.PlanVsAlistado + r.AlistadoVsDespachado)), 2);
+                lblUnidadesTexto.Text = "Novedades";
+                lblUnidadesPacas.Text = unidadesEnConflicto.ToString();
+
+                dgvResumen.DataSource = _dataGridViewExporter.ConvertDynamicToDataTable(_reporte);
+
+
+
+                return;
+
+            }
             try
             {
                 // Llamar al método para obtener los totales de pacas y camiones.
@@ -260,11 +315,10 @@ namespace ALISTAMIENTO_IE
 
             ListViewItem selectedItem = lvwListasCamiones.SelectedItems[0];
 
-            // Recuperar el CodCamion que se guardó en el Tag
+            // Recuperar el CodCamion que se guardó en el Tag (El CodCamion de CAMION_X_DIA)
             codCamionSeleccionado = selectedItem.Tag is int tag ? tag : 0;
             // Acceder al estado del alistamiento (columna índice 3)
-            string estadoAlistamiento = selectedItem.SubItems[3].Text;
-
+            _estadoAlistamiento = selectedItem.SubItems[3].Text;
 
             // Recuperar los valores de cada columna (SubItems)
             placaCamionSeleccionado = selectedItem.SubItems[0].Text;     // Placas
@@ -284,18 +338,27 @@ namespace ALISTAMIENTO_IE
             else if (codCamionSeleccionado > 0)
             {
 
-                if (estadoAlistamiento == "ALISTADO" || estadoAlistamiento == "ALISTADO_INCOMPLETO")
+
+                if (_estadoAlistamiento == "ALISTADO" || _estadoAlistamiento == "ALISTADO_INCOMPLETO")
                 {
                     await _alistamientoService.CargarCamionDia(codCamionSeleccionado, this.dgvItems);
+
+                    // Muestra el checkbox de 'Cambiar Camión'
 
                 }
                 else
                 {
 
                     MostrarItemsDeCamion(codCamionSeleccionado);
-                    btnAlistar.Visible = true;
+
+                    // Si es un Operador o un Administrador, le permitirá 'Alistar'
+                    if (!UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]"))
+                        btnAlistar.Visible = true;
 
                 }
+
+                chkCambiarCamion.Visible = true;
+
                 // Muestra el camión en la UI
                 lblTituloCamion.Text = $"CAMIÓN - {placaCamionSeleccionado}";
                 // Se muestra la fecha
@@ -619,6 +682,7 @@ namespace ALISTAMIENTO_IE
 
 
 
+
                     if (documento == null)
                     {
                         //MessageBox.Show("Documento no existe o Empresa Incorrecta: " + tipoDocumento + "/" + idDocumento);
@@ -910,7 +974,7 @@ namespace ALISTAMIENTO_IE
         }
 
 
-        private async void button1_Click(object sender, EventArgs e)
+        private async void btnCrearCamiones_Click(object sender, EventArgs e)
         {
             if (listaAgrupada is null || listaAgrupada.Count == 0)
             {
@@ -1081,7 +1145,7 @@ namespace ALISTAMIENTO_IE
             cxd.Fecha?.ToString("dd/MM/yyyy") ?? ""
         };
 
-                _pdfService.Generate(dt1, dt2, titles);
+                _pdfService.Generate(dt1, dt2, titles, "C:\\temp\\reporte" + placaDelCamion + ".pdf");
 
                 logs.Add($"✔️ {placaDelCamion}: PDF generado. " +
                          $"Pacas: {totales.TotalPacasEsperadas:N2}, " +
@@ -1137,15 +1201,22 @@ namespace ALISTAMIENTO_IE
 
             if (!UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]"))
             {
-                tabMain.TabPages.Remove(tabReportes);
-                tabMain.TabPages.Remove(tabCargueMasivo);
-                tabMain.TabPages.Remove(tabAdmonCamiones);
+                if (!UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]"))
+                {
+                    tabMain.TabPages.Remove(tabCargueMasivo);
+                    tabMain.TabPages.Remove(tabReportes);
+                    tabMain.TabPages.Remove(tabAdmonCamiones);
+                }
 
                 if (!UserLoginCache.TienePermisoLike($"Operador - [{nombreApp}]"))
                 {
                     btnAlistar.Visible = false;
+                    btnVerMas.Visible = false;
                     btnImprimir.Visible = false;
                 }
+
+                tabMain.TabPages.Remove(tabReportes);
+                tabMain.TabPages.Remove(tabAdmonCamiones);
             }
 
 
@@ -1161,14 +1232,17 @@ namespace ALISTAMIENTO_IE
             lstCamiones.Items.Clear();
             codCamiones.Clear();
 
+
+            // Obtener la lista de Camiones (solo el Modelo de Camion)
+            var res = await _camionService.ObtenerTodosAsync();
+
+            listadoCamiones = res.ToList(); // Asignar camiones (Luego, cuando se dé doble click, el comboBox se llena.)
+
             RefrescarListaCamiones();
 
         }
 
-        private void lstCamiones_SelectedIndexChanged(object sender, EventArgs e)
-        {
 
-        }
         public async void RefrescarListaCamiones()
         {
             var result = await _camionXDiaService.GetByStatusAsync();
@@ -1304,7 +1378,7 @@ namespace ALISTAMIENTO_IE
                 .ToArray();
         }
 
-        private void lstCamiones_SelectedIndexChanged_1(object sender, EventArgs e)
+        private void lstCamiones_SelectedIndexChanged(object sender, EventArgs e)
         {
 
             camionesMarcados.Clear();
@@ -1347,7 +1421,7 @@ namespace ALISTAMIENTO_IE
 
         private void lvwListasCamiones_MouseDown(object sender, MouseEventArgs e)
         {
-            
+
         }
 
         private void btnExportar_Click(object sender, EventArgs e)
@@ -1369,6 +1443,103 @@ namespace ALISTAMIENTO_IE
                 bool current = clb.GetItemChecked(index);
                 clb.SetItemChecked(index, !current);
             }
+        }
+
+        private void cmbReporteFull_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_reporte == null || cmbReporteFull.SelectedValue == null)
+                return;
+
+            int idSeleccionado = (int)cmbReporteFull.SelectedValue;
+
+            var filtrado = _reporte
+                .Where(r => r.CodCamion == idSeleccionado)
+                .ToList();
+
+            var unidadesEnConflicto = Math.Round(Math.Abs(filtrado.Sum(r => r.PlanVsAlistado + r.AlistadoVsDespachado)), 1);
+            lblUnidadesTexto.Text = "Novedades";
+            lblUnidadesPacas.Text = unidadesEnConflicto.ToString();
+
+            lblCamionesNumero.Text = "1";
+
+            dgvResumen.DataSource = _dataGridViewExporter.ConvertDynamicToDataTable(filtrado);
+
+
+        }
+
+        private async void cmbCambiarCamion_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!_cambioManual) return;
+            if (cmbCambiarCamion.SelectedItem == null) return;
+
+            string nuevaPlaca = cmbCambiarCamion.Text;
+
+            if (nuevaPlaca.Equals(placaCamionSeleccionado, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            var result = MessageBox.Show(
+                $"¿Está seguro de cambiar el camión de {placaCamionSeleccionado} a {nuevaPlaca}?",
+                "Confirmar cambio",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+
+                long nuevoCodRegistroCamion = (long)cmbCambiarCamion.SelectedValue;
+                await _camionXDiaService.ActualizarRegistroCamionAsync(codCamionSeleccionado, nuevoCodRegistroCamion);
+                codRegistroCamionSeleccionado = nuevoCodRegistroCamion;
+                placaCamionSeleccionado = nuevaPlaca;
+                MessageBox.Show("Camión actualizado con éxito");
+                CargarUI();
+                lblTituloCamion.Text = $"CAMIÓN - {placaCamionSeleccionado}";
+
+
+            }
+            else
+            {
+                // Revertir selección
+                _cambioManual = false;
+                cmbCambiarCamion.SelectedIndex =
+                    listadoCamiones.FindIndex(a =>
+                        a.PLACAS.Equals(placaCamionSeleccionado, StringComparison.OrdinalIgnoreCase));
+                _cambioManual = true;
+            }
+        }
+
+        private void chkCambiarCamion_CheckedChanged(object sender, EventArgs e)
+        {
+            bool mostrar = chkCambiarCamion.Checked;
+
+            // Permisos:
+            bool tienePermiso =
+                UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]") ||
+                UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]");
+
+            if (!tienePermiso)
+            {
+                chkCambiarCamion.Checked = false;
+                return;
+            }
+
+            cmbCambiarCamion.Visible = mostrar;
+            _cambioManual = false;
+
+            if (mostrar)
+            {
+                // Cargar combo SOLO cuando se muestra
+                cmbCambiarCamion.DataSource = listadoCamiones;
+                cmbCambiarCamion.DisplayMember = "PLACAS";
+                cmbCambiarCamion.ValueMember = "COD_CAMION";
+
+                cmbCambiarCamion.SelectedValue = codCamionSeleccionado;
+            }
+            else
+            {
+                cmbCambiarCamion.SelectedValue = codCamionSeleccionado;
+            }
+
+            _cambioManual = true;
         }
     }
 }

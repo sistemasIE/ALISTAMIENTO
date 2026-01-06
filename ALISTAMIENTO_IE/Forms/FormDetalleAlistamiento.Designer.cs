@@ -56,9 +56,9 @@ namespace ALISTAMIENTO_IE.Forms
             tlpRoot.Padding = new Padding(10);
             tlpRoot.RowCount = 3;
             tlpRoot.RowStyles.Add(new RowStyle());
-            tlpRoot.RowStyles.Add(new RowStyle(SizeType.Absolute, 170F));
+            tlpRoot.RowStyles.Add(new RowStyle(SizeType.Absolute, 134F));
             tlpRoot.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tlpRoot.Size = new Size(701, 492);
+            tlpRoot.Size = new Size(518, 345);
             tlpRoot.TabIndex = 0;
             // 
             // lblTitulo
@@ -70,7 +70,7 @@ namespace ALISTAMIENTO_IE.Forms
             lblTitulo.Location = new Point(10, 10);
             lblTitulo.Margin = new Padding(0, 0, 0, 8);
             lblTitulo.Name = "lblTitulo";
-            lblTitulo.Size = new Size(681, 41);
+            lblTitulo.Size = new Size(498, 41);
             lblTitulo.TabIndex = 0;
             lblTitulo.Text = "DETALLE DE ALISTAMIENTO";
             lblTitulo.TextAlign = ContentAlignment.MiddleCenter;
@@ -86,7 +86,7 @@ namespace ALISTAMIENTO_IE.Forms
             tlpTop.Location = new Point(13, 62);
             tlpTop.Name = "tlpTop";
             tlpTop.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tlpTop.Size = new Size(675, 164);
+            tlpTop.Size = new Size(492, 128);
             tlpTop.TabIndex = 1;
             // 
             // grpStats
@@ -98,7 +98,7 @@ namespace ALISTAMIENTO_IE.Forms
             grpStats.Location = new Point(3, 3);
             grpStats.Name = "grpStats";
             grpStats.Padding = new Padding(8);
-            grpStats.Size = new Size(297, 158);
+            grpStats.Size = new Size(215, 122);
             grpStats.TabIndex = 0;
             grpStats.TabStop = false;
             grpStats.Text = "Estadísticas y Búsqueda";
@@ -120,7 +120,7 @@ namespace ALISTAMIENTO_IE.Forms
             tlpStats.RowStyles.Add(new RowStyle());
             tlpStats.RowStyles.Add(new RowStyle());
             tlpStats.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tlpStats.Size = new Size(281, 126);
+            tlpStats.Size = new Size(199, 90);
             tlpStats.TabIndex = 0;
             // 
             // lblTotalEtiquetasTitulo
@@ -131,7 +131,7 @@ namespace ALISTAMIENTO_IE.Forms
             lblTotalEtiquetasTitulo.ForeColor = Color.Black;
             lblTotalEtiquetasTitulo.Location = new Point(3, 0);
             lblTotalEtiquetasTitulo.Name = "lblTotalEtiquetasTitulo";
-            lblTotalEtiquetasTitulo.Size = new Size(134, 25);
+            lblTotalEtiquetasTitulo.Size = new Size(93, 25);
             lblTotalEtiquetasTitulo.TabIndex = 0;
             lblTotalEtiquetasTitulo.Text = "# Etiquetas:";
             // 
@@ -141,9 +141,9 @@ namespace ALISTAMIENTO_IE.Forms
             lblTotalEtiquetas.Dock = DockStyle.Fill;
             lblTotalEtiquetas.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             lblTotalEtiquetas.ForeColor = Color.FromArgb(0, 150, 70);
-            lblTotalEtiquetas.Location = new Point(143, 0);
+            lblTotalEtiquetas.Location = new Point(102, 0);
             lblTotalEtiquetas.Name = "lblTotalEtiquetas";
-            lblTotalEtiquetas.Size = new Size(135, 25);
+            lblTotalEtiquetas.Size = new Size(94, 25);
             lblTotalEtiquetas.TabIndex = 1;
             lblTotalEtiquetas.Text = "0";
             // 
@@ -155,7 +155,7 @@ namespace ALISTAMIENTO_IE.Forms
             lblTotalItemsTitulo.ForeColor = Color.Black;
             lblTotalItemsTitulo.Location = new Point(3, 25);
             lblTotalItemsTitulo.Name = "lblTotalItemsTitulo";
-            lblTotalItemsTitulo.Size = new Size(134, 25);
+            lblTotalItemsTitulo.Size = new Size(93, 25);
             lblTotalItemsTitulo.TabIndex = 2;
             lblTotalItemsTitulo.Text = "# Items:";
             // 
@@ -165,9 +165,9 @@ namespace ALISTAMIENTO_IE.Forms
             lblTotalItems.Dock = DockStyle.Fill;
             lblTotalItems.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             lblTotalItems.ForeColor = Color.FromArgb(0, 150, 70);
-            lblTotalItems.Location = new Point(143, 25);
+            lblTotalItems.Location = new Point(102, 25);
             lblTotalItems.Name = "lblTotalItems";
-            lblTotalItems.Size = new Size(135, 25);
+            lblTotalItems.Size = new Size(94, 25);
             lblTotalItems.TabIndex = 3;
             lblTotalItems.Text = "0";
             // 
@@ -184,7 +184,7 @@ namespace ALISTAMIENTO_IE.Forms
             tlpSearch.Name = "tlpSearch";
             tlpSearch.Padding = new Padding(0, 8, 0, 0);
             tlpSearch.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tlpSearch.Size = new Size(275, 70);
+            tlpSearch.Size = new Size(193, 34);
             tlpSearch.TabIndex = 4;
             // 
             // lblBuscar
@@ -195,7 +195,7 @@ namespace ALISTAMIENTO_IE.Forms
             lblBuscar.ForeColor = Color.Black;
             lblBuscar.Location = new Point(3, 8);
             lblBuscar.Name = "lblBuscar";
-            lblBuscar.Size = new Size(84, 62);
+            lblBuscar.Size = new Size(84, 26);
             lblBuscar.TabIndex = 0;
             lblBuscar.Text = "Buscar Item:";
             // 
@@ -205,7 +205,7 @@ namespace ALISTAMIENTO_IE.Forms
             txtBuscarItem.Font = new Font("Segoe UI", 11F);
             txtBuscarItem.Location = new Point(93, 11);
             txtBuscarItem.Name = "txtBuscarItem";
-            txtBuscarItem.Size = new Size(179, 27);
+            txtBuscarItem.Size = new Size(97, 27);
             txtBuscarItem.TabIndex = 1;
             // 
             // grpObservaciones
@@ -214,10 +214,10 @@ namespace ALISTAMIENTO_IE.Forms
             grpObservaciones.Controls.Add(txtObservaciones);
             grpObservaciones.Dock = DockStyle.Fill;
             grpObservaciones.ForeColor = Color.FromArgb(0, 80, 180);
-            grpObservaciones.Location = new Point(306, 3);
+            grpObservaciones.Location = new Point(224, 3);
             grpObservaciones.Name = "grpObservaciones";
             grpObservaciones.Padding = new Padding(8);
-            grpObservaciones.Size = new Size(366, 158);
+            grpObservaciones.Size = new Size(265, 122);
             grpObservaciones.TabIndex = 1;
             grpObservaciones.TabStop = false;
             grpObservaciones.Text = "Observaciones";
@@ -231,7 +231,7 @@ namespace ALISTAMIENTO_IE.Forms
             txtObservaciones.Name = "txtObservaciones";
             txtObservaciones.ReadOnly = true;
             txtObservaciones.ScrollBars = ScrollBars.Vertical;
-            txtObservaciones.Size = new Size(350, 126);
+            txtObservaciones.Size = new Size(249, 90);
             txtObservaciones.TabIndex = 0;
             // 
             // dgvEtiquetas
@@ -241,12 +241,12 @@ namespace ALISTAMIENTO_IE.Forms
             dgvEtiquetas.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvEtiquetas.BackgroundColor = Color.White;
             dgvEtiquetas.Dock = DockStyle.Fill;
-            dgvEtiquetas.Location = new Point(13, 232);
+            dgvEtiquetas.Location = new Point(13, 196);
             dgvEtiquetas.Name = "dgvEtiquetas";
             dgvEtiquetas.ReadOnly = true;
             dgvEtiquetas.RowHeadersVisible = false;
-            dgvEtiquetas.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvEtiquetas.Size = new Size(675, 247);
+            dgvEtiquetas.SelectionMode = DataGridViewSelectionMode.CellSelect;
+            dgvEtiquetas.Size = new Size(492, 136);
             dgvEtiquetas.TabIndex = 2;
             // 
             // FormDetalleAlistamiento
@@ -254,7 +254,7 @@ namespace ALISTAMIENTO_IE.Forms
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(701, 492);
+            ClientSize = new Size(518, 345);
             Controls.Add(tlpRoot);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;

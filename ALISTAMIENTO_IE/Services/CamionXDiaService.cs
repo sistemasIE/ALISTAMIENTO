@@ -50,6 +50,37 @@ namespace ALISTAMIENTO_IE.Services
             }
         }
 
+
+
+        public async Task<IEnumerable<CamionXDia>> ObtenerCamionesDespachadosPorFecha(DateTime fecha)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionStringSIE))
+            {
+                string sql = @"
+                            SELECT 
+                                COD_CAMION AS CodCamion,
+                                FECHA AS Fecha,
+                                COD_EMPRESA_TRANSPORTE AS CodEmpresaTransporte,
+                                ESTADO AS Estado,
+                                COD_REGISTRO_CAMION AS CodRegistroCamion,
+                                COD_CONDUCTOR AS CodConductor
+                            FROM CAMION_X_DIA cxd
+                            WHERE 
+                                cxd.ESTADO = 'D'
+                                AND cxd.FECHA >= @Fecha
+                            ORDER BY 
+                                cxd.FECHA DESC;
+                            ";
+
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Fecha", fecha.Date);
+
+                return await connection.QueryAsync<CamionXDia>(sql, parameters);
+            }
+        }
+
+
         // === GET BY STATUS ===
         public async Task<IEnumerable<dynamic>> GetByStatusAsync()
         {
@@ -104,6 +135,23 @@ namespace ALISTAMIENTO_IE.Services
             }
         }
 
+        public async Task<bool> ActualizarRegistroCamionAsync(long codCamion, long codRegistroCamion)
+        {
+            using (var connection = new SqlConnection(_connectionStringSIE))
+            {
+                const string query = @"UPDATE CAMION_X_DIA
+                                       SET COD_REGISTRO_CAMION = @CodRegistroCamion
+                                       WHERE COD_CAMION = @CodCamion";
+                var affectedRows = await connection.ExecuteAsync(query, new
+                {
+                    CodRegistroCamion = codRegistroCamion,
+                    CodCamion = codCamion
+                });
+                return affectedRows > 0;
+            }
+        }
+
+
         // === DELETE ===
         public async Task<bool> DeleteAsync(long codCamion)
         {
@@ -141,5 +189,8 @@ namespace ALISTAMIENTO_IE.Services
                 return await connection.ExecuteAsync(sql, new { CodCamion = codCamion });
             }
         }
+
+
+     
     }
 }

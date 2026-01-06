@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 [Table("CAMION_X_DIA", Schema = "dbo")]
 public class CamionXDia
 {
-    [Key]
+    [Key]  
     [Column("COD_CAMION")]
     public long CodCamion { get; set; }
 
@@ -12,10 +12,10 @@ public class CamionXDia
     public DateTime? Fecha { get; set; }
 
     [Column("COD_EMPRESA_TRANSPORTE")]
-    public string CodEmpresaTransporte { get; set; }
+    public string? CodEmpresaTransporte { get; set; }  // <-- nullable
 
     [Column("ESTADO")]
-    public string Estado { get; set; }
+    public string? Estado { get; set; } // char(1), pero string funciona
 
     [Column("COD_REGISTRO_CAMION")]
     public long? CodRegistroCamion { get; set; }
