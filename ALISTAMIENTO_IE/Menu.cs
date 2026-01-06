@@ -787,7 +787,7 @@ namespace ALISTAMIENTO_IE
                             CANT_SALDO = m.CANT_SALDO,
                             NOTAS_DEL_DOCTO = m.NOTAS_DEL_DOCTO
                         };
-                        if (movimiento.BOD_SALIDA is not ("BODEGA INTEGRAL EMPAQUES" or "BODEGA TERCEROS IE" or "017" or "051C" or "050" or "045"))
+                        if (movimiento.BOD_SALIDA is not ("BODEGA INTEGRAL EMPAQUES" or "BODEGA TERCEROS IE" or "017" or "051C" or "050" or "045" or "BODEGA TERCEROS PEREZ MACA IE"))
                         {
 
                             //MessageBox.Show("Por favor revise la bodega de salida del Documento " + movimiento.NUM_DOCUMENTO);

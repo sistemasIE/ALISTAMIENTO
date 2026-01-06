@@ -32,6 +32,51 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# .NET build artifacts - ENHANCED
+**/bin/**
+**/obj/**
+*.dll
+*.exe
+*.pdb
+*.dll.config
+*.cache
+*.ilk
+*.log
+*.lib
+*.sbr
+*.scc
+*.sig
+*.xdc
+*.xsd.cs
+
+# NuGet artifacts
+*.nuget.props
+*.nuget.targets
+project.assets.json
+project.fragment.lock.json
+project.lock.json
+*.nuget.dgspec.json
+*.nuget.g.props
+*.nuget.g.targets
+*.nuget.cache
+
+# MSBuild artifacts
+*.csproj.nuget.dgspec.json
+*.csproj.nuget.g.props
+*.csproj.nuget.g.targets
+*.csproj.AssemblyReference.cache
+*.csproj.CoreCompileInputs.cache
+*.csproj.FileListAbsolute.txt
+
+# .NET Core/8 build output
+*.AssemblyInfo.cs
+*.AssemblyInfoInputs.cache
+*.GeneratedMSBuildEditorConfig.editorconfig
+*.assets.cache
+*.sourcelink.json
+**/ref/**/*.dll
+**/refint/**/*.dll
+
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
@@ -58,8 +103,6 @@ dlldata.c
 BenchmarkDotNet.Artifacts/
 
 # .NET Core
-project.lock.json
-project.fragment.lock.json
 artifacts/
 
 # ASP.NET Scaffolding
@@ -72,31 +115,26 @@ StyleCopReport.xml
 *_i.c
 *_p.c
 *_h.h
-*.ilk
 *.meta
 *.obj
 *.iobj
 *.pch
-*.pdb
 *.ipdb
 *.pgc
 *.pgd
 *.rsp
-*.sbr
 *.tlb
 *.tli
 *.tlh
 *.tmp
 *.tmp_proj
 *_wpftmp.csproj
-*.log
 *.tlog
 *.vspscc
 *.vssscc
 .builds
 *.pidb
 *.svclog
-*.scc
 
 # Chutzpah Test files
 _Chutzpah*
@@ -202,9 +240,6 @@ PublishScripts/
 !**/[Pp]ackages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/[Pp]ackages/repositories.config
-# NuGet v3's project.json files produces more ignorable files
-*.nuget.props
-*.nuget.targets
 
 # Microsoft Azure Build Output
 csx/
@@ -302,8 +337,6 @@ node_modules/
 *.dsp
 
 # Visual Studio 6 technical files
-*.ncb
-*.aps
 
 # Visual Studio LightSwitch build output
 **/*.HTMLClient/GeneratedArtifacts

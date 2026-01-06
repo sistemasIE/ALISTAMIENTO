@@ -275,6 +275,41 @@ namespace ALISTAMIENTO_IE.Services
 
                 return await connection.QueryAsync<MovimientoDoctoDto>(sqlTts, new { consecDocto, idTipoDocto, idCia });
             }
+            else if (string.Equals(idTipoDocto, "SAT", StringComparison.OrdinalIgnoreCase))
+            {
+                // === Query TTS (u otros) ===
+                const string sqlSat = @"
+            SELECT 
+                t350.f350_rowid,
+                t350.f350_fecha AS FECHA,
+                CASE t350.f350_id_cia WHEN 1 THEN 'RD/' WHEN 2 THEN 'IE/' END
+                    + t350.f350_id_tipo_docto + '-' + CONVERT(nvarchar(20), t350.f350_consec_docto) AS NUM_DOCUMENTO,
+                CASE t350.f350_ind_estado 
+                    WHEN 0 THEN 'EN ELABORACION' 
+                    WHEN 1 THEN 'APROBADO' 
+                    WHEN 2 THEN 'ANULADO' 
+                END AS ESTADO,
+                '' AS NOMBRE_CONDUCTOR,
+                bod_s.f150_descripcion AS BOD_SALIDA,
+                (bod_e.f150_id + '-->' + bod_e.f150_id) AS BOD_ENTRADA,
+                CONVERT(nvarchar(50), t120.f120_id) + ' ->' + CONVERT(nvarchar(200), t120.f120_descripcion) AS ITEM_RESUMEN,
+                t470.f470_cant_base AS CANT_SALDO,
+                t350.f350_notas AS NOTAS_DEL_DOCTO
+            FROM t350_co_docto_contable        AS t350
+            JOIN t470_cm_movto_invent          AS t470  ON t470.f470_rowid_docto     = t350.f350_rowid
+            JOIN t121_mc_items_extensiones     AS t121  ON t121.f121_rowid           = t470.f470_rowid_item_ext
+            JOIN t120_mc_items                 AS t120  ON t120.f120_rowid           = t121.f121_rowid_item
+            JOIN t450_cm_docto_invent          AS t450  ON t450.f450_rowid_docto     = t350.f350_rowid
+            JOIN t150_mc_bodegas               AS bod_s ON bod_s.f150_rowid          = t470.f470_rowid_bodega
+            LEFT JOIN t150_mc_bodegas          AS bod_e ON bod_e.f150_rowid          = t450.f450_rowid_bodega_entrada
+            WHERE 
+                UPPER(t350.f350_id_tipo_docto) = UPPER(@idTipoDocto)
+                AND t350.f350_consec_docto     = @consecDocto
+                AND t350.f350_id_cia           = @idCia
+            ORDER BY t350.f350_fecha DESC, t120.f120_id;";
+
+                return await connection.QueryAsync<MovimientoDoctoDto>(sqlSat, new { consecDocto, idTipoDocto, idCia });
+            }
             else if (string.Equals(idTipoDocto, "PVP", StringComparison.OrdinalIgnoreCase))
             {
                 const string sqlPvp = @"

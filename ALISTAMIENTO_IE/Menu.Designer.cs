@@ -129,10 +129,10 @@
             btnAdminGuardar = new Button();
             btnAdminCrear = new Button();
             pictureBox4 = new PictureBox();
+            label13 = new Label();
             label10 = new Label();
             label4 = new Label();
             pictureBox3 = new PictureBox();
-            label13 = new Label();
             tabMain.SuspendLayout();
             tabAlistar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)tlpMain).BeginInit();
@@ -520,11 +520,11 @@
             // tabReportes
             // 
             tabReportes.Controls.Add(tlpReportes);
-            tabReportes.Location = new Point(4, 24);
+            tabReportes.Location = new Point(4, 30);
             tabReportes.Margin = new Padding(2);
             tabReportes.Name = "tabReportes";
             tabReportes.Padding = new Padding(6);
-            tabReportes.Size = new Size(1202, 488);
+            tabReportes.Size = new Size(1202, 482);
             tabReportes.TabIndex = 1;
             tabReportes.Text = "Reportes";
             tabReportes.UseVisualStyleBackColor = true;
@@ -545,7 +545,7 @@
             tlpReportes.RowCount = 2;
             tlpReportes.RowStyles.Add(new RowStyle(SizeType.Absolute, 39F));
             tlpReportes.RowStyles.Add(new RowStyle(SizeType.Absolute, 19F));
-            tlpReportes.Size = new Size(1190, 476);
+            tlpReportes.Size = new Size(1190, 470);
             tlpReportes.TabIndex = 0;
             // 
             // label3
@@ -579,7 +579,7 @@
             tlpFiltros.RowStyles.Add(new RowStyle());
             tlpFiltros.RowStyles.Add(new RowStyle());
             tlpFiltros.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tlpFiltros.Size = new Size(220, 433);
+            tlpFiltros.Size = new Size(220, 427);
             tlpFiltros.TabIndex = 0;
             // 
             // lblEscogeFecha
@@ -657,7 +657,7 @@
             tlpResumenHost.RowCount = 2;
             tlpResumenHost.RowStyles.Add(new RowStyle());
             tlpResumenHost.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tlpResumenHost.Size = new Size(962, 433);
+            tlpResumenHost.Size = new Size(962, 427);
             tlpResumenHost.TabIndex = 1;
             // 
             // tbcReportes
@@ -757,7 +757,7 @@
             grpResumen.Margin = new Padding(2);
             grpResumen.Name = "grpResumen";
             grpResumen.Padding = new Padding(6);
-            grpResumen.Size = new Size(958, 345);
+            grpResumen.Size = new Size(958, 339);
             grpResumen.TabIndex = 1;
             grpResumen.TabStop = false;
             // 
@@ -776,7 +776,7 @@
             tlpResumen.RowCount = 2;
             tlpResumen.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
             tlpResumen.RowStyles.Add(new RowStyle(SizeType.Percent, 45F));
-            tlpResumen.Size = new Size(946, 311);
+            tlpResumen.Size = new Size(946, 305);
             tlpResumen.TabIndex = 0;
             // 
             // dgvResumen
@@ -795,7 +795,7 @@
             dgvResumen.ReadOnly = true;
             dgvResumen.RowHeadersWidth = 51;
             dgvResumen.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvResumen.Size = new Size(747, 167);
+            dgvResumen.Size = new Size(747, 163);
             dgvResumen.TabIndex = 0;
             // 
             // pnlKpis
@@ -809,7 +809,7 @@
             pnlKpis.Margin = new Padding(2);
             pnlKpis.Name = "pnlKpis";
             pnlKpis.Padding = new Padding(6);
-            pnlKpis.Size = new Size(191, 167);
+            pnlKpis.Size = new Size(191, 163);
             pnlKpis.TabIndex = 1;
             // 
             // lblCamionesTexto
@@ -865,14 +865,14 @@
             dgvMovimientos.ColumnHeadersHeight = 29;
             tlpResumen.SetColumnSpan(dgvMovimientos, 2);
             dgvMovimientos.Dock = DockStyle.Fill;
-            dgvMovimientos.Location = new Point(2, 173);
+            dgvMovimientos.Location = new Point(2, 169);
             dgvMovimientos.Margin = new Padding(2);
             dgvMovimientos.Name = "dgvMovimientos";
             dgvMovimientos.ReadOnly = true;
             dgvMovimientos.RowHeadersVisible = false;
             dgvMovimientos.RowHeadersWidth = 51;
             dgvMovimientos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvMovimientos.Size = new Size(942, 136);
+            dgvMovimientos.Size = new Size(942, 134);
             dgvMovimientos.TabIndex = 2;
             // 
             // pictureBox2
@@ -889,9 +889,9 @@
             // 
             tabCargueMasivo.Controls.Add(lblProgreso);
             tabCargueMasivo.Controls.Add(tableLayoutPanel2);
-            tabCargueMasivo.Location = new Point(4, 24);
+            tabCargueMasivo.Location = new Point(4, 30);
             tabCargueMasivo.Name = "tabCargueMasivo";
-            tabCargueMasivo.Size = new Size(1202, 488);
+            tabCargueMasivo.Size = new Size(1202, 482);
             tabCargueMasivo.TabIndex = 2;
             tabCargueMasivo.Text = "Cargue";
             tabCargueMasivo.UseVisualStyleBackColor = true;
@@ -1531,6 +1531,15 @@
             pictureBox4.TabIndex = 2;
             pictureBox4.TabStop = false;
             // 
+            // label13
+            // 
+            label13.AutoSize = true;
+            label13.Location = new Point(3, 0);
+            label13.Name = "label13";
+            label13.Size = new Size(424, 189);
+            label13.TabIndex = 3;
+            label13.Text = resources.GetString("label13.Text");
+            // 
             // label10
             // 
             label10.AutoSize = true;
@@ -1563,15 +1572,6 @@
             pictureBox3.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox3.TabIndex = 15;
             pictureBox3.TabStop = false;
-            // 
-            // label13
-            // 
-            label13.AutoSize = true;
-            label13.Location = new Point(3, 0);
-            label13.Name = "label13";
-            label13.Size = new Size(424, 189);
-            label13.TabIndex = 3;
-            label13.Text = resources.GetString("label13.Text");
             // 
             // Menu
             // 
