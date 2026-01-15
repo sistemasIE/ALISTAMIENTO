@@ -20,6 +20,8 @@ public interface IAlistamientoService
     Task<bool> ExisteAlistamientoActivo(int idCamionDia);
     Task<IEnumerable<CamionItemsDto>> ObtenerItemsPorAlistarCamion(int camionId);
     Task<List<ReporteTrazabilidadDto>> ObtenerReporteTrazabilidad(IEnumerable<int> codCamiones);
+
+    void ActualizarEstadoAlistamiento(int idAlistamiento, string nuevoEstado, string observaciones);
     void ActualizarAlistamiento(int idAlistamiento, string nuevoEstado, string observaciones, DateTime? fechaFin);
     void AgregarFilaTotalesADataTable(DataTable dataTable, ReporteImpresionTotalesDto totales);
 

@@ -28,9 +28,9 @@ namespace ALISTAMIENTO_IE
         private List<long> camionesMarcados = new List<long>();
         private List<Camion> listadoCamiones;
         private string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
-        private string _estadoAlistamiento;
+        private AlistamientoEstado? _estadoAlistamiento;
         private bool _cambioManual = false;
-
+        private Alistamiento _alistamientoSeleccionado;
         // Binding source para poder editar DataGridViews de administración
         // Por cada nueva entidad administrable, agregar un BindingSource
         private BindingSource bsCamiones = new();
@@ -361,7 +361,12 @@ namespace ALISTAMIENTO_IE
             // Recuperar el CodCamion que se guardó en el Tag (El CodCamion de CAMION_X_DIA)
             codCamionSeleccionado = selectedItem.Tag is int tag ? tag : 0;
             // Acceder al estado del alistamiento (columna índice 3)
-            _estadoAlistamiento = selectedItem.SubItems[3].Text;
+
+            string alistamientoEstadoTexto = selectedItem.SubItems[3].Text;
+
+            if (Enum.TryParse(alistamientoEstadoTexto, out AlistamientoEstado estadoAlistamiento)){
+                _estadoAlistamiento = estadoAlistamiento;
+            }
 
             // Recuperar los valores de cada columna (SubItems)
             placaCamionSeleccionado = selectedItem.SubItems[0].Text;     // Placas
@@ -381,13 +386,11 @@ namespace ALISTAMIENTO_IE
             else if (codCamionSeleccionado > 0)
             {
 
-
-                if (_estadoAlistamiento == "ALISTADO" || _estadoAlistamiento == "ALISTADO_INCOMPLETO")
+                if (_estadoAlistamiento is not AlistamientoEstado.SIN_ALISTAR)
                 {
-                    await _alistamientoService.CargarCamionDia(codCamionSeleccionado, this.dgvItems);
-
-                    // Muestra el checkbox de 'Cambiar Camión'
-
+                    await _alistamientoService.CargarCamionDia(codCamionSeleccionado, dgvItems);
+                     _alistamientoSeleccionado = await _alistamientoService.ObtenerAlistamientoPorCamionDia(codCamionSeleccionado);
+                    cmbEstadoCamion.SelectedItem = _estadoAlistamiento;
                 }
                 else
                 {
@@ -441,21 +444,21 @@ namespace ALISTAMIENTO_IE
             string estadoActual = GetSelectedCamionEstado();
 
             // Validar que el estado permita el alistamiento
-            if (estadoActual == "EN_PROCESO")
+            if (estadoActual == AlistamientoEstado.EN_PROCESO.ToString())
             {
                 MessageBox.Show("Este camión ya tiene un alistamiento en proceso. No se puede iniciar un nuevo alistamiento.",
                               "Estado No Válido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (estadoActual == "ALISTADO")
+            if (estadoActual == AlistamientoEstado.ALISTADO.ToString())
             {
                 MessageBox.Show("Este camión ya ha sido alistado completamente. No se puede volver a alistar.",
                               "Estado No Válido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (estadoActual == "ANULADO")
+            if (estadoActual == AlistamientoEstado.ANULADO.ToString())
             {
                 MessageBox.Show("Este camión tiene un alistamiento anulado. No se puede alistar.",
                               "Estado No Válido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -463,7 +466,7 @@ namespace ALISTAMIENTO_IE
             }
 
             // Solo permitir alistamiento para estados: SIN_ALISTAR y ALISTADO_INCOMPLETO
-            if (estadoActual != "SIN_ALISTAR" && estadoActual != "ALISTADO_INCOMPLETO")
+            if (estadoActual != AlistamientoEstado.SIN_ALISTAR.ToString() && estadoActual != AlistamientoEstado.ALISTADO_INCOMPLETO.ToString())
             {
                 MessageBox.Show($"No se puede alistar un camión con estado '{estadoActual}'.",
                               "Estado No Válido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -471,7 +474,7 @@ namespace ALISTAMIENTO_IE
             }
 
             // Si llegamos aquí, el estado es válido para alistamiento
-            string mensaje = estadoActual == "ALISTADO_INCOMPLETO"
+            string mensaje = estadoActual == AlistamientoEstado.ALISTADO_INCOMPLETO.ToString()
                 ? "Este camión tiene un alistamiento incompleto. ¿Desea CONTINUAR con el alistamiento?"
                 : "¿Desea INICIAR el alistamiento de este camión?";
 
@@ -989,7 +992,6 @@ namespace ALISTAMIENTO_IE
             return sb.ToString();
         }
 
-        // Agregar este helper en la clase ALISTAR_CAMION:
         private void ClearUploadStateAfterSave()
         {
             try
@@ -1015,7 +1017,6 @@ namespace ALISTAMIENTO_IE
             listaNormal?.Clear();
             listaAgrupada?.Clear();
         }
-
 
         private async void btnCrearCamiones_Click(object sender, EventArgs e)
         {
@@ -1246,11 +1247,11 @@ namespace ALISTAMIENTO_IE
             bool esCargueMasivo = UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]");
             bool esOperador = UserLoginCache.TienePermisoLike($"Operador - [{nombreApp}]");
 
-            if (esAdmin)
+            if (ALISTAMIENTO_IE_SECURITY.isAdmin)
                 return; // 🔓 ve todo, no tocar nada
 
             // ❌ Tabs que NO ve un no-admin
-           
+
             if (tabMain.TabPages.Contains(tabAdmonCamiones))
                 tabMain.TabPages.Remove(tabAdmonCamiones);
 
@@ -1295,6 +1296,20 @@ namespace ALISTAMIENTO_IE
 
             RefrescarListaCamiones();
 
+            if (ALISTAMIENTO_IE_SECURITY.isAdmin)
+            {
+                cmbEstadoCamion.DataSource = Enum.GetValues(typeof(AlistamientoEstado))
+                    .Cast<AlistamientoEstado>()
+                    .Where(e => e != AlistamientoEstado.SIN_ALISTAR  )
+                    .ToList();
+            }
+            else
+            {
+                cmbEstadoCamion.DataSource = Enum.GetValues(typeof(AlistamientoEstado))
+                .Cast<AlistamientoEstado>()
+                .Where(e => e != AlistamientoEstado.ANULADO && e != AlistamientoEstado.SIN_ALISTAR && e != AlistamientoEstado.ALISTADO)
+                .ToList();              
+            }
         }
 
 
@@ -1474,10 +1489,6 @@ namespace ALISTAMIENTO_IE
             }
         }
 
-        private void lvwListasCamiones_MouseDown(object sender, MouseEventArgs e)
-        {
-
-        }
 
         private void btnExportar_Click(object sender, EventArgs e)
         {
@@ -1795,6 +1806,71 @@ namespace ALISTAMIENTO_IE
             CargarInfoAdmin();
 
             _cooldownTimer.Start();
+        }
+
+        private void cmbEstadoCamion_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbEstadoCamion.SelectedIndex == -1 || _estadoAlistamiento is null) return;
+            if (cmbEstadoCamion.SelectedItem is not AlistamientoEstado nuevoEstado || nuevoEstado == _estadoAlistamiento ) return;
+
+            // Estados que no pueden cambiarse desde aquí
+            if (_estadoAlistamiento == AlistamientoEstado.SIN_ALISTAR)
+            {
+                MessageBox.Show(
+                    "Debe de iniciar el alistamiento antes de modificar su estado.",
+                    "Atención",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+                cmbEstadoCamion.SelectedItem = _estadoAlistamiento;
+                return;
+            }
+            else
+            {
+                
+                   
+          // Advertencia informativa
+            if (nuevoEstado == AlistamientoEstado.ANULADO)
+            {
+                MessageBox.Show(
+                    "Para cambiar el Alistamiento a ANULADO, utiliza la opción de Administración de Camión.",
+                    "Atención",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+            }
+
+
+            var confirmar = MessageBox.Show(
+                    "¿Estás seguro que quieres cambiar el estado del alistamiento desde " +_estadoAlistamiento.ToString() +" a " +nuevoEstado.ToString()+ "?",
+                    "Confirmación",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                ) == DialogResult.Yes;
+
+            if (!confirmar)
+            {
+                cmbEstadoCamion.SelectedItem = _estadoAlistamiento;
+                return;
+            }
+
+                // Cambio de estado (único punto)
+                var observacion =
+                "\n - Se cambia el estado desde " +
+                _estadoAlistamiento +
+                " a " +
+                nuevoEstado;
+
+            _alistamientoService.ActualizarEstadoAlistamiento(
+                _alistamientoSeleccionado.IdAlistamiento,
+                nuevoEstado.ToString(),
+                _alistamientoSeleccionado.Observaciones + observacion
+            );
+
+            _estadoAlistamiento = nuevoEstado;
+            CargarUI();
+
+            }
         }
     }
 }
