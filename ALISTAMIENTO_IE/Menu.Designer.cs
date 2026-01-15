@@ -911,9 +911,9 @@
             // 
             tabCargueMasivo.Controls.Add(lblProgreso);
             tabCargueMasivo.Controls.Add(tableLayoutPanel2);
-            tabCargueMasivo.Location = new Point(4, 24);
+            tabCargueMasivo.Location = new Point(4, 30);
             tabCargueMasivo.Name = "tabCargueMasivo";
-            tabCargueMasivo.Size = new Size(1202, 533);
+            tabCargueMasivo.Size = new Size(1202, 527);
             tabCargueMasivo.TabIndex = 2;
             tabCargueMasivo.Text = "Cargue";
             tabCargueMasivo.UseVisualStyleBackColor = true;

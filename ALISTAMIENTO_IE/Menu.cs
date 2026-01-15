@@ -619,43 +619,50 @@ namespace ALISTAMIENTO_IE
             }
         }
 
+        private DataTable CargarTablaDesdeExcel()
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Title = "Selecciona un archivo de Excel",
+                Filter = "Archivos de Excel|*.xlsx;*.xls;*.xlsb;*.xlsm"
+            };
+
+            if (ofd.ShowDialog() != DialogResult.OK)
+            {
+                btnCargarArchivo.Enabled = true;
+                return null;
+            }
+
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            using var stream = File.Open(ofd.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var reader = ExcelReaderFactory.CreateReader(stream);
+
+            var conf = new ExcelDataSetConfiguration
+            {
+                ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
+            };
+
+            var ds = reader.AsDataSet(conf);
+            if (ds.Tables.Count == 0)
+            {
+                MessageBox.Show("El archivo no contiene hojas.");
+                btnCargarArchivo.Enabled = true;
+                return null;
+            }
+
+            return ds.Tables[0];
+        }
+
         private async void btnCargarArchivo_Click(object sender, EventArgs e)
         {
             btnCargarArchivo.Enabled = false;
             lstErrores.Items.Clear();
             try
             {
-                using var ofd = new OpenFileDialog
-                {
-                    Title = "Selecciona un archivo de Excel",
-                    Filter = "Archivos de Excel|*.xlsx;*.xls;*.xlsb;*.xlsm"
-                };
+               
 
-                if (ofd.ShowDialog() != DialogResult.OK)
-                {
-                    btnCargarArchivo.Enabled = true;
-                    return;
-                }
-
-                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-                using var stream = File.Open(ofd.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var reader = ExcelReaderFactory.CreateReader(stream);
-
-                var conf = new ExcelDataSetConfiguration
-                {
-                    ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
-                };
-
-                var ds = reader.AsDataSet(conf);
-                if (ds.Tables.Count == 0)
-                {
-                    MessageBox.Show("El archivo no contiene hojas.");
-                    btnCargarArchivo.Enabled = true;
-                    return;
-                }
-
-                DataTable dt = ds.Tables[0];
+                DataTable dt = CargarTablaDesdeExcel();
 
                 // --- Progreso: inicializar ---
                 progressBar1.Visible = true;
@@ -665,16 +672,17 @@ namespace ALISTAMIENTO_IE
                 lblProgreso.Visible = true;
                 lblProgreso.Text = $"0 / {dt.Rows.Count}";
 
+
+                // Cargar datos.
                 listaNormal = new List<MovimientoDocumentoDto>();
                 var itemsParaAgrupar = new List<(DateTime Fecha, string EmpresaTransporte, long CodCamion, long CodConductor, MovimientoDocumentoDto Movimiento)>();
-
                 int procesadas = 0;
-
                 var duplicados = dt.AsEnumerable()
                                 .GroupBy(f => f["ID DOCUMENTO"]?.ToString()?.Trim())
                                 .Where(g => !string.IsNullOrEmpty(g.Key) && g.Count() > 1)
                                 .Select(g => g.Key)
                                 .ToList();
+
 
                 if (duplicados.Any())
                 {
@@ -724,9 +732,6 @@ namespace ALISTAMIENTO_IE
                     var conductor = await _cargueMasivoService.ObtenerConductorPorCodigoAsync(codConductorLong);
                     var camion = await _cargueMasivoService.ObtenerCamionPorCodigoAsync(codCamionLong);
                     var movsDoc = await _cargueMasivoService.ObtenerMovimientosPorConsecutivoAsync(idDocumento, tipoDocumento, int.Parse(empresa));
-
-
-
 
 
                     if (documento == null)

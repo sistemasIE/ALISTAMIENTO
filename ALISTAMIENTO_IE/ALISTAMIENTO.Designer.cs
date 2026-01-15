@@ -501,6 +501,7 @@
             Name = "ALISTAMIENTO";
             Text = "ALISTAMIENTO";
             WindowState = FormWindowState.Maximized;
+            Load += ALISTAMIENTO_Load_1;
             grpErrores.ResumeLayout(false);
             tableLayoutPanel4.ResumeLayout(false);
             tableLayoutPanel4.PerformLayout();

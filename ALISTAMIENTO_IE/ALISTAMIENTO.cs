@@ -218,10 +218,10 @@ namespace ALISTAMIENTO_IE
             {
                 _fechaInicio = DateTime.Now;
 
-                if (_estadoAlistamientoInicial == AlistamientoEstado.ALISTADO_INCOMPLETO.ToString())
+                if (_estadoAlistamientoInicial == "ALISTADO_INCOMPLETO")
                 {
                     // CASO ESPECIAL: Continuar un alistamiento incompleto
-                    Alistamiento alistamientoIncompleto = _alistamientoService.ObtenerAlistamientoPorCodCamionYEstado(_idCamion, AlistamientoEstado.ALISTADO_INCOMPLETO.ToString());
+                    Alistamiento alistamientoIncompleto = _alistamientoService.ObtenerAlistamientoPorCodCamionYEstado(_idCamion, "ALISTADO_INCOMPLETO");
 
                     if (alistamientoIncompleto == null)
                     {
@@ -476,7 +476,7 @@ namespace ALISTAMIENTO_IE
                     if (result == DialogResult.OK)
                     {
                         // Se aceptó la observación y el alistamiento quedó incompleto
-                        _estadoAlistamiento = AlistamientoEstado.ALISTADO_INCOMPLETO.ToString();
+                        _estadoAlistamiento = "ALISTADO_INCOMPLETO";
                         e.Cancel = false;
                     }
                     else
@@ -871,7 +871,7 @@ namespace ALISTAMIENTO_IE
 
             if (res.Equals(true))
             {
-                _alistamientoService.ActualizarAlistamiento(_idAlistamiento, AlistamientoEstado.ALISTADO_INCOMPLETO.ToString(), "Alistamiento pausado por el usuario", DateTime.Now);
+                _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "ALISTADO_INCOMPLETO", "Alistamiento pausado por el usuario", DateTime.Now);
                 MessageBox.Show("Alistamiento PAUSADO.", "Pausa", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
 
@@ -1014,6 +1014,11 @@ namespace ALISTAMIENTO_IE
         private void button1_Click(object sender, EventArgs e)
         {
             RecargarUI();
+        }
+
+        private void ALISTAMIENTO_Load_1(object sender, EventArgs e)
+        {
+
         }
     }
 
