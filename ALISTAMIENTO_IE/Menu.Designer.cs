@@ -53,7 +53,7 @@
             cmbCambiarCamion = new ComboBox();
             chkCambiarCamion = new CheckBox();
             cmbEstadoCamion = new ComboBox();
-            label14 = new Label();
+            lblEstadoAlistamiento = new Label();
             tabReportes = new TabPage();
             tlpReportes = new TableLayoutPanel();
             label3 = new Label();
@@ -323,7 +323,7 @@
             tlpRight.Controls.Add(cmbCambiarCamion, 0, 4);
             tlpRight.Controls.Add(chkCambiarCamion, 0, 3);
             tlpRight.Controls.Add(cmbEstadoCamion, 0, 2);
-            tlpRight.Controls.Add(label14, 0, 1);
+            tlpRight.Controls.Add(lblEstadoAlistamiento, 0, 1);
             tlpRight.Dock = DockStyle.Fill;
             tlpRight.Location = new Point(8, 30);
             tlpRight.Margin = new Padding(2);
@@ -528,16 +528,18 @@
             cmbEstadoCamion.Name = "cmbEstadoCamion";
             cmbEstadoCamion.Size = new Size(121, 29);
             cmbEstadoCamion.TabIndex = 12;
+            cmbEstadoCamion.Visible = false;
             cmbEstadoCamion.SelectedIndexChanged += cmbEstadoCamion_SelectedIndexChanged;
             // 
-            // label14
+            // lblEstadoAlistamiento
             // 
-            label14.AutoSize = true;
-            label14.Location = new Point(3, 35);
-            label14.Name = "label14";
-            label14.Size = new Size(67, 20);
-            label14.TabIndex = 13;
-            label14.Text = "ESTADO";
+            lblEstadoAlistamiento.AutoSize = true;
+            lblEstadoAlistamiento.Location = new Point(3, 35);
+            lblEstadoAlistamiento.Name = "lblEstadoAlistamiento";
+            lblEstadoAlistamiento.Size = new Size(67, 20);
+            lblEstadoAlistamiento.TabIndex = 13;
+            lblEstadoAlistamiento.Text = "ESTADO";
+            lblEstadoAlistamiento.Visible = false;
             // 
             // tabReportes
             // 
@@ -1791,6 +1793,6 @@
         private Button btnAdminRecargar;
         private Label label13;
         private ComboBox cmbEstadoCamion;
-        private Label label14;
+        private Label lblEstadoAlistamiento;
     }
 }

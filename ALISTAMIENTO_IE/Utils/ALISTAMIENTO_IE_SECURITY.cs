@@ -12,5 +12,7 @@ namespace ALISTAMIENTO_IE.Utils
     {
         private static readonly string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
         public static bool isAdmin = UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]");
+        public static bool isLoader = UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]");
+        public static bool isOperator = UserLoginCache.TienePermisoLike($"Operador - [{nombreApp}]");
     }
 }

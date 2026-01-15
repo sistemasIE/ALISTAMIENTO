@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ALISTAMIENTO_IE.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+62cbe7cec22b32bd6d61a3d7f250d3fd0854b847")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3545f9b95879eb24d311e43930a84ad07ca7c36b")]
 [assembly: System.Reflection.AssemblyProductAttribute("ALISTAMIENTO_IE.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ALISTAMIENTO_IE.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

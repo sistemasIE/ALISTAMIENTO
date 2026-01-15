@@ -5,6 +5,7 @@ using ALISTAMIENTO_IE.Services;
 using ALISTAMIENTO_IE.Utils;
 using Common.cache;
 using ExcelDataReader;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data;
 using System.Reflection;
@@ -27,7 +28,6 @@ namespace ALISTAMIENTO_IE
         private List<ReporteTrazabilidadDto> _reporte;
         private List<long> camionesMarcados = new List<long>();
         private List<Camion> listadoCamiones;
-        private string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
         private AlistamientoEstado? _estadoAlistamiento;
         private bool _cambioManual = false;
         private Alistamiento _alistamientoSeleccionado;
@@ -397,11 +397,16 @@ namespace ALISTAMIENTO_IE
 
                     MostrarItemsDeCamion(codCamionSeleccionado);
 
-                    // Si es un Operador o un Administrador, le permitirá 'Alistar'
-                    if (!UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]"))
-                        btnAlistar.Visible = true;
 
                 }
+
+
+                // Si es un Operador o un Administrador, le permitirá 'Alistar'
+                if (!ALISTAMIENTO_IE_SECURITY.isLoader)
+                    btnAlistar.Visible = true;
+                    lblEstadoAlistamiento.Visible = true;
+                    cmbEstadoCamion.Visible = true;
+
 
                 chkCambiarCamion.Visible = true;
 
@@ -1241,11 +1246,6 @@ namespace ALISTAMIENTO_IE
 
         public void LimitarVistaPorUsuario()
         {
-            string nombreApp = Assembly.GetEntryAssembly()?.GetName().Name;
-
-            bool esAdmin = UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]");
-            bool esCargueMasivo = UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]");
-            bool esOperador = UserLoginCache.TienePermisoLike($"Operador - [{nombreApp}]");
 
             if (ALISTAMIENTO_IE_SECURITY.isAdmin)
                 return; // 🔓 ve todo, no tocar nada
@@ -1259,7 +1259,7 @@ namespace ALISTAMIENTO_IE
                 tabMain.TabPages.Remove(tabReportes);
 
             // ❌ Si NO tiene cargue masivo
-            if (!esCargueMasivo)
+            if (! ALISTAMIENTO_IE_SECURITY.isLoader)
             {
                 if (tabMain.TabPages.Contains(tabCargueMasivo))
                     tabMain.TabPages.Remove(tabCargueMasivo);
@@ -1270,7 +1270,7 @@ namespace ALISTAMIENTO_IE
             }
 
             // ❌ Si NO es operador
-            if (!esOperador)
+            if (!ALISTAMIENTO_IE_SECURITY.isOperator)
             {
                 btnAlistar.Visible = false;
                 btnVerMas.Visible = false;
@@ -1303,7 +1303,7 @@ namespace ALISTAMIENTO_IE
                     .Where(e => e != AlistamientoEstado.SIN_ALISTAR  )
                     .ToList();
             }
-            else
+            else if (ALISTAMIENTO_IE_SECURITY.isOperator)
             {
                 cmbEstadoCamion.DataSource = Enum.GetValues(typeof(AlistamientoEstado))
                 .Cast<AlistamientoEstado>()
@@ -1578,9 +1578,7 @@ namespace ALISTAMIENTO_IE
             bool mostrar = chkCambiarCamion.Checked;
 
             // Permisos:
-            bool tienePermiso =
-                UserLoginCache.TienePermisoLike($"Cargue Masivo - [{nombreApp}]") ||
-                UserLoginCache.TienePermisoLike($"Administrador - [{nombreApp}]");
+            bool tienePermiso = ALISTAMIENTO_IE_SECURITY.isLoader || ALISTAMIENTO_IE_SECURITY.isAdmin;
 
             if (!tienePermiso)
             {
