@@ -30,7 +30,6 @@ namespace ALISTAMIENTO_IE.Services
 
         }
 
-
         public async Task<IEnumerable<CamionItemsDto>> ObtenerItemsPorAlistarCamion(int camionId)
         {
 
@@ -80,9 +79,6 @@ namespace ALISTAMIENTO_IE.Services
             }
 
         }
-
-
-
 
         public async Task<List<ReporteTrazabilidadDto>> ObtenerReporteTrazabilidad(IEnumerable<int> codCamiones)
         {
@@ -227,9 +223,6 @@ namespace ALISTAMIENTO_IE.Services
             }
             return resultado;
         }
-
-
-
 
         /// <summary>
         /// Calcula los totales de un conjunto de ítems de camión
@@ -414,6 +407,24 @@ namespace ALISTAMIENTO_IE.Services
                 });
             }
         }
+
+        public void ActualizarEstadoAlistamiento(int idAlistamiento, string nuevoEstado, string observaciones)
+        {
+            using (var connection = new SqlConnection(_connectionStringMAIN))
+            {
+                string sql = @"UPDATE ALISTAMIENTO
+                               SET estado = @nuevoEstado,
+                                   observaciones = @observaciones
+                               WHERE idAlistamiento = @idAlistamiento";
+                connection.Execute(sql, new
+                {
+                    nuevoEstado,
+                    observaciones,
+                    idAlistamiento
+                });
+            }
+        }
+
 
         public Task<bool> ExisteAlistamientoActivo(int idCamionDia)
         {

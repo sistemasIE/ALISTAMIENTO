@@ -1,4 +1,13 @@
-﻿public partial class Alistamiento
+﻿public enum AlistamientoEstado
+{
+    ANULADO,
+    SIN_ALISTAR,
+    EN_PROCESO,
+    ALISTADO_INCOMPLETO,
+    ALISTADO
+}
+
+public partial class Alistamiento
 {
     public int IdAlistamiento { get; set; }
     public int IdCamionDia { get; set; }
@@ -7,4 +16,9 @@
     public DateTime? FechaFin { get; set; }
     public string Observaciones { get; set; }
     public string Estado { get; set; }
+
+
+
+
+
 }

@@ -218,10 +218,10 @@ namespace ALISTAMIENTO_IE
             {
                 _fechaInicio = DateTime.Now;
 
-                if (_estadoAlistamientoInicial == "ALISTADO_INCOMPLETO")
+                if (_estadoAlistamientoInicial == AlistamientoEstado.ALISTADO_INCOMPLETO.ToString())
                 {
                     // CASO ESPECIAL: Continuar un alistamiento incompleto
-                    Alistamiento alistamientoIncompleto = _alistamientoService.ObtenerAlistamientoPorCodCamionYEstado(_idCamion, "ALISTADO_INCOMPLETO");
+                    Alistamiento alistamientoIncompleto = _alistamientoService.ObtenerAlistamientoPorCodCamionYEstado(_idCamion, AlistamientoEstado.ALISTADO_INCOMPLETO.ToString());
 
                     if (alistamientoIncompleto == null)
                     {
@@ -476,7 +476,7 @@ namespace ALISTAMIENTO_IE
                     if (result == DialogResult.OK)
                     {
                         // Se aceptó la observación y el alistamiento quedó incompleto
-                        _estadoAlistamiento = "ALISTADO_INCOMPLETO";
+                        _estadoAlistamiento = AlistamientoEstado.ALISTADO_INCOMPLETO.ToString();
                         e.Cancel = false;
                     }
                     else
@@ -871,7 +871,7 @@ namespace ALISTAMIENTO_IE
 
             if (res.Equals(true))
             {
-                _alistamientoService.ActualizarAlistamiento(_idAlistamiento, "ALISTADO_INCOMPLETO", "Alistamiento pausado por el usuario", DateTime.Now);
+                _alistamientoService.ActualizarAlistamiento(_idAlistamiento, AlistamientoEstado.ALISTADO_INCOMPLETO.ToString(), "Alistamiento pausado por el usuario", DateTime.Now);
                 MessageBox.Show("Alistamiento PAUSADO.", "Pausa", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
 
